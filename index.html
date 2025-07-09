@@ -1,12 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Bobwealth's Site!</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bobwealth's Website</title>
 </head>
 <body>
-    <h1>Hello, World!</h1>
-    <p>This is Bobwealth's first web page. More coming soon!</p>
+  <h1>Welcome to Bobwealth's Site!</h1>
+
+  <!-- Logo Image -->
+  <img src="bobwealth.jpg" alt="Bobwealth logo" width="300" />
+
+  <p>This is just a placeholder. More content coming soon!</p>
+
+  <!-- Newsletter Signup -->
+  <hr>
+  <h2>📬 Subscribe to our Daily Stock Report</h2>
+  <form action="https://buttondown.email/api/emails/embed-subscribe/YOUR_USERNAME" method="post" target="popupwindow" onsubmit="window.open('https://buttondown.email/YOUR_USERNAME', 'popupwindow')" class="embeddable-buttondown-form">
+    <input type="email" name="email" id="bd-email" placeholder="you@example.com" required />
+    <input type="submit" value="Subscribe" />
+  </form>
 </body>
 </html>
