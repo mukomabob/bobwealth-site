@@ -5,8 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Bob Wealth Advisory</title>
 
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 
   <!-- SEO Meta Tags -->
@@ -28,7 +31,6 @@
       <a href="#">Home</a>
       <a href="#subscribe">Subscribe</a>
       <a href="#sources">Sources</a>
-      <a href="#what-we-do" class="nav-highlight">What We Do</a>
     </nav>
 
     <h1>Bob Wealth Advisory</h1>
@@ -36,13 +38,10 @@
 
     <section class="what-we-do" id="what-we-do">
       <h2 class="accordion-header" tabindex="0">What We Do ▼</h2>
-      <div class="accordion-content" hidden>
-        <p>
-          We will not tell you when to buy or sell.<br><br>
-          But we <strong>will</strong> comb through the markets every second — headlines, price movements, analyst commentary — and package the insights that matter to your portfolio.<br><br>
-          So you don’t have to waste your energy sorting through noise. We’ll deliver clear, actionable market context that keeps you sharp and confident.
-        </p>
-      </div>
+      <blockquote class="quote" hidden>
+        We don’t tell you when to buy or sell.<br />
+        We analyse the markets so you don’t have to.
+      </blockquote>
     </section>
 
     <p>Join the tribe of investors receiving curated insights on markets, strategy, and financial literacy. Delivered straight to your inbox.</p>
@@ -80,17 +79,17 @@
   </div>
 
   <script>
-    document.querySelectorAll('.accordion-header').forEach(header => {
-      header.addEventListener('click', () => {
-        const content = header.nextElementSibling;
-        if (content.hasAttribute('hidden')) {
-          content.removeAttribute('hidden');
-          header.textContent = "What We Do ▲";
-        } else {
-          content.setAttribute('hidden', '');
-          header.textContent = "What We Do ▼";
-        }
-      });
+    const accordionHeader = document.querySelector('.accordion-header');
+    const quoteBlock = document.querySelector('.quote');
+
+    accordionHeader.addEventListener('click', () => {
+      if (quoteBlock.hasAttribute('hidden')) {
+        quoteBlock.removeAttribute('hidden');
+        accordionHeader.textContent = "What We Do ▲";
+      } else {
+        quoteBlock.setAttribute('hidden', '');
+        accordionHeader.textContent = "What We Do ▼";
+      }
     });
   </script>
 
