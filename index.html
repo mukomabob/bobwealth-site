@@ -3,136 +3,180 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bob's Wealth Analytics | Market Overview</title>
+  <title>Bob Wealth Advisory</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      padding: 30px;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f8f8f8;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
       text-align: center;
     }
-    h1 {
-      color: #222;
-    }
-    .container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 30px;
-    }
-    table {
-      border-collapse: collapse;
+
+    .card {
       background: white;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      min-width: 300px;
-      margin-top: 20px;
+      padding: 40px 30px;
+      max-width: 500px;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      overflow-y: auto;
+      max-height: 90vh;
     }
-    th, td {
-      padding: 10px;
-      border: 1px solid #ddd;
+
+    h1 {
+      font-size: 28px;
+      color: #222;
+      margin-bottom: 10px;
     }
-    th {
-      background-color: #333;
-      color: white;
+
+    p {
+      font-size: 16px;
+      color: #555;
+      margin-top: 0;
     }
-    td a {
-      color: #0066cc;
-      text-decoration: none;
-    }
-    td a:hover {
-      text-decoration: underline;
-    }
+
     form {
       margin-top: 30px;
     }
+
     input[type="email"] {
-      padding: 10px;
+      padding: 12px;
+      width: 70%;
       font-size: 16px;
-      width: 250px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 15px;
     }
+
     input[type="submit"] {
-      padding: 10px 20px;
+      padding: 12px 25px;
       font-size: 16px;
-      background-color: #333;
+      background-color: #222;
       color: white;
       border: none;
+      border-radius: 8px;
       cursor: pointer;
     }
+
     input[type="submit"]:hover {
-      background-color: #555;
+      background-color: #444;
+    }
+
+    .tagline {
+      font-weight: bold;
+      color: #d18f00;
+      margin-top: 10px;
+    }
+
+    footer {
+      font-size: 12px;
+      margin-top: 30px;
+      color: #aaa;
+      line-height: 1.4;
+    }
+
+    .collapsible {
+      margin-top: 20px;
+      text-align: left;
+    }
+
+    .collapsible button {
+      background: none;
+      border: none;
+      color: #0066cc;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: underline;
+      padding: 0;
+    }
+
+    .collapsible-content {
+      display: none;
+      margin-top: 10px;
+      font-size: 14px;
+      color: #444;
+    }
+
+    section.sources {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 14px;
+      color: #555;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    section.sources a {
+      color: #0066cc;
+      text-decoration: none;
+      margin: 0 5px;
+    }
+
+    section.sources a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
+  <div class="card">
+    <h1>Bob Wealth Advisory</h1>
+    <p class="tagline">We help Africans make smarter investments.</p>
+    <p>Join the tribe of investors receiving curated insights on markets, strategy, and financial literacy. Delivered straight to your inbox.</p>
 
-  <h1>Bob's Wealth Analytics | Dashboard</h1>
+    <form 
+      action="https://buttondown.email/api/emails/embed-subscribe/mukomabob" 
+      method="post" 
+      target="popupwindow" 
+      onsubmit="window.open('https://buttondown.email/mukomabob', 'popupwindow')" 
+      class="embeddable-buttondown-form">
+      
+      <input type="email" name="email" placeholder="you@example.com" required /><br>
+      <input type="submit" value="Subscribe Now" />
+    </form>
 
-  <div class="container">
-    <div>
-      <h2>Top 10 S&P 500</h2>
-      <table>
-        <thead>
-          <tr><th>Symbol</th><th>Price</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>AAPL</td><td>$220.15</td></tr>
-          <tr><td>MSFT</td><td>$406.50</td></tr>
-          <tr><td>GOOGL</td><td>$188.11</td></tr>
-          <tr><td>AMZN</td><td>$204.13</td></tr>
-          <tr><td>NVDA</td><td>$129.45</td></tr>
-          <tr><td>BRK.B</td><td>$420.76</td></tr>
-          <tr><td>META</td><td>$489.14</td></tr>
-          <tr><td>TSLA</td><td>$272.93</td></tr>
-          <tr><td>AVGO</td><td>$1,735.21</td></tr>
-          <tr><td>UNH</td><td>$495.62</td></tr>
-        </tbody>
-      </table>
+    <section class="sources">
+      <p>
+        Every second, our bots are combing through the markets so that we deliver the news that affects your investments directly.<br>
+        For trusted information, we rely on:<br>
+        <a href="https://finance.yahoo.com" target="_blank" rel="noopener noreferrer">Yahoo Finance</a> | 
+        <a href="https://www.reuters.com" target="_blank" rel="noopener noreferrer">Reuters</a> | 
+        <a href="https://www.bbc.com/news" target="_blank" rel="noopener noreferrer">BBC News</a> | 
+        <a href="https://edition.cnn.com/business" target="_blank" rel="noopener noreferrer">CNN</a> | 
+        <a href="https://www.aljazeera.com/business" target="_blank" rel="noopener noreferrer">Al Jazeera</a> | 
+        <a href="https://news.sky.com/business" target="_blank" rel="noopener noreferrer">Sky News</a><br><br>
+        <strong>Quick — sign up and we’ll report back to you ASAP.</strong>
+      </p>
+    </section>
+
+    <div class="collapsible">
+      <button onclick="toggleContent()">What We Do</button>
+      <div class="collapsible-content" id="whatwedo">
+        <p>
+          We won't tell you when to buy or when to sell.<br><br>
+          But we <strong>will</strong> churn through the numbers across the markets — so you don’t have to.<br><br>
+          Every day, we scan what's happening globally and locally, extract what matters, and package it into clear, concise updates.<br><br>
+          You’ll get sharp market insights straight to your inbox — so you can make smarter investment decisions without sacrificing your time.
+        </p>
+      </div>
     </div>
 
-    <div>
-      <h2>Top 10 ZSE</h2>
-      <table>
-        <thead>
-          <tr><th>Symbol</th><th>Price</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Delta</td><td>ZWL 1,234.00</td></tr>
-          <tr><td>Econet</td><td>ZWL 678.50</td></tr>
-          <tr><td>CBZ</td><td>ZWL 998.20</td></tr>
-          <tr><td>Innscor</td><td>ZWL 2,140.90</td></tr>
-          <tr><td>OK Zim</td><td>ZWL 459.10</td></tr>
-          <tr><td>Hippo</td><td>ZWL 1,980.00</td></tr>
-          <tr><td>SeedCo</td><td>ZWL 732.00</td></tr>
-          <tr><td>NatFoods</td><td>ZWL 3,210.00</td></tr>
-          <tr><td>Padenga</td><td>ZWL 1,302.45</td></tr>
-          <tr><td>BAT</td><td>ZWL 4,500.00</td></tr>
-        </tbody>
-      </table>
-    </div>
+    <footer>
+      No spam. Just clarity.<br>
+      Contact us: <a href="mailto:admin@bobwealth.org">admin@bobwealth.org</a><br>
+      <small>We respect your privacy. Your email will only be used to send you market updates from Bob Wealth Advisory. You can unsubscribe anytime.</small>
+    </footer>
   </div>
 
-  <h2>Market News</h2>
-  <table>
-    <thead>
-      <tr><th>Title</th><th>Source</th></tr>
-    </thead>
-    <tbody>
-      <tr><td><a href="https://finance.yahoo.com" target="_blank">Global stocks surge after US jobs report</a></td><td>Yahoo Finance</td></tr>
-      <tr><td><a href="https://www.bloomberg.com/markets" target="_blank">ZSE rallies as investors hedge inflation risk</a></td><td>Bloomberg</td></tr>
-      <tr><td><a href="https://www.reuters.com/markets/" target="_blank">Nvidia hits new all-time high on AI optimism</a></td><td>Reuters</td></tr>
-    </tbody>
-  </table>
-
-  <form id="subscribe"
-        action="https://buttondown.email/api/emails/embed-subscribe/mukomabob" 
-        method="post" 
-        target="popupwindow" 
-        onsubmit="window.open('https://buttondown.email/mukomabob', 'popupwindow')" 
-        class="embeddable-buttondown-form">
-    <h2>Build with us daily</h2>
-    <input type="email" name="email" placeholder="you@example.com" required />
-    <input type="submit" value="Subscribe" />
-  </form>
-
+  <script>
+    function toggleContent() {
+      const content = document.getElementById("whatwedo");
+      content.style.display = content.style.display === "block" ? "none" : "block";
+    }
+  </script>
 </body>
 </html>
