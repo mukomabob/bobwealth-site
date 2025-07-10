@@ -24,29 +24,31 @@
   <meta name="twitter:title" content="Bob Wealth Advisory" />
   <meta name="twitter:description" content="Smart insights from global markets. Delivered daily." />
   <meta name="twitter:image" content="https://bobwealth.org/assets/share-preview.jpg" />
-
 </head>
 <body>
 
   <div class="container">
     <div class="logo">BWA</div>
+
     <nav>
       <a href="#">Home</a>
       <a href="#subscribe">Subscribe</a>
       <a href="#sources">Sources</a>
-      <a href="#what-we-do">What We Do</a>
+      <a href="#what-we-do" class="nav-highlight">What We Do</a>
     </nav>
 
     <h1>Bob Wealth Advisory</h1>
     <p class="tagline">We watch the markets so you don’t have to.</p>
 
     <section class="what-we-do" id="what-we-do">
-      <h2>What We Do</h2>
-      <p>
-        We will not tell you when to buy or sell.<br><br>
-        But we <strong>will</strong> comb through the markets every second — headlines, price movements, analyst commentary — and package the insights that matter to your portfolio.<br><br>
-        So you don’t have to waste your energy sorting through noise. We’ll deliver clear, actionable market context that keeps you sharp and confident.
-      </p>
+      <h2 class="accordion-header" tabindex="0">What We Do ▼</h2>
+      <div class="accordion-content" hidden>
+        <p>
+          We will not tell you when to buy or sell.<br><br>
+          But we <strong>will</strong> comb through the markets every second — headlines, price movements, analyst commentary — and package the insights that matter to your portfolio.<br><br>
+          So you don’t have to waste your energy sorting through noise. We’ll deliver clear, actionable market context that keeps you sharp and confident.
+        </p>
+      </div>
     </section>
 
     <p>Join the tribe of investors receiving curated insights on markets, strategy, and financial literacy. Delivered straight to your inbox.</p>
@@ -57,15 +59,15 @@
       target="popupwindow" 
       onsubmit="window.open('https://buttondown.email/mukomabob', 'popupwindow')" 
       class="embeddable-buttondown-form">
-      
-      <input type="email" name="email" placeholder="you@example.com" required /><br>
+
+      <input type="email" name="email" placeholder="you@example.com" required /><br />
       <input type="submit" value="Subscribe Now" />
     </form>
 
     <div class="sources" id="sources">
       <p>
-        Every second, our bots are combing through the markets so that we deliver the news that affects your investments directly.<br>
-        For trusted information, we rely on:<br>
+        Every second, our bots are combing through the markets so that we deliver the news that affects your investments directly.<br />
+        For trusted information, we rely on:<br />
         <a href="https://finance.yahoo.com" target="_blank" rel="noopener noreferrer">Yahoo Finance</a> | 
         <a href="https://www.reuters.com" target="_blank" rel="noopener noreferrer">Reuters</a> | 
         <a href="https://www.bbc.com/news" target="_blank" rel="noopener noreferrer">BBC News</a> | 
@@ -77,11 +79,26 @@
     </div>
 
     <footer>
-      No spam. Just clarity.<br>
-      Contact us: <a href="mailto:admin@bobwealth.org">admin@bobwealth.org</a><br>
+      No spam. Just clarity.<br />
+      Contact us: <a href="mailto:admin@bobwealth.org">admin@bobwealth.org</a><br />
       <small>We respect your privacy. Your email will only be used to send you market updates from Bob Wealth Advisory. You can unsubscribe anytime.</small>
     </footer>
   </div>
+
+  <script>
+    document.querySelectorAll('.accordion-header').forEach(header => {
+      header.addEventListener('click', () => {
+        const content = header.nextElementSibling;
+        if (content.hasAttribute('hidden')) {
+          content.removeAttribute('hidden');
+          header.textContent = "What We Do ▲";
+        } else {
+          content.setAttribute('hidden', '');
+          header.textContent = "What We Do ▼";
+        }
+      });
+    });
+  </script>
 
 </body>
 </html>
