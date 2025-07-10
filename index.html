@@ -6,50 +6,99 @@
   <title>Bob Wealth Advisory</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f8f8f8;
       margin: 0;
       padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #f0f4f8, #e9eef3);
+      color: #333;
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 650px;
+      padding: 40px 30px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
       text-align: center;
     }
 
-    .card {
-      background: white;
-      padding: 40px 30px;
-      max-width: 500px;
-      border-radius: 16px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-      overflow-y: auto;
-      max-height: 90vh;
+    .logo {
+      width: 60px;
+      height: 60px;
+      background-color: #222;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+      margin: 0 auto 20px auto;
+    }
+
+    nav {
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    nav a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: #0066cc;
     }
 
     h1 {
-      font-size: 28px;
-      color: #222;
+      font-size: 36px;
       margin-bottom: 10px;
+    }
+
+    .tagline {
+      font-size: 18px;
+      color: #d18f00;
+      margin-bottom: 25px;
+      font-weight: bold;
     }
 
     p {
       font-size: 16px;
+      line-height: 1.6;
       color: #555;
-      margin-top: 0;
+    }
+
+    .what-we-do {
+      margin: 30px 0 20px;
+      padding: 0 10px;
+    }
+
+    .what-we-do h2 {
+      font-size: 20px;
+      color: #222;
+      margin-bottom: 10px;
+    }
+
+    .what-we-do p {
+      font-size: 15px;
+      color: #444;
+      line-height: 1.6;
     }
 
     form {
-      margin-top: 30px;
+      margin: 30px 0;
     }
 
     input[type="email"] {
       padding: 12px;
       width: 70%;
+      max-width: 300px;
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 8px;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
     }
 
     input[type="submit"] {
@@ -66,69 +115,55 @@
       background-color: #444;
     }
 
-    .tagline {
-      font-weight: bold;
-      color: #d18f00;
-      margin-top: 10px;
+    .sources {
+      font-size: 14px;
+      margin-top: 30px;
+      line-height: 1.5;
+    }
+
+    .sources a {
+      color: #0066cc;
+      text-decoration: none;
+      margin: 0 4px;
+    }
+
+    .sources a:hover {
+      text-decoration: underline;
     }
 
     footer {
       font-size: 12px;
-      margin-top: 30px;
       color: #aaa;
-      line-height: 1.4;
-    }
-
-    .collapsible {
-      margin-top: 20px;
-      text-align: left;
-    }
-
-    .collapsible button {
-      background: none;
-      border: none;
-      color: #0066cc;
-      cursor: pointer;
-      font-size: 14px;
-      text-decoration: underline;
-      padding: 0;
-    }
-
-    .collapsible-content {
-      display: none;
-      margin-top: 10px;
-      font-size: 14px;
-      color: #444;
-    }
-
-    section.sources {
       margin-top: 40px;
-      text-align: center;
-      font-size: 14px;
-      color: #555;
-      max-width: 480px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    section.sources a {
-      color: #0066cc;
-      text-decoration: none;
-      margin: 0 5px;
-    }
-
-    section.sources a:hover {
-      text-decoration: underline;
+      line-height: 1.4;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Bob Wealth Advisory</h1>
-    <p class="tagline">We help Africans make smarter investments.</p>
-    <p>Join the tribe of investors receiving curated insights on markets, strategy, and financial literacy. Delivered straight to your inbox.</p>
 
-    <form 
+  <div class="container">
+    <div class="logo">BWA</div>
+    <nav>
+      <a href="#">Home</a>
+      <a href="#subscribe">Subscribe</a>
+      <a href="#sources">Sources</a>
+    </nav>
+
+    <h1>Bob's Wealth Advisory</h1>
+    <p class="tagline">We watch the markets so you don’t have to.</p>
+
+    <section class="what-we-do">
+      <h2>What We Do</h2>
+      <p>
+        We will not tell you when to buy or sell.<br><br>
+        But we <strong>will</strong> comb through the markets every second for headlines, articles, price movements, analyst commentaries and package the insights that matter to your portfolio.<br><br>
+        So you don’t have to waste your energy sorting through noise. We’ll deliver clear, actionable market context that keeps you sharp and confident.
+      </p>
+    </section>
+
+    <p>Join the elite society of investors receiving curated insights on markets, strategy, and financial literacy. Delivered straight to your inbox.</p>
+
+    <form id="subscribe"
       action="https://buttondown.email/api/emails/embed-subscribe/mukomabob" 
       method="post" 
       target="popupwindow" 
@@ -139,7 +174,7 @@
       <input type="submit" value="Subscribe Now" />
     </form>
 
-    <section class="sources">
+    <div class="sources" id="sources">
       <p>
         Every second, our bots are combing through the markets so that we deliver the news that affects your investments directly.<br>
         For trusted information, we rely on:<br>
@@ -148,21 +183,9 @@
         <a href="https://www.bbc.com/news" target="_blank" rel="noopener noreferrer">BBC News</a> | 
         <a href="https://edition.cnn.com/business" target="_blank" rel="noopener noreferrer">CNN</a> | 
         <a href="https://www.aljazeera.com/business" target="_blank" rel="noopener noreferrer">Al Jazeera</a> | 
-        <a href="https://news.sky.com/business" target="_blank" rel="noopener noreferrer">Sky News</a><br><br>
-        <strong>Quick — sign up and we’ll report back to you ASAP.</strong>
+        <a href="https://news.sky.com/business" target="_blank" rel="noopener noreferrer">Sky News</a>
       </p>
-    </section>
-
-    <div class="collapsible">
-      <button onclick="toggleContent()">What We Do</button>
-      <div class="collapsible-content" id="whatwedo">
-        <p>
-          We won't tell you when to buy or when to sell.<br><br>
-          But we <strong>will</strong> churn through the numbers across the markets — so you don’t have to.<br><br>
-          Every day, we scan what's happening globally and locally, extract what matters, and package it into clear, concise updates.<br><br>
-          You’ll get sharp market insights straight to your inbox — so you can make smarter investment decisions without sacrificing your time.
-        </p>
-      </div>
+      <p><strong>Quick — sign up and we’ll report back to you ASAP.</strong></p>
     </div>
 
     <footer>
@@ -172,11 +195,5 @@
     </footer>
   </div>
 
-  <script>
-    function toggleContent() {
-      const content = document.getElementById("whatwedo");
-      content.style.display = content.style.display === "block" ? "none" : "block";
-    }
-  </script>
 </body>
 </html>
