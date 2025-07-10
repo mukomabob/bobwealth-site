@@ -3,8 +3,8 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: #f5f3ef;
-  color: #333;
+  background: #f0e6d2; /* khaki beige */
+  color: #374151; /* dark gray text */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -26,7 +26,7 @@ body {
 .logo {
   width: 60px;
   height: 60px;
-  background-color: #003049;
+  background-color: #556b2f; /* olive green */
   color: white;
   border-radius: 50%;
   display: flex;
@@ -46,47 +46,66 @@ nav {
 nav a {
   margin: 0 10px;
   text-decoration: none;
-  color: #003049;
+  color: #556b2f; /* olive green */
   font-weight: 600;
   letter-spacing: 0.05em;
 }
 
 nav a:hover {
   text-decoration: underline;
-  color: #0f766e;
+  color: #9caf88; /* lighter olive green */
+}
+
+/* Highlight nav link */
+nav a.nav-highlight {
+  color: #556b2f; /* olive green */
+  font-weight: 700;
+  border-bottom: 2px solid #556b2f;
+  padding-bottom: 2px;
+}
+
+nav a.nav-highlight:hover {
+  color: #9caf88;
+  border-color: #9caf88;
 }
 
 /* Headings */
 h1 {
   font-size: 36px;
   margin-bottom: 10px;
-  color: #003049;
+  color: #556b2f; /* olive green */
 }
 
 .tagline {
   font-size: 18px;
-  color: #003049;
+  color: #556b2f; /* olive green */
   margin-bottom: 25px;
   font-weight: bold;
 }
 
-/* What We Do section */
-.what-we-do {
-  margin: 30px 0 20px;
-  padding: 0 10px;
-  text-align: left;
-}
-
-.what-we-do h2 {
-  font-size: 22px;
-  color: #003049;
+/* Accordion */
+.accordion-header {
+  cursor: pointer;
+  user-select: none;
+  color: #556b2f; /* olive green */
+  font-weight: 700;
+  border-bottom: 2px solid #556b2f;
+  padding-bottom: 5px;
   margin-bottom: 10px;
 }
 
-.what-we-do p {
+.accordion-header:focus {
+  outline: 2px solid #9caf88;
+  outline-offset: 2px;
+}
+
+.accordion-content {
+  color: #374151;
   font-size: 15px;
-  color: #444;
   line-height: 1.6;
+  text-align: left;
+  margin: 0 auto;
+  max-width: 600px;
 }
 
 /* Paragraph text */
@@ -107,15 +126,17 @@ input[type="email"] {
   width: 70%;
   max-width: 300px;
   font-size: 16px;
-  border: 1px solid #ccc;
+  border: 1px solid #D1D5DB; /* light gray */
   border-radius: 8px;
   margin-bottom: 12px;
+  background: #F9FAFB; /* very light gray */
+  color: #374151;
 }
 
 input[type="submit"] {
   padding: 12px 25px;
   font-size: 16px;
-  background-color: #003049;
+  background-color: #556b2f; /* olive green */
   color: white;
   border: none;
   border-radius: 8px;
@@ -125,7 +146,7 @@ input[type="submit"] {
 }
 
 input[type="submit"]:hover {
-  background-color: #0f766e;
+  background-color: #9caf88; /* lighter olive green */
 }
 
 /* Sources */
@@ -133,10 +154,13 @@ input[type="submit"]:hover {
   font-size: 14px;
   margin-top: 30px;
   line-height: 1.5;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .sources a {
-  color: #003049;
+  color: #556b2f; /* olive green */
   text-decoration: none;
   margin: 0 4px;
 }
@@ -148,7 +172,7 @@ input[type="submit"]:hover {
 /* Footer */
 footer {
   font-size: 12px;
-  color: #aaa;
+  color: #9ca3af; /* gray */
   margin-top: 40px;
   line-height: 1.4;
 }
