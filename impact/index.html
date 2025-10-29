@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Our Impact | Bob Wealth Advisory</title>
-
     <style>
         * {
             margin: 0;
@@ -16,14 +15,13 @@
         body {
             background-color: #fafafa;
             color: #222;
-            line-height: 1.6;
+            line-height: 1.7;
         }
 
-        /* Hero Section */
-        .hero {
+        header {
             position: relative;
             background: url('https://images.unsplash.com/photo-1523952578875-e0b299cfa4b5?auto=format&fit=crop&w=1950&q=80') center/cover no-repeat;
-            height: 70vh;
+            height: 60vh;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -31,150 +29,86 @@
             text-align: center;
         }
 
-        .overlay {
+        header::before {
+            content: "";
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.45);
         }
 
-        .hero-content {
+        header div {
+            position: relative;
             z-index: 2;
             max-width: 700px;
+            padding: 1rem;
         }
 
-        .hero h1 {
+        header h1 {
             font-size: 3rem;
-            margin-bottom: 0.5rem;
             letter-spacing: 1px;
+            margin-bottom: 0.5rem;
         }
 
-        .hero p {
+        header p {
             font-size: 1.2rem;
         }
 
-        /* Sections */
-        .container {
+        section {
+            padding: 4rem 0;
             width: 90%;
             max-width: 1100px;
             margin: 0 auto;
-            padding: 4rem 0;
         }
 
-        .intro {
+        h2 {
+            color: #004aad;
+            margin-bottom: 1rem;
+            font-size: 2rem;
             text-align: center;
         }
 
-        .intro h2 {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-            color: #222;
-        }
-
-        .intro p {
-            font-size: 1.1rem;
-            color: #555;
-        }
-
-        /* Cards */
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .card {
-            background: white;
-            border-radius: 1rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .card img {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-        }
-
-        .card h3 {
-            margin: 1.2rem;
-            color: #004aad;
-        }
-
-        .card p {
-            margin: 0 1.2rem 1.5rem;
-            color: #555;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-        }
-
-        /* Story Section */
         .story {
             background: #f5f7fa;
-            padding: 4rem 0;
-        }
-
-        .story h2 {
-            text-align: center;
-            margin-bottom: 2rem;
-            color: #004aad;
-            font-size: 2rem;
-        }
-
-        .story-content {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 2rem;
-        }
-
-        .story-content img {
-            flex: 1 1 350px;
             border-radius: 1rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            object-fit: cover;
-            max-height: 400px;
+            padding: 3rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-top: 2rem;
         }
 
-        .story-text {
-            flex: 1 1 400px;
+        .story img {
+            width: 100%;
+            border-radius: 1rem;
+            margin-bottom: 1.5rem;
+            object-fit: cover;
+        }
+
+        .story p {
             font-size: 1.1rem;
             color: #333;
-            line-height: 1.8;
+            margin-bottom: 1rem;
         }
 
-        .story-text strong {
+        .story strong {
             color: #004aad;
         }
 
-        /* Stats Section */
-        .numbers {
-            background: #004aad;
-            color: white;
+        .vision {
+            background: white;
             text-align: center;
         }
 
-        .stats {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 3rem;
-            padding: 4rem 0;
+        .vision h3 {
+            color: #004aad;
+            margin-top: 2rem;
         }
 
-        .stat h2 {
-            font-size: 2.5rem;
+        .vision p {
+            font-size: 1.05rem;
+            color: #444;
+            max-width: 800px;
+            margin: 1rem auto;
         }
 
-        .stat p {
-            font-size: 1rem;
-            margin-top: 0.5rem;
-        }
-
-        /* Footer */
         footer {
             background: #111;
             color: #aaa;
@@ -188,111 +122,76 @@
         }
 
         @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.3rem;
+            header h1 {
+                font-size: 2.2rem;
             }
 
-            .hero p {
+            header p {
                 font-size: 1rem;
+            }
+
+            .story {
+                padding: 2rem;
             }
         }
     </style>
 </head>
 
 <body>
-    <header class="hero">
-        <div class="overlay"></div>
-        <div class="hero-content">
+    <header>
+        <div>
             <h1>Our Impact</h1>
-            <p>Empowering communities through financial literacy, wellness, and sustainable growth.</p>
+            <p>Grounded in truth. Driven by purpose. Growing towards 2030.</p>
         </div>
     </header>
 
-    <section class="intro">
-        <div class="container">
-            <h2>Building Wealth, Building People</h2>
+    <section>
+        <h2>Real Stories, Real Impact</h2>
+
+        <div class="story">
+            <img src="https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&w=1000&q=80" alt="Community Impact">
             <p>
-                At Bob Wealth Advisory, we believe wealth extends beyond finances. 
-                It’s about empowering individuals, families, and communities to make informed financial decisions, 
-                achieve wellness, and unlock their potential.
+                Our commitment to community empowerment is not just theory — it’s personal. 
+                Today, we proudly employ <strong>two single mothers</strong> who have found not only 
+                work but purpose through our initiatives.
+            </p>
+            <p>
+                We’ve also supported a young girl named <strong>Shuvai</strong> — her name means “make a wish.” 
+                Through our school assistance programme, we’ve helped cover her monthly fees as she 
+                completes her <strong>Grade 1</strong> in <strong>Epworth</strong> as of <strong>October 2025</strong>. 
+                Her journey embodies the hope and transformation we strive to inspire in every life we touch.
             </p>
         </div>
     </section>
 
-    <section class="impact-section">
-        <div class="container cards">
-            <div class="card">
-                <img src="https://images.unsplash.com/photo-1600880292089-90e9dfdc0b11?auto=format&fit=crop&w=600&q=80" alt="Financial Literacy" />
-                <h3>Financial Literacy Workshops</h3>
-                <p>
-                    From schools to community centres, we’ve equipped hundreds with practical knowledge 
-                    about budgeting, saving, and investing — nurturing financially confident citizens.
-                </p>
-            </div>
+    <section class="vision">
+        <h2>Our Vision for 2030</h2>
+        <p>
+            By the year <strong>2030</strong>, Bob Wealth Advisory aims to expand its community impact through 
+            measurable, sustainable initiatives that empower Zimbabweans to thrive financially, mentally, and socially.
+        </p>
 
-            <div class="card">
-                <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=600&q=80" alt="Wellness Initiative" />
-                <h3>Wellness & Growth</h3>
-                <p>
-                    Through our wellness centre and outreach programmes, we promote mental clarity, 
-                    balance, and productivity — because true wealth includes wellbeing.
-                </p>
-            </div>
+        <h3>📘 Financial Literacy for All</h3>
+        <p>
+            To launch structured financial literacy and savings education programmes in local communities, 
+            beginning with pilot workshops in Epworth and Mabvuku by <strong>2027</strong>.
+        </p>
 
-            <div class="card">
-                <img src="https://images.unsplash.com/photo-1542744173-05336fcc7ad4?auto=format&fit=crop&w=600&q=80" alt="Youth Mentorship" />
-                <h3>Youth Mentorship</h3>
-                <p>
-                    We guide the next generation of leaders through mentorship and career coaching, 
-                    focusing on financial responsibility, purpose, and leadership.
-                </p>
-            </div>
-        </div>
-    </section>
+        <h3>🌿 Wellness & Balance</h3>
+        <p>
+            To integrate financial wellness with mental health awareness through community talks 
+            and small-group wellness sessions by <strong>2028</strong>.
+        </p>
 
-    <section class="story">
-        <div class="container">
-            <h2>Real Stories, Real Impact</h2>
-            <div class="story-content">
-                <img src="https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&w=600&q=80" alt="Community Impact">
-                <div class="story-text">
-                    <p>
-                        Our commitment to community empowerment is not just theory — it’s personal. 
-                        Today, we proudly employ <strong>two single mothers</strong> who have found not only 
-                        work but purpose through our initiatives.
-                    </p>
-                    <p>
-                        We’ve also supported a young girl named <strong>Shuvai</strong> — her name means “make a wish.” 
-                        Through our school assistance programme, we’ve helped cover her monthly fees as she 
-                        completes her <strong>Grade 1</strong> in <strong>Epworth</strong> as of <strong>October 2025</strong>. 
-                        Her journey embodies the hope and transformation we strive to inspire in every life we touch.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="numbers">
-        <div class="container stats">
-            <div class="stat">
-                <h2>500+</h2>
-                <p>Individuals trained in financial literacy</p>
-            </div>
-            <div class="stat">
-                <h2>3</h2>
-                <p>Partnered community centres</p>
-            </div>
-            <div class="stat">
-                <h2>100%</h2>
-                <p>Commitment to positive change</p>
-            </div>
-        </div>
+        <h3>🎓 Mentorship & Opportunity</h3>
+        <p>
+            To establish a mentorship pipeline that links young professionals and students 
+            to financial and career guidance by <strong>2030</strong>.
+        </p>
     </section>
 
     <footer>
-        <div class="container">
-            <p>&copy; <span id="year"></span> Bob Wealth Advisory. All rights reserved.</p>
-        </div>
+        <p>&copy; <span id="year"></span> Bob Wealth Advisory. All rights reserved.</p>
     </footer>
 
     <script>
