@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Our Impact | Bob Wealth Advisory</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            background-color: #fafafa;
+            color: #222;
+            line-height: 1.7;
+        }
+
+        header {
+            position: relative;
+            background: url('https://images.unsplash.com/photo-1523952578875-e0b299cfa4b5?auto=format&fit=crop&w=1950&q=80') center/cover no-repeat;
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.45);
+        }
+
+        header div {
+            position: relative;
+            z-index: 2;
+            max-width: 700px;
+            padding: 1rem;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.2rem;
+        }
+
+        section {
+            padding: 4rem 0;
+            width: 90%;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            color: #004aad;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        .story {
+            background: #f5f7fa;
+            border-radius: 1rem;
+            padding: 3rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-top: 2rem;
+        }
+
+        .story img {
+            width: 100%;
+            border-radius: 1rem;
+            margin-bottom: 1.5rem;
+            object-fit: cover;
+        }
+
+        .story p {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .story strong {
+            color: #004aad;
+        }
+
+        .vision {
+            background: white;
+            text-align: center;
+        }
+
+        .vision h3 {
+            color: #004aad;
+            margin-top: 2rem;
+        }
+
+        .vision p {
+            font-size: 1.05rem;
+            color: #444;
+            max-width: 800px;
+            margin: 1rem auto;
+        }
+
+        footer {
+            background: #111;
+            color: #aaa;
+            text-align: center;
+            padding: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        footer span {
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.2rem;
+            }
+
+            header p {
+                font-size: 1rem;
+            }
+
+            .story {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div>
+            <h1>Our Impact</h1>
+            <p>Grounded in truth. Driven by purpose. Growing towards 2030.</p>
+        </div>
+    </header>
+
+    <section>
+        <h2>Real Stories, Real Impact</h2>
+
+        <div class="story">
+            <img src="https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&w=1000&q=80" alt="Community Impact">
+            <p>
+                Our commitment to community empowerment is not just theory — it’s personal. 
+                Today, we proudly employ <strong>two single mothers</strong> who have found not only 
+                work but purpose through our initiatives.
+            </p>
+            <p>
+                We’ve also supported a young girl named <strong>Shuvai</strong> — her name means “make a wish.” 
+                Through our school assistance programme, we’ve helped cover her monthly fees as she 
+                completes her <strong>Grade 1</strong> in <strong>Epworth</strong> as of <strong>October 2025</strong>. 
+                Her journey embodies the hope and transformation we strive to inspire in every life we touch.
+            </p>
+        </div>
+    </section>
+
+    <section class="vision">
+        <h2>Our Vision for 2030</h2>
+        <p>
+            By the year <strong>2030</strong>, Bob Wealth Advisory aims to expand its community impact through 
+            measurable, sustainable initiatives that empower Zimbabweans to thrive financially, mentally, and socially.
+        </p>
+
+        <h3>📘 Financial Literacy for All</h3>
+        <p>
+            To launch structured financial literacy and savings education programmes in local communities, 
+            beginning with pilot workshops in Epworth and Mabvuku by <strong>2027</strong>.
+        </p>
+
+        <h3>🌿 Wellness & Balance</h3>
+        <p>
+            To integrate financial wellness with mental health awareness through community talks 
+            and small-group wellness sessions by <strong>2028</strong>.
+        </p>
+
+        <h3>🎓 Mentorship & Opportunity</h3>
+        <p>
+            To establish a mentorship pipeline that links young professionals and students 
+            to financial and career guidance by <strong>2030</strong>.
+        </p>
+    </section>
+
+    <footer>
+        <p>&copy; <span id="year"></span> Bob Wealth Advisory. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
