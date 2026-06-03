@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A very important question...</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff0f5;
+      font-family: 'Georgia', serif;
+      overflow: hidden;
+    }
+
+    .hearts-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .heart-float {
+      position: absolute;
+      font-size: 1.5rem;
+      animation: floatUp linear infinite;
+      opacity: 0;
+    }
+
+    @keyframes floatUp {
+      0%   { transform: translateY(100vh) rotate(0deg); opacity: 0.6; }
+      100% { transform: translateY(-10vh) rotate(20deg); opacity: 0; }
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      background: white;
+      border-radius: 24px;
+      padding: 3rem 2.5rem;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 8px 40px rgba(220, 80, 120, 0.15);
+      border: 1px solid #ffd6e0;
+    }
+
+    .stitch-img {
+      width: 130px;
+      height: auto;
+      margin-bottom: 1.2rem;
+      animation: bounce 1.8s ease-in-out infinite;
+    }
+
+    .stitch-wrap {
+      display: inline-block;
+      margin-bottom: 1.2rem;
+      animation: bounce 1.8s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-10px); }
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      color: #c0306a;
+      margin-bottom: 2rem;
+      line-height: 1.4;
+    }
+
+    .btn-yes {
+      display: inline-block;
+      background: #e8386d;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 0.8rem 2.5rem;
+      font-size: 1.1rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: transform 0.15s, background 0.15s;
+      margin: 0.4rem;
+    }
+
+    .btn-yes:hover {
+      background: #c0306a;
+      transform: scale(1.07);
+    }
+
+    .btn-no {
+      display: inline-block;
+      background: white;
+      color: #888;
+      border: 1.5px solid #ddd;
+      border-radius: 50px;
+      padding: 0.8rem 2.5rem;
+      font-size: 1rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: transform 0.15s;
+      margin: 0.4rem;
+      position: relative;
+    }
+
+    .buttons { margin-top: 0.5rem; }
+
+    .celebration {
+      display: none;
+      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes popIn {
+      0%   { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .celebration h2 {
+      font-size: 1.8rem;
+      color: #c0306a;
+      margin-bottom: 0.5rem;
+    }
+
+    .celebration p {
+      color: #888;
+      font-size: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .no-count-msg {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: #e8386d;
+      min-height: 1.2em;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hearts-bg" id="heartsBg"></div>
+
+  <div class="card" id="mainCard">
+    <!-- Stitch holding a heart (inline SVG, no external deps) -->
+    <div class="stitch-wrap">
+    <svg width="130" height="150" viewBox="0 0 130 150" xmlns="http://www.w3.org/2000/svg">
+      <!-- ears -->
+      <ellipse cx="28" cy="38" rx="16" ry="28" fill="#4a90d9" transform="rotate(-20 28 38)"/>
+      <ellipse cx="102" cy="38" rx="16" ry="28" fill="#4a90d9" transform="rotate(20 102 38)"/>
+      <ellipse cx="28" cy="38" rx="9" ry="18" fill="#6ab0f0" transform="rotate(-20 28 38)"/>
+      <ellipse cx="102" cy="38" rx="9" ry="18" fill="#6ab0f0" transform="rotate(20 102 38)"/>
+      <!-- head -->
+      <ellipse cx="65" cy="72" rx="44" ry="40" fill="#4a90d9"/>
+      <!-- face highlight -->
+      <ellipse cx="65" cy="78" rx="30" ry="24" fill="#6ab0f0" opacity="0.45"/>
+      <!-- eyes -->
+      <ellipse cx="50" cy="65" rx="11" ry="12" fill="white"/>
+      <ellipse cx="80" cy="65" rx="11" ry="12" fill="white"/>
+      <ellipse cx="52" cy="67" rx="7" ry="8" fill="#1a1a2e"/>
+      <ellipse cx="82" cy="67" rx="7" ry="8" fill="#1a1a2e"/>
+      <circle cx="54" cy="64" r="2.5" fill="white"/>
+      <circle cx="84" cy="64" r="2.5" fill="white"/>
+      <!-- nose -->
+      <ellipse cx="65" cy="80" rx="8" ry="5" fill="#2a5fa8"/>
+      <ellipse cx="63" cy="79" rx="2" ry="1.5" fill="#5090d0" opacity="0.7"/>
+      <!-- smile -->
+      <path d="M50 90 Q65 104 80 90" stroke="#1a1a2e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <!-- body -->
+      <ellipse cx="65" cy="125" rx="30" ry="22" fill="#4a90d9"/>
+      <ellipse cx="65" cy="122" rx="20" ry="14" fill="#6ab0f0" opacity="0.4"/>
+      <!-- arms holding heart -->
+      <path d="M35 115 Q18 108 22 95" stroke="#4a90d9" stroke-width="12" fill="none" stroke-linecap="round"/>
+      <path d="M95 115 Q112 108 108 95" stroke="#4a90d9" stroke-width="12" fill="none" stroke-linecap="round"/>
+      <!-- heart -->
+      <path d="M65 100 C65 100 45 85 45 75 C45 68 52 63 58.5 68 C61 70 63 73 65 76 C67 73 69 70 71.5 68 C78 63 85 68 85 75 C85 85 65 100 65 100Z" fill="#e8386d"/>
+      <path d="M53 70 C51 72 50 76 52 80" stroke="#f07099" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.7"/>
+    </svg>
+    </div>
+
+    <div id="question-view">
+      <h1>Mags, will you come and do my mother's dishes and help her cook? 🍽️</h1>
+      <div class="buttons">
+        <button class="btn-yes" onclick="sayYes()">Yes! 🥰</button>
+        <button class="btn-no" id="noBtn" onclick="runAway()">No, thank you</button>
+      </div>
+      <div class="no-count-msg" id="noMsg"></div>
+    </div>
+
+    <div class="celebration" id="celebration-view">
+      <div style="font-size:3rem; margin-bottom:0.8rem">🎉💖🎉</div>
+      <h2>She said YES!</h2>
+      <p>Mum's kitchen is saved! 🍳🥹</p>
+    </div>
+  </div>
+
+  <script>
+    const noMessages = [
+      "Are you sure? The button got smaller...",
+      "That can't be right. Try again?",
+      "Hmm. Are you really sure sure?",
+      "The button is getting really small...",
+      "Please reconsider! 🥺",
+      "Last chance before it disappears!",
+      "It's basically invisible now... just press Yes!",
+    ];
+    let noCount = 0;
+    function runAway() {
+      const noBtn = document.getElementById('noBtn');
+      const yesBtn = document.querySelector('.btn-yes');
+      const msg = document.getElementById('noMsg');
+      if (noCount < noMessages.length) {
+        msg.textContent = noMessages[noCount];
+      } else {
+        msg.textContent = "Okay, the button is retired. Time to click Yes! 😉";
+      }
+      const noSize = Math.max(0.4, 1 - noCount * 0.12);
+      noBtn.style.fontSize = noSize + 'rem';
+      noBtn.style.padding = `${Math.max(0.3, 0.8 - noCount * 0.1)}rem ${Math.max(0.8, 2.5 - noCount * 0.3)}rem`;
+      noBtn.style.opacity = Math.max(0.1, 1 - noCount * 0.15);
+      const yesScale = 1 + (noCount * 0.15);
+      yesBtn.style.transform = `scale(${yesScale})`;
+      yesBtn.style.margin = `${0.4 + (noCount * 0.1)}rem`;
+      if (noCount >= noMessages.length + 1) {
+        noBtn.style.display = 'none';
+      }
+      noCount++;
+    }
+    function sayYes() {
+      document.getElementById('question-view').style.display = 'none';
+      const cel = document.getElementById('celebration-view');
+      cel.style.display = 'block';
+      launchHearts();
+    }
+    function launchHearts() {
+      const bg = document.getElementById('heartsBg');
+      const emojis = ['❤️','💕','💖','💗','💓','🥰','💝'];
+      for (let i = 0; i < 40; i++) {
+        const h = document.createElement('span');
+        h.className = 'heart-float';
+        h.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        h.style.left = Math.random() * 100 + 'vw';
+        h.style.fontSize = (1 + Math.random() * 2) + 'rem';
+        h.style.animationDuration = (2.5 + Math.random() * 4) + 's';
+        h.style.animationDelay = (Math.random() * 1.5) + 's';
+        bg.appendChild(h);
+        setTimeout(() => h.remove(), 6000);
+      }
+    }
+    (function spawnBg() {
+      const bg = document.getElementById('heartsBg');
+      const emojis = ['💕','💖','💗'];
+      setInterval(() => {
+        const h = document.createElement('span');
+        h.className = 'heart-float';
+        h.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        h.style.left = Math.random() * 100 + 'vw';
+        h.style.fontSize = '1rem';
+        h.style.opacity = '0.3';
+        h.style.animationDuration = (6 + Math.random() * 6) + 's';
+        bg.appendChild(h);
+        setTimeout(() => h.remove(), 12000);
+      }, 1000);
+    })();
+  </script>
+</body>
+</html>
