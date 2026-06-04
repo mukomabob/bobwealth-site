@@ -652,7 +652,7 @@ function renderBarChart(){
           <option value="30" ${cntF===30?'selected':''}>Top/bottom 30</option><option value="50" ${cntF===50?'selected':''}>Top/bottom 50</option>
         </select>
         <button class="btn-print" onclick="printChart()">🖨 Print / Save PDF</button>
-        <span style="font-size:9px;font-family:var(--mono);color:var(--ts)">* unavailable at baseline date</span>
+        <span style="font-size:9px;font-family:var(--mono);color:var(--ts)"> </span>
       </div>
       <div class="bchart-legend">
         <div class="bl-item"><div class="bl-dot" style="background:#1A3A2A"></div> &gt;$${(investment*1.5).toFixed(0)}</div>
@@ -663,7 +663,7 @@ function renderBarChart(){
       </div>
       <div id="bcRows">${rows}</div>
       <div class="bchart-footer">
-        <p>Data: FBC Securities (Pvt) Ltd · Prices in USD (IBR rate for ZSE counters) · For informational purposes only<br>* denotes counter unavailable at baseline date</p>
+        <p>Data: FBC Securities (Pvt) Ltd · Prices in USD (IBR rate for ZSE counters) · For informational purposes only<br></p>
         <div class="bchart-stats">
           <span class="bcs">Winners: <b style="color:var(--gain)">${winners}</b></span>
           <span class="bcs">Losers: <b style="color:var(--red)">${losers2}</b></span>
