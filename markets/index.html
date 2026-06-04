@@ -403,10 +403,25 @@ function ingestSnapshot(data){
     });
   }
 
-  showPage('barchart');
-  document.querySelector('.ni.on')?.classList.remove('on');
-  document.querySelector('.ni')?.classList.add('on');
+showPage('barchart'); 
+
+  // 2. Synchronize the view workspace heading title
+  const tbTitle = document.getElementById('tbTitle');
+  if(tbTitle) tbTitle.textContent = "Investment Chart";
+
+  // 3. Clear existing active tabs and locate the correct chart menu item to highlight
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('on'));
+  const chartNav = Array.from(document.querySelectorAll('.ni')).find(n => n.getAttribute('onclick')?.includes('barchart'));
+  if (chartNav) {
+    chartNav.classList.add('on');
+  } else {
+    // Safety fallback just in case the selector misses
+    document.querySelector('.ni')?.classList.add('on'); 
+  }
+
+  // 4. Fire the engine calculations and draw dashboards/bar calculations
   render();
+  renderBarChart();
 }
 
 function showError(){
