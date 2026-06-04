@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Markets — Bob Wealth Holdings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gd:#1A3A2A;--gm:#2D5A40;--gl:#3D7A56;--gp:#EAF2ED;--gb:#F4F8F5;
+  --gold:#B8872A;--gold-l:#D4A847;--gold-p:#FDF6E3;
+  --cream:#FAFAF7;--white:#FFFFFF;
+  --text:#1A1A1A;--tm:#4A4A4A;--ts:#7A7A7A;
+  --border:#D8E4DC;--bl:#EBF1ED;
+  --red:#C0392B;--gain:#1D6B3A;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;--serif:'Playfair Display',serif;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:var(--cream);color:var(--text);display:flex;flex-direction:column;font-size:13px}
+.site-header{background:var(--gd);border-bottom:3px solid var(--gold);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:62px;flex-shrink:0;box-shadow:0 2px 16px rgba(0,0,0,.2)}
+.hd-brand{display:flex;align-items:center;gap:13px;text-decoration:none}
+.hd-logo{height:36px;width:36px;object-fit:contain}
+.hd-logo-fb{width:36px;height:36px;border-radius:4px;background:var(--gold);display:none;align-items:center;justify-content:center;font-family:var(--serif);font-size:17px;font-weight:700;color:var(--gd);flex-shrink:0}
+.hd-name{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--white);letter-spacing:.2px;line-height:1.1}
+.hd-name span{display:block;font-family:var(--mono);font-size:9px;font-weight:400;color:var(--gold-l);letter-spacing:.15em;text-transform:uppercase;margin-top:2px}
+.site-nav{display:flex;align-items:center;gap:3px}
+.site-nav a{color:rgba(255,255,255,.7);font-size:12px;font-weight:500;text-decoration:none;padding:6px 13px;border-radius:3px;transition:all .15s;letter-spacing:.02em}
+.site-nav a:hover{color:var(--white);background:rgba(255,255,255,.08)}
+.site-nav a.active{color:var(--white);background:rgba(184,135,42,.2);border:1px solid rgba(184,135,42,.3)}
+.app{display:flex;flex:1;overflow:hidden}
+.sb{width:216px;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;height:100%;overflow-y:auto}
+.sb-hdr{padding:18px 16px 14px;border-bottom:1px solid var(--border);background:var(--gb)}
+.sb-title{font-family:var(--serif);font-size:13px;font-weight:700;color:var(--gd)}
+.sb-date{font-family:var(--mono);font-size:10px;color:var(--ts);margin-top:4px;letter-spacing:.04em}
+.sb-nav{padding:10px 8px;flex:1}
+.ng{margin-bottom:6px}
+.ng-lbl{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ts);padding:6px 8px 3px;font-family:var(--mono);font-weight:500}
+.ni{display:flex;align-items:center;gap:7px;padding:7px 9px;color:var(--tm);cursor:pointer;border-radius:4px;font-size:12px;font-weight:500;border-left:2px solid transparent;transition:all .12s;margin-bottom:1px}
+.ni:hover{color:var(--gm);background:var(--gp)}
+.ni.on{color:var(--gd);background:var(--gp);border-left-color:var(--gold);font-weight:600}
+.ni-ic{font-size:12px;width:15px;text-align:center;flex-shrink:0}
+.sb-foot{padding:12px 14px;border-top:1px solid var(--border);flex-shrink:0;background:var(--cream)}
+.sb-foot p{font-size:10px;font-family:var(--mono);color:var(--gm);line-height:1.7}
+.sb-foot .sfs{color:var(--ts);font-size:9px}
+.ws{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--cream)}
+.topbar{padding:12px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;background:var(--white)}
+.tb-left h1{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--gd);letter-spacing:.1px}
+.tb-left .tb-sub{font-size:10px;font-family:var(--mono);color:var(--ts);margin-top:2px;letter-spacing:.04em}
+.tb-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.uw{position:relative;overflow:hidden;display:inline-block}
+.btn-imp{border:1.5px solid var(--gl);color:var(--gd);background:var(--gp);padding:6px 14px;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.08em;transition:all .14s;font-family:var(--font)}
+.btn-imp:hover{background:var(--gl);color:var(--white)}
+.uw input[type=file]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.btn-base{border:1.5px solid var(--gold);color:var(--gold);background:var(--gold-p);padding:6px 14px;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.08em;transition:all .14s;font-family:var(--font)}
+.btn-base:hover{background:var(--gold);color:var(--white)}
+.btn-exp{display:none;border:1.5px solid var(--gd);color:var(--gd);background:transparent;padding:6px 12px;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.08em;transition:all .14s;font-family:var(--font)}
+.btn-exp:hover{background:var(--gd);color:var(--white)}
+.btn-pub{display:none;border:1.5px solid var(--gold);color:var(--white);background:var(--gold);padding:6px 14px;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.08em;transition:all .14s;font-family:var(--font)}
+.btn-pub:hover{background:var(--gold-l);border-color:var(--gold-l)}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--gain);box-shadow:0 0 6px rgba(29,107,58,.5);display:none;animation:pulse 2.5s infinite;flex-shrink:0}
+.base-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px rgba(184,135,42,.5);display:none;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.file-label{font-size:9px;font-family:var(--mono);padding:3px 7px;border-radius:3px;border:1px solid var(--border);color:var(--ts);background:var(--gb);max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:none}
+.file-label.base-lbl{border-color:rgba(184,135,42,.4);color:var(--gold);background:var(--gold-p)}
+.file-label.curr-lbl{border-color:rgba(61,122,86,.4);color:var(--gl);background:var(--gp)}
+.content{flex:1;overflow-y:auto}
+.vp{padding:20px 24px 40px;display:none}
+.vp.on{display:block}
+.kpi-row{display:grid;gap:10px;margin-bottom:16px}
+.k5{grid-template-columns:repeat(5,1fr)}.k4{grid-template-columns:repeat(4,1fr)}.k3{grid-template-columns:repeat(3,1fr)}
+.kc{background:var(--white);border:1px solid var(--border);border-radius:6px;padding:14px 16px;position:relative;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.kc::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--kca,var(--gl))}
+.kc-lbl{font-size:9px;color:var(--ts);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;font-family:var(--mono);font-weight:500}
+.kc-val{font-size:21px;font-weight:700;color:var(--gd);font-family:var(--mono);line-height:1}
+.kc-sub{font-size:9px;color:var(--ts);margin-top:3px;font-family:var(--mono)}
+.row{display:grid;gap:12px;margin-bottom:12px}
+.c1{grid-template-columns:1fr}.c2{grid-template-columns:1fr 1fr}.c21{grid-template-columns:2fr 1fr}
+.mc{background:var(--white);border:1px solid var(--border);border-radius:6px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.mc-title{font-size:10px;font-weight:700;color:var(--gd);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono);margin-bottom:12px;padding-bottom:7px;border-bottom:1px solid var(--bl)}
+.mc-title .hint{color:var(--ts);text-transform:none;font-weight:400;margin-left:5px;font-size:9px}
+.ch{position:relative;width:100%}
+.mkt-toggle{display:flex;gap:5px;margin-bottom:14px}
+.mkt-btn{border:1.5px solid var(--border);background:var(--white);color:var(--tm);font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:4px;cursor:pointer;text-transform:uppercase;letter-spacing:.08em;transition:all .14s}
+.mkt-btn.on{background:var(--gd);border-color:var(--gd);color:var(--white)}
+.mkt-btn:hover:not(.on){border-color:var(--gl);color:var(--gm)}
+.sect{display:inline-block;font-size:9px;font-family:var(--mono);padding:2px 6px;border-radius:3px;background:var(--gp);color:var(--gm);border:1px solid var(--border);white-space:nowrap;font-weight:500}
+.sect-v{background:var(--gold-p);color:var(--gold);border-color:rgba(184,135,42,.25)}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:11px}
+thead th{padding:7px 9px;color:var(--ts);border-bottom:1.5px solid var(--bl);text-transform:uppercase;letter-spacing:.07em;font-weight:600;text-align:left;font-family:var(--mono);white-space:nowrap;font-size:9px;background:var(--gb)}
+tbody tr{border-bottom:1px solid var(--bl);transition:background .08s}
+tbody tr:hover{background:var(--gb)}
+tbody td{padding:8px 9px;font-family:var(--mono);vertical-align:middle;font-size:11px;color:var(--tm)}
+tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
+.up{color:var(--gain);font-weight:600}.dn{color:var(--red);font-weight:600}.nc{color:var(--ts)}.hi{color:var(--gd);font-weight:600}.am{color:var(--gold)}
+.iv-up{color:var(--gain);font-weight:700}.iv-dn{color:var(--red);font-weight:700}.iv-nc{color:var(--ts);font-weight:500}
+.iv-bar{display:inline-block;height:4px;border-radius:2px;min-width:3px;vertical-align:middle;margin-left:5px}
+.wl-controls{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.wl-input{background:var(--white);border:1.5px solid var(--border);border-radius:4px;padding:6px 10px;color:var(--text);font-family:var(--mono);font-size:10px;outline:none;width:170px;text-transform:uppercase}
+.wl-input:focus{border-color:var(--gl)}
+.wl-input::placeholder{text-transform:none;color:var(--ts)}
+.btn-wl{background:var(--gd);border:none;color:var(--white);font-family:var(--mono);font-size:10px;padding:6px 12px;border-radius:4px;cursor:pointer;text-transform:uppercase;letter-spacing:.08em}
+.btn-wl-clr{background:transparent;border:1.5px solid var(--border);color:var(--ts);font-family:var(--mono);font-size:10px;padding:6px 10px;border-radius:4px;cursor:pointer}
+.btn-wl-clr:hover{border-color:var(--red);color:var(--red)}
+.wl-tag{display:inline-flex;align-items:center;gap:4px;background:var(--gp);border:1px solid var(--border);border-radius:3px;padding:3px 8px;font-size:10px;font-family:var(--mono);color:var(--gm);font-weight:500}
+.wl-tag button{background:none;border:none;color:var(--ts);cursor:pointer;font-size:11px;line-height:1;padding:0 2px}
+.wl-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.fb{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.fb input,.fb select{background:var(--white);border:1.5px solid var(--border);border-radius:4px;padding:6px 9px;color:var(--text);font-family:var(--mono);font-size:10px;outline:none;transition:border-color .14s}
+.fb input:focus,.fb select:focus{border-color:var(--gl)}
+.fb input{min-width:180px}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px;text-align:center;color:var(--ts)}
+.empty-state .es-icon{font-size:36px;margin-bottom:12px;opacity:.4}
+.empty-state h3{font-family:var(--serif);font-size:16px;color:var(--gd);margin-bottom:6px;font-weight:600}
+.empty-state p{font-size:12px;line-height:1.7;max-width:300px}
+.base-banner{background:linear-gradient(135deg,var(--gd),var(--gm));border-radius:6px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:14px;border:1px solid rgba(184,135,42,.25)}
+.base-banner .bb-icon{font-size:22px;flex-shrink:0}
+.base-banner .bb-text h3{font-family:var(--serif);font-size:14px;font-weight:700;color:var(--white);margin-bottom:2px}
+.base-banner .bb-text p{font-size:10px;color:rgba(255,255,255,.68);font-family:var(--mono)}
+.base-banner .bb-badge{margin-left:auto;background:var(--gold);color:var(--gd);font-family:var(--mono);font-size:9px;font-weight:700;padding:4px 10px;border-radius:3px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;flex-shrink:0}
+.inv-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.inv-kc{background:var(--white);border:1px solid var(--border);border-radius:6px;padding:14px 16px;position:relative;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.inv-kc::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--kca,var(--gl))}
+.inv-kc .lbl{font-size:9px;color:var(--ts);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;font-family:var(--mono)}
+.inv-kc .val{font-size:18px;font-weight:700;font-family:var(--mono);line-height:1;color:var(--gd)}
+.inv-kc .sub{font-size:9px;color:var(--ts);margin-top:3px;font-family:var(--mono)}
+.inv-note{font-size:10px;font-family:var(--mono);color:var(--ts);margin-top:8px;padding-top:8px;border-top:1px solid var(--bl);line-height:1.6}
+/* BAR CHART PAGE */
+.bchart-wrap{background:var(--white);border:1px solid var(--border);border-radius:6px;padding:24px 28px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.bchart-header{text-align:center;margin-bottom:22px;padding-bottom:16px;border-bottom:2px solid var(--border)}
+.bchart-header .bch-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px}
+.bchart-header .bch-logo-mark{width:40px;height:40px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:17px;font-weight:700;color:var(--gd)}
+.bchart-header h2{font-family:var(--serif);font-size:16px;font-weight:700;color:var(--gd)}
+.bchart-header .bch-sub{font-size:11px;font-family:var(--mono);color:var(--ts);margin-top:4px;line-height:1.6}
+.bchart-header .bch-title{font-size:14px;font-weight:600;color:var(--text);margin:10px 0 2px;font-family:var(--font)}
+.bchart-header .bch-date{font-size:11px;font-family:var(--mono);color:var(--gold);font-weight:600}
+.bchart-legend{display:flex;align-items:center;gap:18px;justify-content:center;margin-bottom:18px;flex-wrap:wrap}
+.bchart-legend .bl-item{display:flex;align-items:center;gap:5px;font-size:10px;font-family:var(--mono);color:var(--tm)}
+.bchart-legend .bl-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.bchart-controls{display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.bchart-controls select,.bchart-controls input{background:var(--white);border:1.5px solid var(--border);border-radius:4px;padding:5px 9px;color:var(--text);font-family:var(--mono);font-size:10px;outline:none}
+.bchart-controls select:focus,.bchart-controls input:focus{border-color:var(--gl)}
+.btn-print{border:1.5px solid var(--gd);color:var(--gd);background:transparent;padding:5px 13px;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.08em;font-family:var(--font)}
+.btn-print:hover{background:var(--gd);color:var(--white)}
+/* Bar rows */
+.bc-row{display:flex;align-items:center;gap:0;margin-bottom:3px;min-height:22px}
+.bc-label{font-family:var(--mono);font-size:10px;color:var(--text);text-align:right;flex-shrink:0;width:200px;padding-right:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:22px}
+.bc-bar-wrap{flex:1;display:flex;align-items:center;gap:6px;position:relative}
+.bc-bar{height:18px;border-radius:2px;min-width:4px;transition:all .3s;flex-shrink:0;position:relative}
+.bc-val{font-family:var(--mono);font-size:10px;font-weight:700;flex-shrink:0;white-space:nowrap;line-height:22px}
+.bc-baseline{position:absolute;left:0;top:0;bottom:0;width:2px;background:rgba(26,58,42,.15);pointer-events:none;z-index:1}
+.bc-sect{font-size:8px;font-family:var(--mono);color:var(--ts);margin-left:6px;flex-shrink:0}
+.bc-mkt{font-size:8px;font-family:var(--mono);color:var(--ts);margin-left:3px}
+.bchart-footer{margin-top:16px;padding-top:12px;border-top:1px solid var(--bl);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.bchart-footer p{font-size:9px;font-family:var(--mono);color:var(--ts);line-height:1.6}
+.bchart-stats{display:flex;gap:16px}
+.bcs{font-size:10px;font-family:var(--mono);color:var(--ts)}
+.bcs b{color:var(--text);font-weight:700}
+@media print{
+  .site-header,.sb,.topbar,.bchart-controls,.bchart-legend{display:none!important}
+  .app{display:block}
+  .ws{overflow:visible}
+  .content{overflow:visible}
+  body{overflow:visible;font-size:11px}
+  .vp{display:none!important}
+  #page-barchart{display:block!important;padding:0}
+  .bchart-wrap{box-shadow:none;border:none;padding:10px}
+  .bc-label{width:180px;font-size:9px}
+  .bc-val{font-size:9px}
+}
+.setup-panel{background:var(--white);border:1px solid var(--border);border-radius:6px;padding:22px;margin-bottom:16px}
+.setup-panel h3{font-family:var(--serif);font-size:16px;font-weight:700;color:var(--gd);margin-bottom:6px}
+.setup-panel > p{font-size:11px;color:var(--tm);margin-bottom:16px;line-height:1.7}
+.setup-steps{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.setup-step{background:var(--gb);border:1px solid var(--bl);border-radius:5px;padding:14px 16px}
+.setup-step .step-num{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
+.setup-step p{font-size:11px;color:var(--tm);margin:0;line-height:1.6}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="https://bobwealth.org/index.html" class="hd-brand">
+    <img src="https://bobwealth.org/images/bob_logo.png" class="hd-logo" alt="Bob Wealth"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="hd-logo-fb">B</div>
+    <div class="hd-name">Bob Wealth Holdings<span>Wealth · Purpose · Impact</span></div>
+  </a>
+  <nav class="site-nav">
+    <a href="https://bobwealth.org/index.html">Home</a>
+    <a href="#" class="active">Markets</a>
+    <a href="https://bobwealth.org/impact.html">Impact</a>
+    <a href="https://bobwealth.org/contact.html">Contact</a>
+  </nav>
+</header>
+<div class="app">
+<aside class="sb">
+  <div class="sb-hdr">
+    <div class="sb-title">Market Intelligence</div>
+    <div class="sb-date" id="sbDate">No file loaded</div>
+  </div>
+  <nav class="sb-nav">
+    <div class="ng">
+      <div class="ng-lbl">Markets</div>
+      <div class="ni on" onclick="nav('overview',this)"><span class="ni-ic">◈</span>Overview</div>
+      <div class="ni" onclick="nav('movers',this)"><span class="ni-ic">⇅</span>Movers</div>
+      <div class="ni" onclick="nav('activity',this)"><span class="ni-ic">◎</span>Trading Activity</div>
+    </div>
+    <div class="ng">
+      <div class="ng-lbl">Analysis</div>
+      <div class="ni" onclick="nav('sectors',this)"><span class="ni-ic">▦</span>Sector Breakdown</div>
+      <div class="ni" onclick="nav('screener',this)"><span class="ni-ic">≡</span>Full Screener</div>
+    </div>
+    <div class="ng">
+      <div class="ng-lbl">Portfolio</div>
+      <div class="ni" onclick="nav('investment',this)"><span class="ni-ic">$</span>$100 Tracker</div>
+      <div class="ni" onclick="nav('barchart',this)"><span class="ni-ic">▬</span>Investment Chart</div>
+      <div class="ni" onclick="nav('watchlist',this)"><span class="ni-ic">♡</span>Watchlist</div>
+    </div>
+  </nav>
+  <div class="sb-foot">
+    <p>Data Source<br><span class="sfs">FBC Securities (Pvt) Ltd</span></p>
+    <p id="sbStats" style="color:var(--ts);font-size:9px;margin-top:4px;line-height:1.8"></p>
+  </div>
+</aside>
+<div class="ws">
+  <div class="topbar">
+    <div class="tb-left">
+      <h1 id="tbTitle">Market Overview</h1>
+      <div class="tb-sub" id="tbSub">Import a daily FBC price sheet to begin</div>
+    </div>
+    <div class="tb-right">
+      <div class="base-dot" id="baseDot"></div>
+      <div class="file-label base-lbl" id="baseLabel"></div>
+      <div class="live-dot" id="liveDot"></div>
+      <div class="file-label curr-lbl" id="currLabel"></div>
+      <div id="btnBase" class="btn-base" style="cursor:default;opacity:.7">⏳ Loading baseline…</div>
+      <button class="btn-pub" id="btnPub" onclick="publishSnapshot()" style="display:none">⬆ Publish Snapshot</button>
+      <button class="btn-exp" id="btnExp" onclick="exportReport()">↓ Export</button>
+      <div class="uw">
+        <button class="btn-imp" id="btnImp">↑ Import Sheet</button>
+        <input type="file" accept=".xlsx,.xls" onchange="handleFile(this.files[0])">
+      </div>
+    </div>
+  </div>
+  <div class="content">
+
+    <!-- OVERVIEW -->
+    <div class="vp on" id="page-overview">
+      <div class="mkt-toggle">
+        <button class="mkt-btn on" onclick="setMkt('ALL',this)">All Markets</button>
+        <button class="mkt-btn" onclick="setMkt('ZSE',this)">ZSE</button>
+        <button class="mkt-btn" onclick="setMkt('VFEX',this)">VFEX</button>
+      </div>
+      <div id="overviewContent">
+        <div class="empty-state"><div class="es-icon">📊</div><h3>Daily Market Intelligence</h3><p>Import your FBC Securities daily price sheet (.xlsx) to begin.</p></div>
+      </div>
+    </div>
+
+    <!-- MOVERS -->
+    <div class="vp" id="page-movers">
+      <div class="mkt-toggle">
+        <button class="mkt-btn on" onclick="setMktMovers('ALL',this)">All Markets</button>
+        <button class="mkt-btn" onclick="setMktMovers('ZSE',this)">ZSE</button>
+        <button class="mkt-btn" onclick="setMktMovers('VFEX',this)">VFEX</button>
+      </div>
+      <div class="row c1"><div class="mc"><div class="mc-title">Top Gainers <span class="hint">by % change</span></div>
+        <div class="tw"><table><thead><tr><th>#</th><th>Counter</th><th>Sector</th><th>Market</th><th>Open</th><th>Close</th><th>Change</th><th>% Change</th><th>YTD G/L</th></tr></thead><tbody id="tblGainers"></tbody></table></div>
+      </div></div>
+      <div class="row c1"><div class="mc"><div class="mc-title">Top Losers <span class="hint">by % change</span></div>
+        <div class="tw"><table><thead><tr><th>#</th><th>Counter</th><th>Sector</th><th>Market</th><th>Open</th><th>Close</th><th>Change</th><th>% Change</th><th>YTD G/L</th></tr></thead><tbody id="tblLosers"></tbody></table></div>
+      </div></div>
+    </div>
+
+    <!-- ACTIVITY -->
+    <div class="vp" id="page-activity">
+      <div class="mkt-toggle">
+        <button class="mkt-btn on" onclick="setMktAct('ALL',this)">All Markets</button>
+        <button class="mkt-btn" onclick="setMktAct('ZSE',this)">ZSE</button>
+        <button class="mkt-btn" onclick="setMktAct('VFEX',this)">VFEX</button>
+      </div>
+      <div class="kpi-row k3">
+        <div class="kc" style="--kca:var(--gl)"><div class="kc-lbl">Total Volume</div><div class="kc-val" id="kActVol">—</div></div>
+        <div class="kc" style="--kca:var(--gold)"><div class="kc-lbl">Total Value</div><div class="kc-val" id="kActVal">—</div></div>
+        <div class="kc" style="--kca:var(--gain)"><div class="kc-lbl">Active Counters</div><div class="kc-val" id="kActCnt">—</div><div class="kc-sub">volume &gt; 0</div></div>
+      </div>
+      <div class="row c21">
+        <div class="mc"><div class="mc-title">Volume by Counter <span class="hint">top 12</span></div><div class="ch" style="height:260px"><canvas id="cVolBar"></canvas></div></div>
+        <div class="mc"><div class="mc-title">Value Share</div><div class="ch" style="height:260px"><canvas id="cValPie"></canvas></div></div>
+      </div>
+      <div class="row c1"><div class="mc"><div class="mc-title">All Traded Counters</div>
+        <div class="tw"><table><thead><tr><th>#</th><th>Counter</th><th>Sector</th><th>Market</th><th>Close</th><th>Volume</th><th>Value Traded</th><th>% Change</th></tr></thead><tbody id="tblActivity"></tbody></table></div>
+      </div></div>
+    </div>
+
+    <!-- SECTORS -->
+    <div class="vp" id="page-sectors">
+      <div class="row c1"><div class="mc"><div class="mc-title">Sector Performance Summary</div><div class="ch" style="height:240px"><canvas id="cSectPerf"></canvas></div></div></div>
+      <div class="row c1"><div class="mc"><div class="mc-title">Counters by Sector</div>
+        <div class="tw"><table><thead><tr><th>#</th><th>Counter</th><th>Sector</th><th>Market</th><th>Mkt Cap (USD)</th><th>Close</th><th>% Today</th><th>YTD G/L</th></tr></thead><tbody id="tblSectors"></tbody></table></div>
+      </div></div>
+    </div>
+
+    <!-- SCREENER -->
+    <div class="vp" id="page-screener">
+      <div class="fb">
+        <input type="text" id="scrSearch" placeholder="Search counter or sector…" oninput="renderScreener()">
+        <select id="scrMkt" onchange="renderScreener()"><option value="">All Markets</option><option>ZSE</option><option>VFEX</option></select>
+        <select id="scrSect" onchange="renderScreener()"><option value="">All Sectors</option></select>
+        <select id="scrSort" onchange="renderScreener()">
+          <option value="mktcap_d">Market Cap ↓</option><option value="pct_d">% Change ↓</option><option value="pct_a">% Change ↑</option>
+          <option value="vol_d">Volume ↓</option><option value="ytd_d">YTD ↓</option><option value="ytd_a">YTD ↑</option><option value="az">A–Z</option>
+        </select>
+      </div>
+      <div class="mc">
+        <div class="tw"><table><thead><tr><th>#</th><th>Counter</th><th>ISIN</th><th>Sector</th><th>Mkt</th><th>Open</th><th>Close</th><th>Change</th><th>% Chg</th><th>Volume</th><th>Value</th><th>Mkt Cap (USD)</th><th>YTD G/L</th><th>Div Yield</th></tr></thead><tbody id="tblScreener"></tbody></table></div>
+        <div style="margin-top:8px;font-size:10px;font-family:var(--mono);color:var(--ts)" id="scrCount"></div>
+      </div>
+    </div>
+
+    <!-- $100 TRACKER -->
+    <div class="vp" id="page-investment">
+      <div id="investContent">
+        <div class="setup-panel">
+          <h3>$100 Investment Tracker</h3>
+          <p>Track how a $100 investment in each ZSE/VFEX counter on <strong>6 January 2026</strong> has grown or declined. All prices compared in USD using the IBR rate.</p>
+          <div class="setup-steps">
+            <div class="setup-step"><div class="step-num">Step 1 — Set Baseline</div><p>Click <strong>"Set Baseline"</strong> in the toolbar and select the Jan 6 price sheet. This locks in your $100 starting price per counter.</p></div>
+            <div class="setup-step"><div class="step-num">Step 2 — Compare</div><p>Use <strong>"Import Sheet"</strong> to load any later date. The tracker instantly shows the current USD value of each $100 investment.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BAR CHART PAGE -->
+    <div class="vp" id="page-barchart">
+      <div id="barchartContent">
+        <div class="setup-panel">
+          <h3>Investment Chart</h3>
+          <p>Load a baseline and current price sheet to generate the chart.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- WATCHLIST -->
+    <div class="vp" id="page-watchlist">
+      <div class="wl-controls">
+        <input type="text" class="wl-input" id="wlInput" placeholder="Add counter (e.g. DELTA)" onkeydown="if(event.key==='Enter')addWatch()">
+        <button class="btn-wl" onclick="addWatch()">+ Add</button>
+        <button class="btn-wl-clr" onclick="clearWatch()">Clear All</button>
+        <span style="font-size:10px;font-family:var(--mono);color:var(--ts)">Saved in your browser</span>
+      </div>
+      <div class="wl-tags" id="wlTags"></div>
+      <div class="mc">
+        <div class="tw"><table><thead><tr><th>Counter</th><th>Market</th><th>Sector</th><th>Open</th><th>Close</th><th>Change</th><th>% Today</th><th>Volume</th><th>Value</th><th>Mkt Cap (USD)</th><th>YTD G/L</th><th>$100 Now</th></tr></thead><tbody id="tblWatch"></tbody></table></div>
+        <div id="wlEmpty" class="empty-state" style="display:none;padding:20px 0"><p>Add counters above to track them.</p></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+<script>
+'use strict';
+window.PS=[]; window.BASE={}; window.BASE_DATE='';
+window.MKT='ALL'; window.MKT_M='ALL'; window.MKT_A='ALL';
+window.WATCH=JSON.parse(localStorage.getItem('bw_watchlist')||'[]');
+let CH={};
+const PAL=['#1A3A2A','#2D5A40','#3D7A56','#4D9A6C','#B8872A','#D4A847','#5D9A76','#7DBA96','#6D4F1F','#8B6914','#1D6B3A','#C0392B'];
+const tt={backgroundColor:'#1A3A2A',titleColor:'#FAFAF7',bodyColor:'rgba(255,255,255,.82)',borderColor:'#3D7A56',borderWidth:1,cornerRadius:4};
+const fN=v=>v==null?'—':Number(v).toLocaleString();
+const fP2=v=>v==null?'—':v.toFixed(2);
+const fM=v=>{if(v==null)return'—';const a=Math.abs(v);if(a>=1e9)return'$'+(a/1e9).toFixed(2)+'B';if(a>=1e6)return'$'+(a/1e6).toFixed(2)+'M';if(a>=1e3)return'$'+(a/1e3).toFixed(1)+'K';return'$'+a.toLocaleString();};
+const fZ=v=>{if(v==null)return'—';const a=Math.abs(v);if(a>=1e9)return(a/1e9).toFixed(2)+'B';if(a>=1e6)return(a/1e6).toFixed(2)+'M';if(a>=1e3)return(a/1e3).toFixed(0)+'K';return a.toLocaleString();};
+const pC=v=>v>0?'up':v<0?'dn':'nc';
+
+function parseSheet(raw,fname){
+  let hdr=-1;
+  for(let i=0;i<raw.length;i++){if(raw[i]&&raw[i].some(c=>String(c||'').trim().toUpperCase()==='COUNTER')){hdr=i;break;}}
+  if(hdr<0)throw new Error('No COUNTER header row found.');
+  const dm=fname.match(/(\d{2})[_\-](\d{2})[_\-](\d{2,4})/);
+  const date=dm?`20${dm[3].length===2?dm[3]:dm[3].slice(-2)}-${dm[2]}-${dm[1]}`:fname.replace(/\.(xlsx?)$/i,'');
+  let mkt='ZSE'; const rows=[];
+  for(let i=hdr+1;i<raw.length;i++){
+    const r=raw[i]; if(!r||!r[0])continue;
+    const first=String(r[0]).trim(); if(!first)continue;
+    if(first.toUpperCase().includes('VFEX PRICE SHEET')){mkt='VFEX';continue;}
+    if(/VFEX BONDS|VFEX REITS|VFEX ETF|ZSE ETF|ZSE REIT|ZSE TOP|THIS PRICE SHEET/i.test(first))continue;
+    if(isNaN(parseFloat(r[1]))&&typeof r[1]!=='string')continue;
+    const sect=String(r[5]||'').trim();
+    if(['Fixed Term  Bond','Riet','Reit','Derivative'].includes(sect))continue;
+    const closePx=parseFloat(r[8]);
+    const isSusp=String(r[13]||'').toUpperCase().includes('SUSPEND')||String(r[13]||'').toUpperCase().includes('NOT FOUND');
+    const usdPrice=mkt==='VFEX'?(isNaN(closePx)?null:closePx):(parseFloat(r[9])||null);
+    rows.push({counter:first,isin:String(r[1]||'').trim(),shares:parseFloat(r[2])||0,mktCapIBR:parseFloat(r[3])||0,mktCapPMR:parseFloat(r[4])||0,sector:sect||'Other',pxDec31:parseFloat(r[6])||0,open:parseFloat(r[7])||null,close:isNaN(closePx)?null:closePx,usdIBR:parseFloat(r[9])||null,chg:parseFloat(r[11])||0,chgPct:parseFloat(r[12])||0,vol:isSusp?0:(parseFloat(r[13])||0),val:isSusp?0:(parseFloat(r[14])||0),divYield:parseFloat(r[15])||0,ytd:parseFloat(r[16])||0,market:mkt,suspended:isSusp,usdPrice});
+  }
+  return{rows,date};
+}
+
+// Auto-fetch baseline from GitHub on page load
+// Multiple fetch strategies for the baseline file
+const BASELINE_RAW  = 'https://raw.githubusercontent.com/mukomabob/bobwealth-site/main/Price%20Sheet%2006.01.26.xlsx';
+const BASELINE_URLS = [
+  // jsDelivr CDN — mirrors GitHub, has permissive CORS headers
+  'https://cdn.jsdelivr.net/gh/mukomabob/bobwealth-site@main/Price%20Sheet%2006.01.26.xlsx',
+  // allorigins proxy — wraps any URL with CORS headers
+  'https://api.allorigins.win/raw?url=' + encodeURIComponent(BASELINE_RAW),
+];
+const BASELINE_FNAME = 'Price_Sheet_06_01_26.xlsx';
+
+function ingestBaselineBuffer(buffer, fname){
+  const wb=XLSX.read(new Uint8Array(buffer),{type:'array',cellDates:true});
+  const ws=wb.Sheets[wb.SheetNames[0]];
+  const{rows,date}=parseSheet(XLSX.utils.sheet_to_json(ws,{header:1,defval:null}),fname);
+  window.BASE={}; window.BASE_DATE=date;
+  rows.forEach(r=>{if(r.usdPrice&&r.usdPrice>0)window.BASE[r.counter.trim().toUpperCase()]={price:r.usdPrice,market:r.market,sector:r.sector};});
+  const bd=document.getElementById('baseDot'); if(bd)bd.style.display='block';
+  const bl=document.getElementById('baseLabel'); if(bl){bl.textContent='Base: '+date; bl.style.display='block';}
+  const btn=document.getElementById('btnBase');
+  if(btn){btn.textContent='✓ Baseline: '+date; btn.style.opacity='1'; btn.style.cursor='default';}
+  if(window.PS.length){renderInvestment(); if(document.getElementById('page-barchart').classList.contains('on'))renderBarChart();}
+  renderWatchlist();
+}
+
+async function fetchBaseline(){
+  const btn=document.getElementById('btnBase');
+  // Try each URL strategy in order
+  for(const url of BASELINE_URLS){
+    try{
+      console.log('Trying baseline URL:', url);
+      const res=await fetch(url);
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      const buf=await res.arrayBuffer();
+      if(buf.byteLength < 1000) throw new Error('Response too small, likely not the file');
+      ingestBaselineBuffer(buf, BASELINE_FNAME);
+      return; // success — stop trying
+    }catch(err){
+      console.warn('Baseline fetch failed for', url, ':', err.message);
+    }
+  }
+  // All URLs failed — show manual upload button
+  console.warn('All baseline URLs failed. Showing manual upload.');
+  showManualBaselineButton();
+}
+
+function showManualBaselineButton(){
+  const btn=document.getElementById('btnBase');
+  if(btn){
+    btn.textContent='⊕ Load Baseline';
+    btn.style.cursor='pointer';
+    btn.style.opacity='1';
+    btn.style.borderColor='var(--gold)';
+    btn.onclick=()=>document.getElementById('fileBaseFallback').click();
+  }
+  if(!document.getElementById('fileBaseFallback')){
+    const inp=document.createElement('input');
+    inp.type='file'; inp.id='fileBaseFallback'; inp.accept='.xlsx,.xls'; inp.style.display='none';
+    inp.onchange=e=>{
+      if(!e.target.files[0])return;
+      const r=new FileReader();
+      r.onload=ev=>{
+        try{ ingestBaselineBuffer(ev.target.result, e.target.files[0].name); }
+        catch(ex){ alert('Could not parse baseline: '+ex.message); }
+      };
+      r.readAsArrayBuffer(e.target.files[0]);
+    };
+    document.body.appendChild(inp);
+  }
+}
+
+// Keep manual handleBaseline for fallback
+function handleBaseline(file){
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{ try{ ingestBaselineBuffer(e.target.result, file.name); }catch(err){ alert('Could not parse baseline: '+err.message); } };
+  reader.readAsArrayBuffer(file);
+}
+
+function handleFile(file){
+  if(!file)return;
+  const btn=document.getElementById('btnImp'); btn.textContent='Reading…';
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const{rows,date}=parseSheet(XLSX.utils.sheet_to_json(ws,{header:1,defval:null}),file.name);
+      window.PS=rows;
+      document.getElementById('sbDate').textContent=date;
+      document.getElementById('tbSub').textContent='FBC Securities · '+date+' · ZSE + VFEX';
+      const ld=document.getElementById('liveDot'); if(ld)ld.style.display='block';
+      const cl=document.getElementById('currLabel'); if(cl){cl.textContent='Current: '+date; cl.style.display='block';}
+      const sel=document.getElementById('scrSect');
+      sel.innerHTML='<option value="">All Sectors</option>';
+      [...new Set(rows.map(r=>r.sector))].sort().forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;sel.appendChild(o);});
+      const zse=rows.filter(r=>r.market==='ZSE').length, vfex=rows.filter(r=>r.market==='VFEX').length;
+      const sbS=document.getElementById('sbStats'); if(sbS)sbS.innerHTML=`ZSE: ${zse}<br>VFEX: ${vfex}<br><span class="sfs">${rows.length} total equities</span>`;
+      btn.textContent='↑ Update Sheet';
+      document.getElementById('btnExp').style.display='inline-block';
+      document.getElementById('btnPub').style.display='inline-block';
+      render(); renderWatchlist();
+    }catch(err){console.error(err);btn.textContent='↑ Import Sheet';alert('Could not parse: '+err.message);}
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function getInvValue(r){
+  if(!window.BASE||!Object.keys(window.BASE).length)return null;
+  const base=window.BASE[r.counter.trim().toUpperCase()];
+  if(!base||!base.price||base.price<=0)return null;
+  if(!r.usdPrice||r.usdPrice<=0)return null;
+  return(r.usdPrice/base.price)*100;
+}
+
+function nav(id,el){
+  document.querySelectorAll('.vp').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
+  document.getElementById('page-'+id).classList.add('on');
+  el.classList.add('on');
+  const T={overview:'Market Overview',movers:'Movers',activity:'Trading Activity',sectors:'Sector Breakdown',screener:'Full Screener',investment:'$100 Investment Tracker',barchart:'Investment Chart',watchlist:'Watchlist'};
+  document.getElementById('tbTitle').textContent=T[id]||id;
+  if(id==='investment')renderInvestment();
+  if(id==='barchart')renderBarChart();
+}
+
+function filterBy(mkt){return mkt==='ALL'?window.PS:window.PS.filter(r=>r.market===mkt);}
+function setMkt(m,el){window.MKT=m;hlBtn(el);render();}
+function setMktMovers(m,el){window.MKT_M=m;hlBtn(el);renderMovers();}
+function setMktAct(m,el){window.MKT_A=m;hlBtn(el);renderActivity();}
+function hlBtn(el){el.parentNode.querySelectorAll('.mkt-btn').forEach(b=>b.classList.remove('on'));el.classList.add('on');}
+
+function mk(id,cfg){if(CH[id]){CH[id].destroy();delete CH[id];}const cv=document.getElementById(id);if(!cv)return;CH[id]=new Chart(cv,cfg);return CH[id];}
+const scX=()=>({grid:{display:false},ticks:{color:'#7A7A7A',font:{family:'DM Mono,monospace',size:10},maxRotation:30}});
+const scY=cb=>({grid:{color:'rgba(216,228,220,.5)'},ticks:{color:'#7A7A7A',font:{family:'DM Mono,monospace',size:10},callback:cb}});
+
+function render(){if(!window.PS.length)return;renderOverview();renderMovers();renderActivity();renderSectors();renderScreener();}
+
+function renderOverview(){
+  const D=filterBy(window.MKT);
+  const gainers=D.filter(r=>r.chg>0),losers=D.filter(r=>r.chg<0),unch=D.filter(r=>r.chg===0&&!r.suspended);
+  const tvol=D.reduce((s,r)=>s+r.vol,0),tval=D.reduce((s,r)=>s+r.val,0);
+  document.getElementById('overviewContent').innerHTML=`
+    <div class="kpi-row k5">
+      <div class="kc" style="--kca:var(--gl)"><div class="kc-lbl">Counters</div><div class="kc-val">${D.length}</div><div class="kc-sub">${window.MKT==='ALL'?'ZSE + VFEX':window.MKT}</div></div>
+      <div class="kc" style="--kca:var(--gain)"><div class="kc-lbl">Gainers</div><div class="kc-val" style="color:var(--gain)">${gainers.length}</div><div class="kc-sub">up today</div></div>
+      <div class="kc" style="--kca:var(--red)"><div class="kc-lbl">Losers</div><div class="kc-val" style="color:var(--red)">${losers.length}</div><div class="kc-sub">down today</div></div>
+      <div class="kc" style="--kca:var(--ts)"><div class="kc-lbl">Unchanged</div><div class="kc-val">${unch.length}</div><div class="kc-sub">no movement</div></div>
+      <div class="kc" style="--kca:var(--gold)"><div class="kc-lbl">Total Volume</div><div class="kc-val" style="color:var(--gold)">${fZ(tvol)}</div><div class="kc-sub">${fZ(tval)} ZiG/$</div></div>
+    </div>
+    <div class="row c21">
+      <div class="mc"><div class="mc-title">Market Cap by Sector <span class="hint">(USD IBR)</span></div><div class="ch" style="height:250px"><canvas id="cSectorCap"></canvas></div></div>
+      <div class="mc"><div class="mc-title">Gainers vs Losers</div><div class="ch" style="height:250px"><canvas id="cGainLoss"></canvas></div></div>
+    </div>
+    <div class="row c2">
+      <div class="mc"><div class="mc-title">Top 5 Gainers</div><div class="tw"><table><thead><tr><th>Counter</th><th>Market</th><th>Close</th><th>Change</th><th>%</th></tr></thead><tbody id="tblGain5"></tbody></table></div></div>
+      <div class="mc"><div class="mc-title">Top 5 Losers</div><div class="tw"><table><thead><tr><th>Counter</th><th>Market</th><th>Close</th><th>Change</th><th>%</th></tr></thead><tbody id="tblLoss5"></tbody></table></div></div>
+    </div>`;
+  const sm={};D.forEach(r=>{sm[r.sector]=(sm[r.sector]||0)+r.mktCapIBR;});
+  const ss=Object.entries(sm).sort((a,b)=>b[1]-a[1]);
+  mk('cSectorCap',{type:'bar',data:{labels:ss.map(([k])=>k),datasets:[{data:ss.map(([,v])=>v),backgroundColor:PAL,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...tt,callbacks:{label:c=>' '+fM(c.raw)}}},scales:{x:scX(),y:scY(fM)}}});
+  mk('cGainLoss',{type:'doughnut',data:{labels:['Gainers','Losers','Unchanged'],datasets:[{data:[gainers.length,losers.length,unch.length],backgroundColor:['#1D6B3A','#C0392B','#A7A8A9'],borderColor:'#FFF',borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{display:true,position:'bottom',labels:{color:'#4A4A4A',font:{size:10},boxWidth:10}},tooltip:{...tt}}}});
+  const g5=[...gainers].sort((a,b)=>b.chgPct-a.chgPct).slice(0,5);
+  document.getElementById('tblGain5').innerHTML=g5.map(r=>`<tr><td class="tf hi">${r.counter}</td><td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td><td>${r.close!=null?fP2(r.close):'—'}</td><td class="up">+${fP2(r.chg)}</td><td class="up">▲ ${fP2(r.chgPct)}%</td></tr>`).join('');
+  const l5=[...losers].sort((a,b)=>a.chgPct-b.chgPct).slice(0,5);
+  document.getElementById('tblLoss5').innerHTML=l5.map(r=>`<tr><td class="tf hi">${r.counter}</td><td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td><td>${r.close!=null?fP2(r.close):'—'}</td><td class="dn">${fP2(r.chg)}</td><td class="dn">▼ ${Math.abs(r.chgPct).toFixed(2)}%</td></tr>`).join('');
+}
+
+function renderMovers(){
+  const D=filterBy(window.MKT_M).filter(r=>!r.suspended&&r.close!=null);
+  const gainers=[...D].filter(r=>r.chg>0).sort((a,b)=>b.chgPct-a.chgPct);
+  const losers=[...D].filter(r=>r.chg<0).sort((a,b)=>a.chgPct-b.chgPct);
+  const row=(r,i,cls,sign)=>`<tr><td class="nc">${i+1}</td><td class="tf hi">${r.counter}</td><td><span class="sect">${r.sector}</span></td><td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td><td>${r.open!=null?fP2(r.open):'—'}</td><td class="hi">${fP2(r.close)}</td><td class="${cls}">${sign}${fP2(r.chg)}</td><td class="${cls}">${cls==='up'?'▲ +':'▼ '}${Math.abs(r.chgPct).toFixed(2)}%</td><td class="${pC(r.ytd)}">${(r.ytd*100).toFixed(1)}%</td></tr>`;
+  document.getElementById('tblGainers').innerHTML=gainers.length?gainers.map((r,i)=>row(r,i,'up','+')).join(''):'<tr><td colspan="9" style="color:var(--ts);text-align:center;padding:24px">No gainers.</td></tr>';
+  document.getElementById('tblLosers').innerHTML=losers.length?losers.map((r,i)=>row(r,i,'dn','')).join(''):'<tr><td colspan="9" style="color:var(--ts);text-align:center;padding:24px">No losers.</td></tr>';
+}
+
+function renderActivity(){
+  const D=filterBy(window.MKT_A),traded=D.filter(r=>r.vol>0).sort((a,b)=>b.val-a.val);
+  document.getElementById('kActVol').textContent=fZ(D.reduce((s,r)=>s+r.vol,0));
+  document.getElementById('kActVal').textContent=fZ(D.reduce((s,r)=>s+r.val,0));
+  document.getElementById('kActCnt').textContent=traded.length;
+  const t12=traded.slice(0,12);
+  mk('cVolBar',{type:'bar',data:{labels:t12.map(r=>r.counter),datasets:[{data:t12.map(r=>r.vol),backgroundColor:'#2D5A40',hoverBackgroundColor:'#3D7A56',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...tt,callbacks:{label:c=>' '+fN(c.raw)+' shares'}}},scales:{x:scX(),y:scY(fZ)}}});
+  const t8=traded.slice(0,8);
+  mk('cValPie',{type:'doughnut',data:{labels:t8.map(r=>r.counter),datasets:[{data:t8.map(r=>r.val),backgroundColor:PAL,borderColor:'#fff',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,cutout:'50%',plugins:{legend:{display:true,position:'bottom',labels:{color:'#4A4A4A',font:{size:9},boxWidth:8}},tooltip:{...tt,callbacks:{label:c=>' '+fZ(c.raw)}}}}});
+  document.getElementById('tblActivity').innerHTML=traded.map((r,i)=>`<tr><td class="nc">${i+1}</td><td class="tf hi">${r.counter}</td><td><span class="sect">${r.sector}</span></td><td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td><td>${r.close!=null?fP2(r.close):'—'}</td><td>${fN(r.vol)}</td><td class="am">${fZ(r.val)}</td><td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'▲ +':'▼ ')+fP2(r.chgPct)+'%'}</td></tr>`).join('');
+}
+
+function renderSectors(){
+  const D=window.PS,sm={};
+  D.forEach(r=>{if(!sm[r.sector])sm[r.sector]={gainers:0,losers:0,unch:0,cap:0};if(r.chg>0)sm[r.sector].gainers++;else if(r.chg<0)sm[r.sector].losers++;else sm[r.sector].unch++;sm[r.sector].cap+=r.mktCapIBR;});
+  const sects=Object.keys(sm).sort();
+  mk('cSectPerf',{type:'bar',data:{labels:sects,datasets:[{label:'Gainers',data:sects.map(s=>sm[s].gainers),backgroundColor:'rgba(29,107,58,.75)',borderRadius:3},{label:'Losers',data:sects.map(s=>sm[s].losers),backgroundColor:'rgba(192,57,43,.7)',borderRadius:3},{label:'Unch.',data:sects.map(s=>sm[s].unch),backgroundColor:'rgba(122,122,122,.4)',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#4A4A4A',font:{size:10},boxWidth:10}},tooltip:{...tt}},scales:{x:scX(),y:scY(v=>v)}}});
+  const sorted=[...D].sort((a,b)=>a.sector.localeCompare(b.sector)||b.mktCapIBR-a.mktCapIBR);
+  document.getElementById('tblSectors').innerHTML=sorted.map((r,i)=>`<tr><td class="nc">${i+1}</td><td class="tf hi">${r.counter}</td><td><span class="sect">${r.sector}</span></td><td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td><td class="am">${fM(r.mktCapIBR)}</td><td>${r.close!=null?fP2(r.close):'—'}</td><td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'▲ +':'▼ ')+fP2(r.chgPct)+'%'}</td><td class="${pC(r.ytd)}">${(r.ytd*100).toFixed(1)}%</td></tr>`).join('');
+}
+
+function renderScreener(){
+  if(!window.PS.length)return;
+  const q=document.getElementById('scrSearch').value.toLowerCase().trim();
+  const m=document.getElementById('scrMkt').value,s=document.getElementById('scrSect').value,so=document.getElementById('scrSort').value;
+  let D=[...window.PS];
+  if(q)D=D.filter(r=>r.counter.toLowerCase().includes(q)||r.sector.toLowerCase().includes(q)||r.isin.toLowerCase().includes(q));
+  if(m)D=D.filter(r=>r.market===m);if(s)D=D.filter(r=>r.sector===s);
+  if(so==='mktcap_d')D.sort((a,b)=>b.mktCapIBR-a.mktCapIBR);else if(so==='pct_d')D.sort((a,b)=>b.chgPct-a.chgPct);else if(so==='pct_a')D.sort((a,b)=>a.chgPct-b.chgPct);else if(so==='vol_d')D.sort((a,b)=>b.vol-a.vol);else if(so==='ytd_d')D.sort((a,b)=>b.ytd-a.ytd);else if(so==='ytd_a')D.sort((a,b)=>a.ytd-b.ytd);else if(so==='az')D.sort((a,b)=>a.counter.localeCompare(b.counter));
+  document.getElementById('tblScreener').innerHTML=D.map((r,i)=>`<tr><td class="nc">${i+1}</td><td class="tf hi" style="cursor:pointer" onclick="quickAddWatch('${r.counter.trim()}')" title="Add to watchlist">${r.counter}</td><td style="color:var(--ts);font-size:10px">${r.isin}</td><td><span class="sect">${r.sector}</span></td><td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td><td>${r.open!=null?fP2(r.open):'—'}</td><td class="hi">${r.close!=null?fP2(r.close):(r.suspended?'<span style="color:var(--gold)">SUSP</span>':'—')}</td><td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'+':'')+fP2(r.chg)}</td><td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'▲ +':'▼ ')+fP2(r.chgPct)+'%'}</td><td>${r.vol>0?fN(r.vol):'<span class="nc">—</span>'}</td><td>${r.val>0?fZ(r.val):'<span class="nc">—</span>'}</td><td class="am">${fM(r.mktCapIBR)}</td><td class="${pC(r.ytd)}">${(r.ytd*100).toFixed(1)}%</td><td>${r.divYield>0?(r.divYield*100).toFixed(2)+'%':'<span class="nc">—</span>'}</td></tr>`).join('');
+  document.getElementById('scrCount').textContent=`Showing ${D.length} of ${window.PS.length} counters · click name to add to watchlist`;
+}
+
+function renderInvestment(){
+  const hasBase=window.BASE&&Object.keys(window.BASE).length>0;
+  const hasPS=window.PS.length>0;
+  const el=document.getElementById('investContent');
+  if(!hasBase||!hasPS){
+    let msg=!hasBase&&!hasPS?'Load a baseline sheet, then import a current price sheet to compare.':!hasBase?'Click <strong>"Set Baseline"</strong> in the toolbar to load the Jan 6 price sheet.':'Click <strong>"Import Sheet"</strong> to load a current sheet to compare.';
+    el.innerHTML=`<div class="setup-panel"><h3>$100 Investment Tracker</h3><p>${msg}</p></div>`;
+    return;
+  }
+  const results=[];
+  window.PS.forEach(r=>{
+    const iv=getInvValue(r);
+    if(iv!=null)results.push({...r,inv100:iv,gain:iv-100,gainPct:iv-100});
+  });
+  if(!results.length){el.innerHTML='<div class="setup-panel"><h3>$100 Investment Tracker</h3><p>No matching counters found between the baseline and current sheet.</p></div>';return;}
+  const winners=results.filter(r=>r.inv100>100),losers=results.filter(r=>r.inv100<100);
+  const best=winners.length?[...winners].sort((a,b)=>b.inv100-a.inv100)[0]:null;
+  const worst=losers.length?[...losers].sort((a,b)=>a.inv100-b.inv100)[0]:null;
+  const avg=results.reduce((s,r)=>s+r.inv100,0)/results.length;
+  const allSorted=[...results].sort((a,b)=>b.inv100-a.inv100);
+  const irow=r=>{
+    const pct=r.gainPct;
+    const bw=Math.min(Math.abs(pct),120);
+    const bc=r.inv100>100?'#1D6B3A':r.inv100<100?'#C0392B':'#7A7A7A';
+    const cls=r.inv100>100?'iv-up':r.inv100<100?'iv-dn':'iv-nc';
+    const basePx=(window.BASE[r.counter.trim().toUpperCase()]||{}).price||0;
+    return `<tr>
+      <td class="tf hi" style="cursor:pointer" onclick="quickAddWatch('${r.counter.trim()}')" title="Add to watchlist">${r.counter}</td>
+      <td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td>
+      <td><span class="sect">${r.sector}</span></td>
+      <td class="nc" style="font-size:10px">$${basePx.toFixed(5)}</td>
+      <td class="nc" style="font-size:10px">$${(r.usdPrice||0).toFixed(5)}</td>
+      <td class="${cls}" style="font-size:13px;font-weight:700">$${r.inv100.toFixed(2)}</td>
+      <td class="${cls}">${r.gain>=0?'+':''}$${r.gain.toFixed(2)}</td>
+      <td class="${cls}">${pct>=0?'▲ +':'▼ '}${Math.abs(pct).toFixed(2)}%<span class="iv-bar" style="background:${bc};width:${bw}px"></span></td>
+      <td class="${pC(r.ytd)}">${(r.ytd*100).toFixed(1)}%</td>
+    </tr>`;
+  };
+  el.innerHTML=`
+    <div class="base-banner">
+      <div class="bb-icon">📅</div>
+      <div class="bb-text">
+        <h3>Baseline: ${window.BASE_DATE}</h3>
+        <p>$100 invested per counter on ${window.BASE_DATE} · Comparing with: ${document.getElementById('sbDate').textContent}</p>
+      </div>
+      <div class="bb-badge">$100 per counter</div>
+    </div>
+    <div class="inv-summary">
+      <div class="inv-kc" style="--kca:var(--gl)">
+        <div class="lbl">Portfolio Average</div>
+        <div class="val" style="color:${avg>=100?'var(--gain)':'var(--red)'}">$${avg.toFixed(2)}</div>
+        <div class="sub">${avg>=100?'▲':'▼'} avg return from $100</div>
+      </div>
+      <div class="inv-kc" style="--kca:var(--gain)">
+        <div class="lbl">Winners</div>
+        <div class="val" style="color:var(--gain)">${winners.length}</div>
+        <div class="sub">of ${results.length} counters tracked</div>
+      </div>
+      <div class="inv-kc" style="--kca:var(--red)">
+        <div class="lbl">Losers</div>
+        <div class="val" style="color:var(--red)">${losers.length}</div>
+        <div class="sub">of ${results.length} counters tracked</div>
+      </div>
+      <div class="inv-kc" style="--kca:var(--gold)">
+        <div class="lbl">Best Performer</div>
+        <div class="val" style="color:var(--gain);font-size:14px">${best?best.counter:'—'}</div>
+        <div class="sub">${best?'$100 → $'+best.inv100.toFixed(2):'no winners yet'}</div>
+      </div>
+    </div>
+    <div class="mc">
+      <div class="mc-title">All Counters — $100 Value <span class="hint">USD · best to worst · click name to add to watchlist</span></div>
+      <div class="tw"><table>
+        <thead><tr><th>Counter</th><th>Market</th><th>Sector</th><th>Base Price (USD)</th><th>Current Price (USD)</th><th>$100 Now Worth</th><th>Gain / Loss</th><th>% Change</th><th>YTD G/L</th></tr></thead>
+        <tbody>${allSorted.map(irow).join('')}</tbody>
+      </table></div>
+      <div class="inv-note">All prices compared in USD. VFEX prices are native USD. ZSE prices use the USD@IBR column from the price sheet. ${results.length} of ${window.PS.length} counters have USD prices in both sheets.</div>
+    </div>`;
+}
+
+function saveWatch(){localStorage.setItem('bw_watchlist',JSON.stringify(window.WATCH));}
+function addWatch(t){const raw=t||document.getElementById('wlInput').value.trim().toUpperCase();if(!raw)return;if(!window.WATCH.includes(raw))window.WATCH.push(raw);saveWatch();document.getElementById('wlInput').value='';renderWatchlist();}
+function quickAddWatch(t){addWatch(t.trim().toUpperCase());}
+function removeWatch(t){window.WATCH=window.WATCH.filter(w=>w!==t);saveWatch();renderWatchlist();}
+function clearWatch(){window.WATCH=[];saveWatch();renderWatchlist();}
+
+function renderWatchlist(){
+  document.getElementById('wlTags').innerHTML=window.WATCH.map(t=>`<div class="wl-tag">${t}<button onclick="removeWatch('${t}')">✕</button></div>`).join('');
+  const rows=window.WATCH.map(t=>{const r=window.PS.find(p=>p.counter.trim().toUpperCase()===t);return r?r:{counter:t,_missing:true};});
+  if(!rows.length){document.getElementById('tblWatch').innerHTML='';document.getElementById('wlEmpty').style.display='flex';return;}
+  document.getElementById('wlEmpty').style.display='none';
+  document.getElementById('tblWatch').innerHTML=rows.map(r=>{
+    if(r._missing)return`<tr><td class="tf" style="color:var(--gold)">${r.counter}</td><td colspan="11" class="nc">Not in current sheet</td></tr>`;
+    const iv=getInvValue(r);
+    const ivCell=iv!=null?`<span class="${iv>100?'iv-up':iv<100?'iv-dn':'iv-nc'}">$${iv.toFixed(2)}</span>`:'<span class="nc">—</span>';
+    return`<tr><td class="tf hi">${r.counter}</td><td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td><td><span class="sect">${r.sector}</span></td><td>${r.open!=null?fP2(r.open):'—'}</td><td class="hi">${r.close!=null?fP2(r.close):(r.suspended?'<span class="am">SUSP</span>':'—')}</td><td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'+':'')+fP2(r.chg)}</td><td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'▲ +':'▼ ')+fP2(r.chgPct)+'%'}</td><td>${r.vol>0?fN(r.vol):'<span class="nc">—</span>'}</td><td>${r.val>0?fZ(r.val):'<span class="nc">—</span>'}</td><td class="am">${fM(r.mktCapIBR)}</td><td class="${pC(r.ytd)}">${(r.ytd*100).toFixed(1)}%</td><td>${ivCell}</td></tr>`;
+  }).join('');
+}
+
+function renderBarChart(){
+  const hasBase=window.BASE&&Object.keys(window.BASE).length>0;
+  const hasPS=window.PS.length>0;
+  const el=document.getElementById('barchartContent');
+  if(!hasBase||!hasPS){
+    let msg=!hasBase?'Click <strong>"Set Baseline"</strong> to load the Jan 6 price sheet first.':'Click <strong>"Import Sheet"</strong> to load a current price sheet to compare.';
+    el.innerHTML=`<div class="setup-panel"><h3>Investment Chart</h3><p>${msg}</p></div>`;
+    return;
+  }
+  // Build results
+  const results=[];
+  window.PS.forEach(r=>{
+    const iv=getInvValue(r);
+    if(iv!=null)results.push({...r,inv100:iv,gain:iv-100});
+  });
+  if(!results.length){el.innerHTML='<div class="setup-panel"><h3>Investment Chart</h3><p>No matching counters between baseline and current sheet.</p></div>';return;}
+  // Sort worst to best (like reference image)
+  results.sort((a,b)=>a.inv100-b.inv100);
+  // Get filter values
+  const mktF=document.getElementById('bcMkt')?.value||'';
+  const showN=parseInt(document.getElementById('bcCount')?.value||'999')||999;
+  let filtered=mktF?results.filter(r=>r.market===mktF):results;
+  filtered=filtered.slice(-showN); // top N worst→best means last N after sort
+  const maxVal=Math.max(...filtered.map(r=>r.inv100),200);
+  const baseDate=window.BASE_DATE;
+  const currDate=document.getElementById('sbDate').textContent;
+  const winners=filtered.filter(r=>r.inv100>100).length;
+  const losers=filtered.filter(r=>r.inv100<100).length;
+  const avg=(filtered.reduce((s,r)=>s+r.inv100,0)/filtered.length).toFixed(2);
+  // Scale: each px unit
+  const MAXPX=520; // max bar width in px
+  const scale=v=>Math.max(4,Math.round((v/maxVal)*MAXPX));
+  const barColor=v=>{
+    if(v>=150)return'#1A3A2A';
+    if(v>=120)return'#2D5A40';
+    if(v>=100)return'#3D7A56';
+    if(v>=80)return'#B8872A';
+    return'#C0392B';
+  };
+  const rows=filtered.map(r=>{
+    const bw=scale(r.inv100);
+    const bc=barColor(r.inv100);
+    const cls=r.inv100>100?'iv-up':r.inv100<100?'iv-dn':'iv-nc';
+    const susp=r.suspended?' *':'';
+    return `<div class="bc-row">
+      <div class="bc-label" title="${r.counter}${r.market==='VFEX'?' (VFEX)':''}">${r.counter}${susp}</div>
+      <div class="bc-bar-wrap">
+        <div class="bc-bar" style="width:${bw}px;background:${bc}"></div>
+        <span class="bc-val ${cls}">$${r.inv100.toFixed(2)}</span>
+        <span class="bc-sect">${r.sector}</span>
+        <span class="bc-mkt">${r.market==='VFEX'?'(VFEX)':''}</span>
+      </div>
+    </div>`;
+  }).join('');
+  el.innerHTML=`
+    <div class="bchart-wrap" id="printArea">
+      <div class="bchart-header">
+        <div class="bch-logo">
+          <img src="https://bobwealth.org/images/bob_logo.png" style="height:36px;width:36px;object-fit:contain" onerror="this.style.display='none'">
+          <div>
+            <div style="font-family:var(--serif);font-size:15px;font-weight:700;color:var(--gd)">Bob Wealth Holdings</div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--ts);letter-spacing:.1em;text-transform:uppercase">Zimbabwe Capital Markets</div>
+          </div>
+        </div>
+        <div class="bch-title">If you invested US$100 in each of these counters on <strong>${baseDate}</strong>,</div>
+        <div class="bch-title">on <strong>${currDate}</strong> it was worth;</div>
+        <div style="margin-top:8px;display:flex;gap:20px;justify-content:center;font-family:var(--mono);font-size:10px">
+          <span style="color:var(--ts)">Start: ${Object.keys(window.BASE).length} counters</span>
+          <span style="color:var(--ts)">End: ${filtered.length} counters with matching prices</span>
+        </div>
+      </div>
+      <div class="bchart-controls" id="bcControls">
+        <select id="bcMkt" onchange="renderBarChart()"><option value="">All Markets</option><option>ZSE</option><option>VFEX</option></select>
+        <select id="bcCount" onchange="renderBarChart()">
+          <option value="999">All counters</option>
+          <option value="20">Top/bottom 20</option>
+          <option value="30">Top/bottom 30</option>
+          <option value="50">Top/bottom 50</option>
+        </select>
+        <button class="btn-print" onclick="printChart()">🖨 Print / Save PDF</button>
+        <span style="font-size:9px;font-family:var(--mono);color:var(--ts)">* denotes unavailable at baseline date</span>
+      </div>
+      <div class="bchart-legend">
+        <div class="bl-item"><div class="bl-dot" style="background:#1A3A2A"></div> &gt; $150</div>
+        <div class="bl-item"><div class="bl-dot" style="background:#2D5A40"></div> $120–$150</div>
+        <div class="bl-item"><div class="bl-dot" style="background:#3D7A56"></div> $100–$120</div>
+        <div class="bl-item"><div class="bl-dot" style="background:#B8872A"></div> $80–$100</div>
+        <div class="bl-item"><div class="bl-dot" style="background:#C0392B"></div> &lt; $80</div>
+      </div>
+      <div id="bcRows">${rows}</div>
+      <div class="bchart-footer">
+        <p>Data: FBC Securities (Pvt) Ltd · Prices in USD (IBR rate for ZSE) · For informational purposes only<br>* denotes counter unavailable in baseline sheet</p>
+        <div class="bchart-stats">
+          <span class="bcs">Winners: <b style="color:var(--gain)">${winners}</b></span>
+          <span class="bcs">Losers: <b style="color:var(--red)">${losers}</b></span>
+          <span class="bcs">Avg: <b style="color:${parseFloat(avg)>=100?'var(--gain)':'var(--red)'}">$${avg}</b></span>
+        </div>
+      </div>
+    </div>`;
+}
+
+function printChart(){
+  // Hide controls for print, then restore
+  const ctrl=document.getElementById('bcControls');
+  if(ctrl)ctrl.style.display='none';
+  window.print();
+  setTimeout(()=>{if(ctrl)ctrl.style.display='flex';},500);
+}
+
+function publishSnapshot(){
+  if(!window.PS.length){ alert('Import a price sheet first.'); return; }
+  const btn=document.getElementById('btnPub');
+  btn.textContent='Building…'; btn.disabled=true;
+  try{
+    const date=document.getElementById('sbDate').textContent;
+    const snapshot={
+      generated: new Date().toISOString(),
+      priceDate: date,
+      baseDate: window.BASE_DATE||'',
+      counters: window.PS.map(r=>({
+        counter:r.counter.trim(), isin:r.isin, market:r.market, sector:r.sector,
+        shares:r.shares, mktCapIBR:r.mktCapIBR,
+        open:r.open, close:r.close, usdIBR:r.usdIBR,
+        chg:r.chg, chgPct:r.chgPct,
+        vol:r.vol, val:r.val,
+        divYield:r.divYield, ytd:r.ytd,
+        suspended:r.suspended, usdPrice:r.usdPrice,
+        // pre-calculated $100 value
+        inv100: (()=>{ const b=window.BASE[r.counter.trim().toUpperCase()]; return(b&&b.price>0&&r.usdPrice>0)?(r.usdPrice/b.price)*100:null; })()
+      }))
+    };
+    const json=JSON.stringify(snapshot, null, 2);
+    const blob=new Blob([json],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+    a.download='market-data.json'; a.click();
+    URL.revokeObjectURL(a.href);
+    btn.textContent='✓ Downloaded — upload to GitHub';
+    btn.style.background='var(--gain)'; btn.style.borderColor='var(--gain)';
+    setTimeout(()=>{ btn.textContent='⬆ Publish Snapshot'; btn.style.background='var(--gold)'; btn.style.borderColor='var(--gold)'; btn.disabled=false; },4000);
+  }catch(err){
+    console.error(err); alert('Publish failed: '+err.message);
+    btn.textContent='⬆ Publish Snapshot'; btn.disabled=false;
+  }
+}
+
+function exportReport(){
+  if(!window.PS.length)return;
+  const btn=document.getElementById('btnExp');btn.textContent='Building…';btn.disabled=true;
+  setTimeout(()=>{
+    try{
+      const wb=XLSX.utils.book_new(),date=document.getElementById('sbDate').textContent;
+      const h1=['Counter','ISIN','Market','Sector','Shares','Mkt Cap USD','Open','Close','USD@IBR','Change','% Change','Volume','Value (ZiG)','YTD G/L %','Div Yield %'];
+      const r1=window.PS.map(r=>[r.counter.trim(),r.isin,r.market,r.sector,r.shares,+r.mktCapIBR.toFixed(2),r.open,r.close,r.usdIBR,r.chg,+r.chgPct.toFixed(4),r.vol,+r.val.toFixed(2),+(r.ytd*100).toFixed(2),+(r.divYield*100).toFixed(4)]);
+      XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([h1,...r1]),'PRICE DATA');
+      if(window.BASE&&Object.keys(window.BASE).length){
+        const h2=['Counter','Market','Sector','Base Price (USD)','Current Price (USD)','$100 Value','Gain/Loss ($)','% Change','YTD G/L %'];
+        const r2=window.PS.map(r=>{const iv=getInvValue(r);const b=window.BASE[r.counter.trim().toUpperCase()];return iv!=null?[r.counter.trim(),r.market,r.sector,+b.price.toFixed(6),+r.usdPrice.toFixed(6),+iv.toFixed(4),+(iv-100).toFixed(4),+(iv-100).toFixed(4),+(r.ytd*100).toFixed(2)]:null;}).filter(Boolean).sort((a,b)=>b[5]-a[5]);
+        XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([h2,...r2]),'$100 TRACKER');
+      }
+      XLSX.writeFile(wb,`BobWealth_Markets_${date.replace(/-/g,'')}.xlsx`);
+      btn.textContent='↓ Export';btn.disabled=false;
+    }catch(err){console.error(err);btn.textContent='↓ Export';btn.disabled=false;}
+  },50);
+}
+
+renderWatchlist();
+fetchBaseline();
+</script>
+</body>
+</html>
