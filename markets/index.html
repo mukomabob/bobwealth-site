@@ -619,8 +619,8 @@ function renderBarChart(){
             <div style="font-family:var(--mono);font-size:9px;color:var(--ts);letter-spacing:.1em;text-transform:uppercase">Zimbabwe Capital Markets</div>
           </div>
         </div>
-        <div style="font-size:14px;font-weight:600;color:var(--text);font-family:var(--font)">If you invested US$<span id="dynamicLabelAmount">100</span> in each of these counters on <strong>${document.getElementById('tbSub')?.textContent?.match(/Base: ([^\s·]+)/)?.[1]||'Jan 6, 2026'}</strong>,</div>
-        <div style="font-size:14px;font-weight:600;color:var(--text);font-family:var(--font);margin-top:2px">on <strong>${priceDate}</strong> it was worth;</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);font-family:var(--font)">If you invested US$<span id="dynamicLabelAmount">100</span> in each of these counters at the beginning of the year,</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);font-family:var(--font);margin-top:2px">on <strong>${priceDate}</strong> it would be worth;</div>
         <div style="margin-top:8px;display:flex;gap:20px;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--ts)">
           <span>Start: ${results.length} counters</span><span>End: ${filtered.length} shown</span>
         </div>
