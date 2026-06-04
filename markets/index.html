@@ -497,7 +497,7 @@ function nav(id, el){
   showPage(id);
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
   el.classList.add('on');
-  const T={overview:'Market Overview',movers:'Movers',activity:'Trading Activity',sectors:'Sector Breakdown',screener:'Full Screener',barchart:'Investment Chart'};
+  const T={overview:'Market Overview',movers:'Movers',activity:'Trading Activity',sectors:'Sector Breakdown',screener:'Full Screener',barchart:'Investment Simulator'};
   const tt2 = document.getElementById('tbTitle');
   if(tt2) tt2.textContent = T[id]||id;
   if(id==='barchart') renderBarChart();
