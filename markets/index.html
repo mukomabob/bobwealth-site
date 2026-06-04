@@ -167,12 +167,7 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 </style>
 </head>
 <body>
-/*=====================================TOP PART IN GREEN===============================================
-  ================================================================================================
-  ================================================================================================
-  ================================================================================================
-  ===================================TOP TOP PART IN GREEN====================================
-  ================================================================================================*/
+
 <header class="site-header">
   <a href="https://bobwealth.org/index.html" class="hd-brand">
     <img src="https://bobwealth.org/images/bob_logo.png" class="hd-logo" alt="Bob Wealth"
@@ -194,20 +189,7 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
   </div>
 </header>
 
-  /*=================================END OF HEADER========================================
-  ================================================================================================
-  ================================================================================================
-  ================================================================================================
-  ===================================END OF HEADER====================================
-  ================================================================================================*/
-
 <div class="app">
-/*==================================+===SIDE BAR===================================================
-  ================================================================================================
-  ================================================================================================
-  ================================================================================================
-  =====================================SIDE BAR ON LEFT SIDE======================================
-  ================================================================================================*/
 <aside class="sb">
   <div class="sb-hdr">
     <div class="sb-title">Market Intelligence</div>
@@ -219,7 +201,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
       <div class="ni on" onclick="nav('overview',this)"><span class="ni-ic">◈</span>Overview</div>
       <div class="ni" onclick="nav('barchart',this)"><span class="ni-ic">▬</span>Investment Simulator</div>
       <div class="ni" onclick="nav('movers',this)"><span class="ni-ic">⇅</span>Movers</div>
-      
     </div>
     <div class="ng">
       <div class="ng-lbl">Analysis</div>
@@ -237,13 +218,7 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
     <p style="margin-top:8px;font-size:9px;color:var(--ts);font-family:var(--mono)" id="sbGenerated"></p>
   </div>
 </aside>
-/*=====================================END OF SIDE BAR===================================================
-  ================================================================================================
-  ================================================================================================
-  ================================================================================================
-  ==================================END OF SIDE BAR ON LEFT SIDE
-  =================================BEGINNING OF TOP BAR==============================================
-  ================================================================================================*/
+
 <div class="ws">
   <div class="topbar">
     <div class="tb-left">
@@ -347,13 +322,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 </div>
 </div>
 
-/*======================================BEGINNING OF SCRIPT AND FUNCTIONS=============================*/
-/*======================================BEGINNING OF SCRIPT AND FUNCTIONS=============================*/
-/*======================================BEGINNING OF SCRIPT AND FUNCTIONS=============================*/
-/*======================================BEGINNING OF SCRIPT AND FUNCTIONS=============================*/
-/*======================================BEGINNING OF SCRIPT AND FUNCTIONS=============================*/
-/*======================================BEGINNING OF SCRIPT AND FUNCTIONS=============================*/
-/*======================================BEGINNING OF SCRIPT AND FUNCTIONS=============================*/
 <script>
 'use strict';
 window.PS  = [];
@@ -375,14 +343,12 @@ const fM  = v => { if(v==null)return'—';const a=Math.abs(v);if(a>=1e9)return'$
 const fZ  = v => { if(v==null)return'—';const a=Math.abs(v);if(a>=1e9)return(a/1e9).toFixed(2)+'B';if(a>=1e6)return(a/1e6).toFixed(2)+'M';if(a>=1e3)return(a/1e3).toFixed(0)+'K';return a.toLocaleString(); };
 const pC  = v => v>0?'up':v<0?'dn':'nc';
 
-/* ── HELPER FUNCTIONS ─────────────────────────────────── */
 function setInvestment(amount){
   const el = document.getElementById('investmentAmount');
   if(el) el.value = amount;
   renderBarChart();
 }
 
-/* ── DATA LOADING ──────────────────────────────────────── */
 async function loadData(){
   for(const url of DATA_URLS){
     try{
@@ -407,7 +373,6 @@ function ingestSnapshot(data){
   const baseDate  = data.baseDate  || '';
   const generated = data.generated ? new Date(data.generated) : null;
 
-  // Sidebar
   const sbD = document.getElementById('sbDate');
   if(sbD) sbD.textContent = priceDate;
   const sbSt = document.getElementById('sbStats');
@@ -419,11 +384,9 @@ function ingestSnapshot(data){
   const sbGen = document.getElementById('sbGenerated');
   if(sbGen && generated) sbGen.textContent = 'Updated: ' + generated.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
 
-  // Topbar
   const tbS = document.getElementById('tbSub');
   if(tbS) tbS.textContent = `· ${priceDate} · ZSE + VFEX${baseDate ? ' · Base: '+baseDate : ''}`;
 
-  // Freshness indicator
   const dot = document.getElementById('freshDot');
   const lbl = document.getElementById('freshLbl');
   if(dot && lbl && generated){
@@ -432,7 +395,6 @@ function ingestSnapshot(data){
     else { dot.className='fresh-dot stale'; lbl.textContent='Last updated: '+priceDate; }
   }
 
-  // Populate sector filter
   const sel = document.getElementById('scrSect');
   if(sel){
     sel.innerHTML = '<option value="">All Sectors</option>';
@@ -441,7 +403,6 @@ function ingestSnapshot(data){
     });
   }
 
-  // Switch from loading to overview
   showPage('overview');
   document.querySelector('.ni.on')?.classList.remove('on');
   document.querySelector('.ni')?.classList.add('on');
@@ -492,12 +453,11 @@ function showPage(id){
   if(pg) pg.classList.add('on');
 }
 
-/* ── NAVIGATION ────────────────────────────────────────── */
 function nav(id, el){
   showPage(id);
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
   el.classList.add('on');
-  const T={overview:'Market Overview',movers:'Movers',activity:'Trading Activity',sectors:'Sector Breakdown',screener:'Full Screener',barchart:'Investment Simulator'};
+  const T={overview:'Market Overview',movers:'Movers',activity:'Trading Activity',sectors:'Sector Breakdown',screener:'Full Screener',barchart:'Investment Chart'};
   const tt2 = document.getElementById('tbTitle');
   if(tt2) tt2.textContent = T[id]||id;
   if(id==='barchart') renderBarChart();
@@ -509,15 +469,12 @@ function setMktMovers(m,el){ window.MKT_M=m; hlBtn(el); renderMovers(); }
 function setMktAct(m,el)   { window.MKT_A=m; hlBtn(el); renderActivity(); }
 function hlBtn(el){ el.parentNode.querySelectorAll('.mkt-btn').forEach(b=>b.classList.remove('on')); el.classList.add('on'); }
 
-/* ── CHART FACTORY ─────────────────────────────────────── */
 function mk(id,cfg){ if(CH[id]){CH[id].destroy();delete CH[id];} const cv=document.getElementById(id); if(!cv)return; CH[id]=new Chart(cv,cfg); return CH[id]; }
 const scX = ()=>({grid:{display:false},ticks:{color:'#7A7A7A',font:{family:'DM Mono,monospace',size:10},maxRotation:30}});
 const scY = cb=>({grid:{color:'rgba(216,228,220,.5)'},ticks:{color:'#7A7A7A',font:{family:'DM Mono,monospace',size:10},callback:cb}});
 
-/* ── RENDER ALL ────────────────────────────────────────── */
 function render(){ if(!window.PS.length)return; renderOverview(); renderMovers(); renderActivity(); renderSectors(); renderScreener(); }
 
-/* ── OVERVIEW ──────────────────────────────────────────── */
 function renderOverview(){
   const D=filterBy(window.MKT);
   const gainers=D.filter(r=>r.chg>0), losers=D.filter(r=>r.chg<0), unch=D.filter(r=>r.chg===0&&!r.suspended);
@@ -548,7 +505,6 @@ function renderOverview(){
   document.getElementById('tblLoss5').innerHTML=l5.map(r=>`<tr><td class="tf hi">${r.counter}</td><td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td><td>${r.close!=null?fP2(r.close):'—'}</td><td class="dn">${fP2(r.chg)}</td><td class="dn">▼ ${Math.abs(r.chgPct).toFixed(2)}%</td></tr>`).join('');
 }
 
-/* ── MOVERS ────────────────────────────────────────────── */
 function renderMovers(){
   const D=filterBy(window.MKT_M).filter(r=>!r.suspended&&r.close!=null);
   const gainers=[...D].filter(r=>r.chg>0).sort((a,b)=>b.chgPct-a.chgPct);
@@ -558,7 +514,6 @@ function renderMovers(){
   document.getElementById('tblLosers').innerHTML=losers.length?losers.map((r,i)=>row(r,i,'dn','')).join(''):'<tr><td colspan="9" style="color:var(--ts);text-align:center;padding:24px">No losers.</td></tr>';
 }
 
-/* ── ACTIVITY ──────────────────────────────────────────── */
 function renderActivity(){
   const D=filterBy(window.MKT_A), traded=D.filter(r=>r.vol>0).sort((a,b)=>b.val-a.val);
   document.getElementById('kActVol').textContent=fZ(D.reduce((s,r)=>s+r.vol,0));
@@ -571,7 +526,6 @@ function renderActivity(){
   document.getElementById('tblActivity').innerHTML=traded.map((r,i)=>`<tr><td class="nc">${i+1}</td><td class="tf hi">${r.counter}</td><td><span class="sect">${r.sector}</span></td><td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td><td>${r.close!=null?fP2(r.close):'—'}</td><td>${fN(r.vol)}</td><td class="am">${fZ(r.val)}</td><td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'▲ +':'▼ ')+fP2(r.chgPct)+'%'}</td></tr>`).join('');
 }
 
-/* ── SECTORS ───────────────────────────────────────────── */
 function renderSectors(){
   const D=window.PS, sm={};
   D.forEach(r=>{if(!sm[r.sector])sm[r.sector]={gainers:0,losers:0,unch:0,cap:0};if(r.chg>0)sm[r.sector].gainers++;else if(r.chg<0)sm[r.sector].losers++;else sm[r.sector].unch++;sm[r.sector].cap+=r.mktCapIBR;});
@@ -581,7 +535,6 @@ function renderSectors(){
   document.getElementById('tblSectors').innerHTML=sorted.map((r,i)=>`<tr><td class="nc">${i+1}</td><td class="tf hi">${r.counter}</td><td><span class="sect">${r.sector}</span></td><td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td><td class="am">${fM(r.mktCapIBR)}</td><td>${r.close!=null?fP2(r.close):'—'}</td><td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'▲ +':'▼ ')+fP2(r.chgPct)+'%'}</td><td class="${pC(r.ytd)}">${(r.ytd*100).toFixed(1)}%</td></tr>`).join('');
 }
 
-/* ── SCREENER ──────────────────────────────────────────── */
 function renderScreener(){
   if(!window.PS.length)return;
   const q=document.getElementById('scrSearch').value.toLowerCase().trim();
@@ -594,7 +547,6 @@ function renderScreener(){
   document.getElementById('scrCount').textContent=`Showing ${D.length} of ${window.PS.length} counters`;
 }
 
-/* ── BAR CHART ─────────────────────────────────────────── */
 function renderBarChart(){
   const el=document.getElementById('barchartContent');
   if(!window.PS.length){ el.innerHTML='<div class="state-card"><div class="sc-icon">📊</div><h3>No data</h3><p>Data has not been loaded yet.</p></div>'; return; }
@@ -642,7 +594,6 @@ function renderBarChart(){
     </div>`;
   }).join('');
   
-  // Outer template frame replacement logic
   el.innerHTML=`
     <div class="bchart-wrap" id="printArea">
       <div class="bchart-header">
@@ -721,7 +672,6 @@ function renderBarChart(){
       </div>
     </div>`;
 
-  // Apply the execution context indicators downstream to UI DOM targets
   document.getElementById("kpiInvestment").textContent = "$" + investment.toLocaleString();
   document.getElementById("kpiBest").textContent = bestStock ? bestStock.counter : '-';
   document.getElementById("kpiHighest").textContent = "$" + highestValue.toFixed(2);
@@ -735,7 +685,6 @@ function printChart(){
   setTimeout(()=>{ if(ctrl) ctrl.style.display='flex'; },500);
 }
 
-// Boot
 loadData();
 </script>
 </body>
