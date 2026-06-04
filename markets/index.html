@@ -390,7 +390,7 @@ function ingestSnapshot(data){
 
   // Topbar
   const tbS = document.getElementById('tbSub');
-  if(tbS) tbS.textContent = `FBC Securities · ${priceDate} · ZSE + VFEX${baseDate ? ' · Base: '+baseDate : ''}`;
+  if(tbS) tbS.textContent = `· ${priceDate} · ZSE + VFEX${baseDate ? ' · Base: '+baseDate : ''}`;
 
   // Freshness indicator
   const dot = document.getElementById('freshDot');
