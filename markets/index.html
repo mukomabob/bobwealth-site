@@ -26,6 +26,7 @@ body{font-family:var(--font);background:var(--cream);color:var(--text);display:f
 .hd-brand{display:flex;align-items:center;gap:13px;text-decoration:none}
 .hd-logo{height:36px;width:36px;object-fit:contain}
 .hd-logo-fb{width:36px;height:36px;border-radius:4px;background:var(--gold);display:none;align-items:center;justify-content:center;font-family:var(--serif);font-size:17px;font-weight:700;color:var(--gd);flex-shrink:0}
+.hd-brand:hover .hd-logo-fb{background:var(--gold-l)}
 .hd-name{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--white);letter-spacing:.2px;line-height:1.1}
 .hd-name span{display:block;font-family:var(--mono);font-size:9px;font-weight:400;color:var(--gold-l);letter-spacing:.15em;text-transform:uppercase;margin-top:2px}
 .site-nav{display:flex;align-items:center;gap:3px}
@@ -125,7 +126,7 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 .bchart-legend .bl-item{display:flex;align-items:center;gap:5px;font-size:10px;font-family:var(--mono);color:var(--tm)}
 .bchart-legend .bl-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
 .bchart-controls{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
-.bchart-controls select{background:var(--white);border:1.5px solid var(--border);border-radius:4px;padding:5px 9px;color:var(--text);font-family:var(--mono);font-size:10px;outline:none}
+.bchart-controls select,.bchart-controls input{background:var(--white);border:1.5px solid var(--border);border-radius:4px;padding:5px 9px;color:var(--text);font-family:var(--mono);font-size:10px;outline:none}
 .btn-print{border:1.5px solid var(--gd);color:var(--gd);background:transparent;padding:5px 13px;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.08em;font-family:var(--font)}
 .btn-print:hover{background:var(--gd);color:var(--white)}
 .bc-row{display:flex;align-items:center;gap:0;margin-bottom:3px;min-height:22px}
@@ -155,7 +156,7 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
 @media print{
-  .site-header,.sb,.topbar,.bchart-controls,.bchart-legend,.mkt-toggle{display:none!important}
+  .site-header,.sb,.topbar,.bchart-controls,.bchart-legend,.mkt-toggle,#investmentSummary{display:none!important}
   .app{display:block}.ws,.content{overflow:visible}
   body{overflow:visible}
   .vp{display:none!important}
@@ -190,7 +191,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 
 <div class="app">
 
-<!-- SIDEBAR -->
 <aside class="sb">
   <div class="sb-hdr">
     <div class="sb-title">Market Intelligence</div>
@@ -220,7 +220,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
   </div>
 </aside>
 
-<!-- WORKSPACE -->
 <div class="ws">
   <div class="topbar">
     <div class="tb-left">
@@ -231,7 +230,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 
   <div class="content">
 
-    <!-- LOADING STATE -->
     <div class="vp on" id="page-loading">
       <div class="state-card">
         <div class="spinner"></div>
@@ -240,7 +238,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
       </div>
     </div>
 
-    <!-- ERROR STATE -->
     <div class="vp" id="page-error">
       <div class="state-card">
         <div class="sc-icon">⚠️</div>
@@ -249,7 +246,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
       </div>
     </div>
 
-    <!-- OVERVIEW -->
     <div class="vp" id="page-overview">
       <div class="mkt-toggle">
         <button class="mkt-btn on" onclick="setMkt('ALL',this)">All Markets</button>
@@ -259,7 +255,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
       <div id="overviewContent"></div>
     </div>
 
-    <!-- MOVERS -->
     <div class="vp" id="page-movers">
       <div class="mkt-toggle">
         <button class="mkt-btn on" onclick="setMktMovers('ALL',this)">All Markets</button>
@@ -274,7 +269,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
       </div></div>
     </div>
 
-    <!-- ACTIVITY -->
     <div class="vp" id="page-activity">
       <div class="mkt-toggle">
         <button class="mkt-btn on" onclick="setMktAct('ALL',this)">All Markets</button>
@@ -295,7 +289,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
       </div></div>
     </div>
 
-    <!-- SECTORS -->
     <div class="vp" id="page-sectors">
       <div class="row c1"><div class="mc"><div class="mc-title">Sector Performance Summary</div><div class="ch" style="height:240px"><canvas id="cSectPerf"></canvas></div></div></div>
       <div class="row c1"><div class="mc"><div class="mc-title">Counters by Sector</div>
@@ -303,7 +296,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
       </div></div>
     </div>
 
-    <!-- SCREENER -->
     <div class="vp" id="page-screener">
       <div class="fb">
         <input type="text" id="scrSearch" placeholder="Search counter or sector…" oninput="renderScreener()">
@@ -321,7 +313,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
       </div>
     </div>
 
-    <!-- INVESTMENT BAR CHART -->
     <div class="vp" id="page-barchart">
       <div id="barchartContent">
         <div class="state-card"><div class="spinner"></div><h3>Preparing chart…</h3></div>
@@ -353,6 +344,13 @@ const fM  = v => { if(v==null)return'—';const a=Math.abs(v);if(a>=1e9)return'$
 const fZ  = v => { if(v==null)return'—';const a=Math.abs(v);if(a>=1e9)return(a/1e9).toFixed(2)+'B';if(a>=1e6)return(a/1e6).toFixed(2)+'M';if(a>=1e3)return(a/1e3).toFixed(0)+'K';return a.toLocaleString(); };
 const pC  = v => v>0?'up':v<0?'dn':'nc';
 
+/* ── HELPER FUNCTIONS ─────────────────────────────────── */
+function setInvestment(amount){
+  const el = document.getElementById('investmentAmount');
+  if(el) el.value = amount;
+  renderBarChart();
+}
+
 /* ── DATA LOADING ──────────────────────────────────────── */
 async function loadData(){
   for(const url of DATA_URLS){
@@ -369,7 +367,6 @@ async function loadData(){
       console.warn('Failed:', url, err.message);
     }
   }
-  // All URLs failed — show helpful error with manual load option
   showError();
 }
 
@@ -425,7 +422,6 @@ function showError(){
   const lbl = document.getElementById('freshLbl');
   if(dot) dot.className = 'fresh-dot stale';
   if(lbl) lbl.textContent = 'Data unavailable';
-  // Replace error page content with helpful state + manual load option
   const errPage = document.getElementById('page-error');
   if(errPage) errPage.innerHTML = `
     <div class="state-card">
@@ -573,31 +569,49 @@ function renderBarChart(){
   if(!window.PS.length){ el.innerHTML='<div class="state-card"><div class="sc-icon">📊</div><h3>No data</h3><p>Data has not been loaded yet.</p></div>'; return; }
   const results=window.PS.filter(r=>r.inv100!=null).sort((a,b)=>a.inv100-b.inv100);
   if(!results.length){ el.innerHTML='<div class="state-card"><div class="sc-icon">📊</div><h3>No $100 data</h3><p>The published snapshot does not include investment comparison data. The superuser needs to load a baseline before publishing.</p></div>'; return; }
+  
   const mktF=document.getElementById('bcMktF')?.value||'';
   const cntF=parseInt(document.getElementById('bcCntF')?.value||'999')||999;
   let filtered=mktF?results.filter(r=>r.market===mktF):results;
   filtered=filtered.slice(-Math.min(cntF,filtered.length));
-  const maxVal=Math.max(...filtered.map(r=>r.inv100),200);
+  
+  const investment = parseFloat(document.getElementById('investmentAmount')?.value || 100);
+
+  let bestStock = filtered[0];
+  let highestValue = 0;
+
+  filtered.forEach(stock => {
+    const valueToday = (stock.inv100 / 100) * investment;
+    if(valueToday > highestValue){
+      highestValue = valueToday;
+      bestStock = stock;
+    }
+  });
+
+  const maxVal=Math.max(...filtered.map(r=>(r.inv100 / 100) * investment), investment * 2);
   const MAXPX=520;
   const scale=v=>Math.max(4,Math.round((v/maxVal)*MAXPX));
-  const barColor=v=>v>=150?'#1A3A2A':v>=120?'#2D5A40':v>=100?'#3D7A56':v>=80?'#B8872A':'#C0392B';
+  const barColor=v=>(v/investment)*100>=150?'#1A3A2A':(v/investment)*100>=120?'#2D5A40':(v/investment)*100>=100?'#3D7A56':(v/investment)*100>=80?'#B8872A':'#C0392B';
   const priceDate=document.getElementById('sbDate')?.textContent||'';
-  const baseDate=(window.PS[0]&&window.PS[0].baseDate)||'';
   const winners=filtered.filter(r=>r.inv100>100).length;
   const losers2=filtered.filter(r=>r.inv100<100).length;
-  const avg=(filtered.reduce((s,r)=>s+r.inv100,0)/filtered.length).toFixed(2);
+  const avg=((filtered.reduce((s,r)=>s+r.inv100,0)/filtered.length) / 100 * investment).toFixed(2);
+  
   const rows=filtered.map(r=>{
+    const valueToday = (r.inv100 / 100) * investment;
     const cls=r.inv100>100?'iv-up':r.inv100<100?'iv-dn':'iv-nc';
     return `<div class="bc-row">
       <div class="bc-label" title="${r.counter}">${r.counter}${r.suspended?' *':''}</div>
       <div class="bc-bar-wrap">
-        <div class="bc-bar" style="width:${scale(r.inv100)}px;background:${barColor(r.inv100)}"></div>
-        <span class="bc-val ${cls}">$${r.inv100.toFixed(2)}</span>
+        <div class="bc-bar" style="width:${scale(valueToday)}px;background:${barColor(valueToday)}"></div>
+        <span class="bc-val ${cls}">$${valueToday.toFixed(2)}</span>
         <span class="bc-sect">${r.sector}</span>
         <span style="font-size:8px;font-family:var(--mono);color:var(--ts);margin-left:3px">${r.market==='VFEX'?'(VFEX)':''}</span>
       </div>
     </div>`;
   }).join('');
+  
+  // Outer template frame replacement logic
   el.innerHTML=`
     <div class="bchart-wrap" id="printArea">
       <div class="bchart-header">
@@ -608,27 +622,62 @@ function renderBarChart(){
             <div style="font-family:var(--mono);font-size:9px;color:var(--ts);letter-spacing:.1em;text-transform:uppercase">Zimbabwe Capital Markets</div>
           </div>
         </div>
-        <div style="font-size:14px;font-weight:600;color:var(--text);font-family:var(--font)">If you invested US$100 in each of these counters on <strong>${document.getElementById('tbSub')?.textContent?.match(/Base: ([^\s·]+)/)?.[1]||'Jan 6, 2026'}</strong>,</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);font-family:var(--font)">If you invested US$<span id="dynamicLabelAmount">100</span> in each of these counters on <strong>${document.getElementById('tbSub')?.textContent?.match(/Base: ([^\s·]+)/)?.[1]||'Jan 6, 2026'}</strong>,</div>
         <div style="font-size:14px;font-weight:600;color:var(--text);font-family:var(--font);margin-top:2px">on <strong>${priceDate}</strong> it was worth;</div>
         <div style="margin-top:8px;display:flex;gap:20px;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--ts)">
           <span>Start: ${results.length} counters</span><span>End: ${filtered.length} shown</span>
         </div>
       </div>
+      
+      <div class="bchart-controls" style="margin-bottom:16px;">
+          <label style="font-family:var(--mono);font-size:10px;">
+              Investment Amount ($)
+          </label>
+          <input
+              type="number"
+              id="investmentAmount"
+              value="${investment}"
+              min="1"
+              step="1"
+              style="width:120px;"
+              oninput="renderBarChart()"
+          >
+          <button class="mkt-btn" onclick="setInvestment(1)">$1</button>
+          <button class="mkt-btn" onclick="setInvestment(100)">$100</button>
+          <button class="mkt-btn" onclick="setInvestment(1000)">$1,000</button>
+          <button class="mkt-btn" onclick="setInvestment(10000)">$10,000</button>
+      </div>
+
+      <div class="kpi-row k3" id="investmentSummary">
+          <div class="kc" style="--kca:var(--gl)">
+              <div class="kc-lbl">Investment Amount</div>
+              <div class="kc-val" id="kpiInvestment">$100</div>
+          </div>
+          <div class="kc" style="--kca:var(--gold)">
+              <div class="kc-lbl">Best Performer</div>
+              <div class="kc-val" id="kpiBest">-</div>
+          </div>
+          <div class="kc" style="--kca:var(--gain)">
+              <div class="kc-lbl">Highest Value</div>
+              <div class="kc-val" id="kpiHighest">-</div>
+          </div>
+      </div>
+
       <div class="bchart-controls" id="bcControls">
-        <select id="bcMktF" onchange="renderBarChart()"><option value="">All Markets</option><option>ZSE</option><option>VFEX</option></select>
+        <select id="bcMktF" onchange="renderBarChart()"><option value="">All Markets</option><option ${mktF==='ZSE'?'selected':''}>ZSE</option><option ${mktF==='VFEX'?'selected':''}>VFEX</option></select>
         <select id="bcCntF" onchange="renderBarChart()">
-          <option value="999">All counters</option><option value="20">Top/bottom 20</option>
-          <option value="30">Top/bottom 30</option><option value="50">Top/bottom 50</option>
+          <option value="999" ${cntF===999?'selected':''}>All counters</option><option value="20" ${cntF===20?'selected':''}>Top/bottom 20</option>
+          <option value="30" ${cntF===30?'selected':''}>Top/bottom 30</option><option value="50" ${cntF===50?'selected':''}>Top/bottom 50</option>
         </select>
         <button class="btn-print" onclick="printChart()">🖨 Print / Save PDF</button>
         <span style="font-size:9px;font-family:var(--mono);color:var(--ts)">* unavailable at baseline date</span>
       </div>
       <div class="bchart-legend">
-        <div class="bl-item"><div class="bl-dot" style="background:#1A3A2A"></div> &gt;$150</div>
-        <div class="bl-item"><div class="bl-dot" style="background:#2D5A40"></div> $120–$150</div>
-        <div class="bl-item"><div class="bl-dot" style="background:#3D7A56"></div> $100–$120</div>
-        <div class="bl-item"><div class="bl-dot" style="background:#B8872A"></div> $80–$100</div>
-        <div class="bl-item"><div class="bl-dot" style="background:#C0392B"></div> &lt;$80</div>
+        <div class="bl-item"><div class="bl-dot" style="background:#1A3A2A"></div> &gt;$${(investment*1.5).toFixed(0)}</div>
+        <div class="bl-item"><div class="bl-dot" style="background:#2D5A40"></div> $${(investment*1.2).toFixed(0)}–$${(investment*1.5).toFixed(0)}</div>
+        <div class="bl-item"><div class="bl-dot" style="background:#3D7A56"></div> $${investment.toFixed(0)}–$${(investment*1.2).toFixed(0)}</div>
+        <div class="bl-item"><div class="bl-dot" style="background:#B8872A"></div> $${(investment*0.8).toFixed(0)}–$${investment.toFixed(0)}</div>
+        <div class="bl-item"><div class="bl-dot" style="background:#C0392B"></div> &lt;$${(investment*0.8).toFixed(0)}</div>
       </div>
       <div id="bcRows">${rows}</div>
       <div class="bchart-footer">
@@ -636,10 +685,16 @@ function renderBarChart(){
         <div class="bchart-stats">
           <span class="bcs">Winners: <b style="color:var(--gain)">${winners}</b></span>
           <span class="bcs">Losers: <b style="color:var(--red)">${losers2}</b></span>
-          <span class="bcs">Avg: <b style="color:${parseFloat(avg)>=100?'var(--gain)':'var(--red)'}">$${avg}</b></span>
+          <span class="bcs">Avg Value: <b style="color:${parseFloat(avg)>=investment?'var(--gain)':'var(--red)'}">$${avg}</b></span>
         </div>
       </div>
     </div>`;
+
+  // Apply the execution context indicators downstream to UI DOM targets
+  document.getElementById("kpiInvestment").textContent = "$" + investment.toLocaleString();
+  document.getElementById("kpiBest").textContent = bestStock ? bestStock.counter : '-';
+  document.getElementById("kpiHighest").textContent = "$" + highestValue.toFixed(2);
+  document.getElementById("dynamicLabelAmount").textContent = investment.toLocaleString();
 }
 
 function printChart(){
