@@ -1,177 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Markets — Bob Wealth Analytics</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  :root{
-    --gd:#1A3A2A;--gm:#2D5A40;--gl:#3D7A56;--gp:#EAF2ED;--gb:#F4F8F5;
-    --gold:#B8872A;--gold-l:#D4A847;--gold-p:#FDF6E3;
-    --cream:#FAFAF7;--white:#FFFFFF;
-    --text:#1A1A1A;--tm:#4A4A4A;--ts:#7A7A7A;
-    --border:#D8E4DC;--bl:#EBF1ED;
-    --red:#C0392B;--gain:#27AE60;
-    --font-sans:'DM Sans', sans-serif;
-    --font-serif:'Playfair Display', serif;
-    --mono:'DM Mono', monospace;
-  }
-  body{background-color:var(--cream);font-family:var(--font-sans);color:var(--text);padding:40px 20px;}
-  .container{max-width:1100px;margin:0 auto;}
-  
-  /* Layout Architecture Header Markers */
-  .subtitle{color:var(--ts);font-size:14px;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;font-weight:600;}
-  
-  /* Simulator Structural Panel Placement */
-  .simulator-panel{background:var(--white);border:1px solid var(--border);border-radius:6px;padding:24px;margin-bottom:30px;box-shadow: 0 1px 3px rgba(0,0,0,0.02);}
-  .sim-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:20px;}
-  .sim-title{font-family:var(--font-serif);font-size:22px;color:var(--gd);font-weight:700;}
-  .input-group{display:flex;align-items:center;gap:12px}
-  .input-group label{font-size:12px;font-weight:600;color:var(--tm);text-transform:uppercase;letter-spacing:0.5px;}
-  .input-group input{padding:8px 12px;border:1px solid var(--border);border-radius:4px;font-family:var(--mono);width:110px;text-align:right;font-size:14px;color:var(--text);font-weight:500;}
-  .input-group input:focus{outline:none;border-color:var(--gm);}
-  
-  /* Audit KPI Dash Metrics Grid */
-  .kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;}
-  .kpi-card{background:var(--gb);border:1px solid var(--bl);padding:16px 20px;border-radius:4px}
-  .kpi-label{font-size:11px;color:var(--ts);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;font-weight:500;}
-  .kpi-val{font-family:var(--mono);font-size:24px;font-weight:500}
-  
-  /* Enterprise Data Table Screener Styling */
-  .screener-card{background:var(--white);border:1px solid var(--border);border-radius:6px;padding:24px;box-shadow: 0 1px 3px rgba(0,0,0,0.02);}
-  table{width:100%;border-collapse:collapse;margin-top:10px}
-  th{text-align:left;font-size:11px;color:var(--ts);text-transform:uppercase;padding:12px 10px;border-bottom:1px solid var(--border);letter-spacing:0.5px;font-weight:600;}
-  td{padding:14px 10px;font-size:13px;border-bottom:1px solid var(--bl)}
-  .text-right{text-align:right}
-  .font-mono{font-family:var(--mono)}
-  .text-gain{color:var(--gain)!important;font-weight:500}
-  .text-loss{color:var(--red)!important;font-weight:500}
-  .text-neutral{color:var(--ts);font-style:italic;}
-  .sect-v{background:var(--gp);color:var(--gd);border-radius:3px;font-weight:600}
-  .status-suspended{background:#FADBD8;padding:2px 6px;border-radius:3px}
-</style>
-</head>
-<body>
-
-<div class="container">
-  <p class="subtitle">Overview</p>
-  
-  <div class="simulator-panel">
-    <div class="sim-header">
-      <div class="sim-title">Investment Simulator</div>
-      <div class="input-group">
-        <label for="investmentAmount">Principal Base ($):</label>
-        <input type="number" id="investmentAmount" value="100" min="1" step="10">
-      </div>
-    </div>
-    
-    <div class="kpi-grid">
-      <div class="kpi-card">
-        <div class="kpi-label">Simulated Portfolio Avg</div>
-        <div class="kpi-val" id="kpiAverageValue" style="color:var(--gd)">$0.00</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Gaining Cohorts</div>
-        <div class="kpi-val" id="kpiWinnersCount" style="color:var(--gain)">0</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Declining Cohorts</div>
-        <div class="kpi-val" id="kpiLosersCount" style="color:var(--red)">0</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="screener-card">
-    <h2 style="font-family:var(--font-serif); font-size:22px; margin-bottom:12px; color:var(--text); font-weight:700;">Market Screener</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Counter</th>
-          <th>Board</th>
-          <th>Industry Sector</th>
-          <th class="text-right">Close Price</th>
-          <th class="text-right">YTD Performance</th>
-        </tr>
-      </thead>
-      <tbody id="screenerTableBody">
-        </tbody>
-    </table>
-  </div>
-</div>
-
 <script type="module">
-  import { MarketDataStore } from '/js/marketDataStore.js';
-  import { calculateInvestmentMetrics } from '/js/investmentEngine.js';
-  import { renderScreenerRow } from '/js/screenerRenderer.js';
-
-  // Local storage caching object to resolve active user changes instantly
-  window.DashboardStore = null;
+  import { MarketDataStore } from './marketDataStore.js';
+  import { calculateInvestmentMetrics } from './investmentEngine.js';
+  import { renderScreenerRow } from './screenerRenderer.js';
 
   async function initDashboard() {
-    try {
-      // 1. Request core pipeline database layout asset from application root context
-      const response = await fetch('/market-data.json');
-      if (!response.ok) throw new Error(`Data transmission synchronization error: ${response.status}`);
-      const rawData = await response.json();
+    // 1. Fetch raw json feed
+    const response = await fetch('./market-data.json');
+    const rawData = await response.json();
 
-      // 2. Feed warehouse instance validation logic checks
-      const store = new MarketDataStore(rawData);
-      window.DashboardStore = store;
+    // 2. Initialize warehouse
+    const store = new MarketDataStore(rawData);
+    
+    // 3. Extract partitioned datasets
+    const cohort = store.getBaselineCohort();
+    const allSecurities = store.getAllActiveInstruments();
 
-      // 3. Extract calculations metrics array boundaries
-      const baselineCohort = store.getBaselineCohort();
-      const activeSecurities = store.getAllActiveInstruments();
+    // 4. Run calculation calculations instantly
+    const metrics = calculateInvestmentMetrics(cohort, 100);
+    console.log("Calculated Dashboard KPI Portfolio Average:", metrics.averageValue);
 
-      // 4. Trace default runtime base investment setting and run evaluation calculations
-      const investmentInput = parseFloat(document.getElementById('investmentAmount')?.value || 100);
-      const metrics = calculateInvestmentMetrics(baselineCohort, investmentInput);
-
-      // 5. Update layout view elements
-      updateKPICards(metrics);
-
-      // 6. Loop map data rows directly into table visual grid
-      const tableBody = document.getElementById('screenerTableBody');
-      if (tableBody) {
-        tableBody.innerHTML = activeSecurities.map(c => renderScreenerRow(c)).join('');
-      }
-
-    } catch (error) {
-      console.error("Dashboard Root Initialization Critical Fault:", error);
-      const tableBody = document.getElementById('screenerTableBody');
-      if (tableBody) {
-        tableBody.innerHTML = `<tr><td colspan="5" style="color:var(--red); text-align:center; padding:24px; font-weight:500; font-family:var(--mono);">Failed to execute system dashboard calculations pipeline.</td></tr>`;
-      }
+    // 5. Append to UI Screener Table Grid
+    const tableBody = document.getElementById('screenerTableBody');
+    if (tableBody) {
+      tableBody.innerHTML = allSecurities.map(c => renderScreenerRow(c)).join('');
     }
   }
 
-  function updateKPICards(metrics) {
-    const avgCard = document.getElementById('kpiAverageValue');
-    const winnerCard = document.getElementById('kpiWinnersCount');
-    const loserCard = document.getElementById('kpiLosersCount');
-
-    if (avgCard) avgCard.textContent = `$${metrics.averageValue.toFixed(2)}`;
-    if (winnerCard) winnerCard.textContent = metrics.winners;
-    if (loserCard) loserCard.textContent = metrics.losers;
-  }
-
-  // Hook operational event context listeners
   document.addEventListener('DOMContentLoaded', initDashboard);
-
-  // Live real-time metric updates binding capture loop
-  const amtInput = document.getElementById('investmentAmount');
-  if (amtInput) {
-    amtInput.addEventListener('input', () => {
-      if (window.DashboardStore) {
-        const cohort = window.DashboardStore.getBaselineCohort();
-        const amt = parseFloat(amtInput.value || 0);
-        const metrics = calculateInvestmentMetrics(cohort, amt);
-        updateKPICards(metrics);
-      }
-    });
-  }
 </script>
-</body>
-</html>
