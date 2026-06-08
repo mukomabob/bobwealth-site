@@ -1,3 +1,4 @@
+cat > /mnt/user-data/outputs/markets.html << 'HTMLEOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,6 +7,7 @@
 <title>Markets — Bob Wealth Holdings</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -16,6 +18,7 @@
   --text:#1A1A1A;--tm:#4A4A4A;--ts:#7A7A7A;
   --border:#D8E4DC;--bl:#EBF1ED;
   --red:#C0392B;--gain:#1D6B3A;
+  --admin:#0F2A3A;--admin-b:#1B4060;--admin-acc:#3B9EE8;
   --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;--serif:'Playfair Display',serif;
 }
 html,body{height:100%;overflow:hidden}
@@ -26,15 +29,12 @@ body{font-family:var(--font);background:var(--cream);color:var(--text);display:f
 .hd-brand{display:flex;align-items:center;gap:13px;text-decoration:none}
 .hd-logo{height:36px;width:36px;object-fit:contain}
 .hd-logo-fb{width:36px;height:36px;border-radius:4px;background:var(--gold);display:none;align-items:center;justify-content:center;font-family:var(--serif);font-size:17px;font-weight:700;color:var(--gd);flex-shrink:0}
-.hd-brand:hover .hd-logo-fb{background:var(--gold-l)}
 .hd-name{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--white);letter-spacing:.2px;line-height:1.1}
 .hd-name span{display:block;font-family:var(--mono);font-size:9px;font-weight:400;color:var(--gold-l);letter-spacing:.15em;text-transform:uppercase;margin-top:2px}
 .site-nav{display:flex;align-items:center;gap:3px}
 .site-nav a{color:rgba(255,255,255,.7);font-size:12px;font-weight:500;text-decoration:none;padding:6px 13px;border-radius:3px;transition:all .15s;letter-spacing:.02em}
 .site-nav a:hover{color:var(--white);background:rgba(255,255,255,.08)}
 .site-nav a.active{color:var(--white);background:rgba(184,135,42,.2);border:1px solid rgba(184,135,42,.3)}
-
-/* DATA FRESHNESS BADGE */
 .freshness{display:flex;align-items:center;gap:8px}
 .fresh-dot{width:7px;height:7px;border-radius:50%;background:var(--gain);box-shadow:0 0 6px rgba(29,107,58,.5);flex-shrink:0}
 .fresh-dot.stale{background:var(--gold);box-shadow:0 0 6px rgba(184,135,42,.5)}
@@ -60,11 +60,20 @@ body{font-family:var(--font);background:var(--cream);color:var(--text);display:f
 .sb-foot p{font-size:10px;font-family:var(--mono);color:var(--gm);line-height:1.7}
 .sb-foot .sfs{color:var(--ts);font-size:9px}
 
+/* ADMIN NAV ITEM */
+.ni-admin{display:flex;align-items:center;gap:7px;padding:7px 9px;color:var(--ts);cursor:pointer;border-radius:4px;font-size:11px;font-weight:500;border-left:2px solid transparent;transition:all .12s;margin-bottom:1px;opacity:.6}
+.ni-admin:hover{color:var(--admin-acc);background:rgba(59,158,232,.08);opacity:1}
+.ni-admin.on{color:var(--admin-acc);background:rgba(59,158,232,.1);border-left-color:var(--admin-acc);font-weight:600;opacity:1}
+
 /* WORKSPACE */
 .ws{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--cream)}
 .topbar{padding:12px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;background:var(--white)}
+.topbar.admin-mode{background:var(--admin);border-bottom-color:var(--admin-acc)}
 .tb-left h1{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--gd);letter-spacing:.1px}
+.topbar.admin-mode .tb-left h1{color:var(--white)}
 .tb-left .tb-sub{font-size:10px;font-family:var(--mono);color:var(--ts);margin-top:2px;letter-spacing:.04em}
+.topbar.admin-mode .tb-left .tb-sub{color:rgba(255,255,255,.5)}
+.tb-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 
 /* CONTENT */
 .content{flex:1;overflow-y:auto}
@@ -73,7 +82,7 @@ body{font-family:var(--font);background:var(--cream);color:var(--text);display:f
 
 /* KPI CARDS */
 .kpi-row{display:grid;gap:10px;margin-bottom:16px}
-.k5{grid-template-columns:repeat(5,1fr)}.k3{grid-template-columns:repeat(3,1fr)}
+.k5{grid-template-columns:repeat(5,1fr)}.k4{grid-template-columns:repeat(4,1fr)}.k3{grid-template-columns:repeat(3,1fr)}
 .kc{background:var(--white);border:1px solid var(--border);border-radius:6px;padding:14px 16px;position:relative;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)}
 .kc::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--kca,var(--gl))}
 .kc-lbl{font-size:9px;color:var(--ts);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;font-family:var(--mono);font-weight:500}
@@ -115,13 +124,21 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 .fb input:focus,.fb select:focus{border-color:var(--gl)}
 .fb input{min-width:180px}
 
+/* WATCHLIST */
+.wl-controls{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.wl-input{background:var(--white);border:1.5px solid var(--border);border-radius:4px;padding:6px 10px;color:var(--text);font-family:var(--mono);font-size:10px;outline:none;width:170px;text-transform:uppercase}
+.wl-input:focus{border-color:var(--gl)}
+.wl-input::placeholder{text-transform:none;color:var(--ts)}
+.btn-wl{background:var(--gd);border:none;color:var(--white);font-family:var(--mono);font-size:10px;padding:6px 12px;border-radius:4px;cursor:pointer;text-transform:uppercase;letter-spacing:.08em}
+.btn-wl-clr{background:transparent;border:1.5px solid var(--border);color:var(--ts);font-family:var(--mono);font-size:10px;padding:6px 10px;border-radius:4px;cursor:pointer}
+.btn-wl-clr:hover{border-color:var(--red);color:var(--red)}
+.wl-tag{display:inline-flex;align-items:center;gap:4px;background:var(--gp);border:1px solid var(--border);border-radius:3px;padding:3px 8px;font-size:10px;font-family:var(--mono);color:var(--gm);font-weight:500}
+.wl-tag button{background:none;border:none;color:var(--ts);cursor:pointer;font-size:11px;line-height:1;padding:0 2px}
+.wl-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+
 /* BAR CHART */
 .bchart-wrap{background:var(--white);border:1px solid var(--border);border-radius:6px;padding:24px 28px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
 .bchart-header{text-align:center;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border)}
-.bchart-header .bch-org{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px}
-.bchart-header h2{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--gd)}
-.bchart-header .bch-sub{font-size:11px;font-family:var(--mono);color:var(--ts);margin-top:4px;line-height:1.6}
-.bchart-header .bch-date{font-size:11px;font-family:var(--mono);color:var(--gold);font-weight:700;margin-top:6px}
 .bchart-legend{display:flex;align-items:center;gap:16px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
 .bchart-legend .bl-item{display:flex;align-items:center;gap:5px;font-size:10px;font-family:var(--mono);color:var(--tm)}
 .bchart-legend .bl-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
@@ -135,28 +152,99 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 .bc-bar{height:18px;border-radius:2px;min-width:4px;flex-shrink:0}
 .bc-val{font-family:var(--mono);font-size:10px;font-weight:700;flex-shrink:0;white-space:nowrap;line-height:22px}
 .bc-sect{font-size:8px;font-family:var(--mono);color:var(--ts);margin-left:4px;flex-shrink:0}
-.iv-bar{display:inline-block;height:4px;border-radius:2px;min-width:3px;vertical-align:middle;margin-left:5px}
 .bchart-footer{margin-top:14px;padding-top:10px;border-top:1px solid var(--bl);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
 .bchart-footer p{font-size:9px;font-family:var(--mono);color:var(--ts);line-height:1.6}
 .bchart-stats{display:flex;gap:14px}
 .bcs{font-size:10px;font-family:var(--mono);color:var(--ts)}
 .bcs b{color:var(--text);font-weight:700}
 
-/* LOADING / ERROR STATES */
+/* $100 TRACKER */
+.base-banner{background:linear-gradient(135deg,var(--gd),var(--gm));border-radius:6px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:14px;border:1px solid rgba(184,135,42,.25)}
+.base-banner .bb-icon{font-size:22px;flex-shrink:0}
+.base-banner .bb-text h3{font-family:var(--serif);font-size:14px;font-weight:700;color:var(--white);margin-bottom:2px}
+.base-banner .bb-text p{font-size:10px;color:rgba(255,255,255,.68);font-family:var(--mono)}
+.base-banner .bb-badge{margin-left:auto;background:var(--gold);color:var(--gd);font-family:var(--mono);font-size:9px;font-weight:700;padding:4px 10px;border-radius:3px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;flex-shrink:0}
+.iv-bar{display:inline-block;height:4px;border-radius:2px;min-width:3px;vertical-align:middle;margin-left:5px}
+.inv-note{font-size:10px;font-family:var(--mono);color:var(--ts);margin-top:8px;padding-top:8px;border-top:1px solid var(--bl);line-height:1.6}
+
+/* SETUP PANEL */
+.setup-panel{background:var(--white);border:1px solid var(--border);border-radius:6px;padding:22px;margin-bottom:16px}
+.setup-panel h3{font-family:var(--serif);font-size:16px;font-weight:700;color:var(--gd);margin-bottom:6px}
+.setup-panel>p{font-size:11px;color:var(--tm);margin-bottom:16px;line-height:1.7}
+.setup-steps{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.setup-step{background:var(--gb);border:1px solid var(--bl);border-radius:5px;padding:14px 16px}
+.setup-step .step-num{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
+.setup-step p{font-size:11px;color:var(--tm);margin:0;line-height:1.6}
+
+/* ADMIN PANEL */
+.admin-panel{background:var(--admin);min-height:100%}
+.adm-header{background:linear-gradient(135deg,#0a1f2e,#163349);border-bottom:1px solid rgba(59,158,232,.2);padding:20px 24px 16px}
+.adm-header h2{font-family:var(--serif);font-size:18px;font-weight:700;color:var(--white);margin-bottom:4px}
+.adm-header p{font-size:10px;font-family:var(--mono);color:rgba(255,255,255,.4)}
+.adm-body{padding:20px 24px 40px}
+.adm-section{background:rgba(255,255,255,.04);border:1px solid rgba(59,158,232,.15);border-radius:8px;padding:18px 20px;margin-bottom:14px}
+.adm-section-title{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--admin-acc);text-transform:uppercase;letter-spacing:.14em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.adm-section-title::before{content:'';width:3px;height:14px;background:var(--admin-acc);border-radius:2px;flex-shrink:0}
+.adm-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.adm-row:last-child{margin-bottom:0}
+.adm-label{font-size:10px;font-family:var(--mono);color:rgba(255,255,255,.5);min-width:80px;flex-shrink:0}
+.adm-input{background:rgba(255,255,255,.06);border:1px solid rgba(59,158,232,.2);border-radius:4px;padding:7px 11px;color:var(--white);font-family:var(--mono);font-size:11px;outline:none;transition:border-color .14s;width:340px}
+.adm-input:focus{border-color:var(--admin-acc)}
+.adm-input::placeholder{color:rgba(255,255,255,.25)}
+.adm-badge{font-size:9px;font-family:var(--mono);padding:3px 8px;border-radius:3px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.adm-badge.ok{background:rgba(29,107,58,.3);color:#4dbb74;border:1px solid rgba(29,107,58,.4)}
+.adm-badge.warn{background:rgba(184,135,42,.2);color:var(--gold-l);border:1px solid rgba(184,135,42,.3)}
+.adm-badge.err{background:rgba(192,57,43,.2);color:#e06c5c;border:1px solid rgba(192,57,43,.3)}
+
+/* ADMIN BUTTONS */
+.btn-adm{border:1.5px solid rgba(59,158,232,.4);color:var(--admin-acc);background:rgba(59,158,232,.08);padding:7px 16px;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.08em;transition:all .14s;font-family:var(--font);display:inline-flex;align-items:center;gap:6px}
+.btn-adm:hover{background:rgba(59,158,232,.18);border-color:var(--admin-acc)}
+.btn-adm:disabled{opacity:.4;cursor:not-allowed}
+.btn-adm.primary{background:var(--admin-acc);border-color:var(--admin-acc);color:#0a1f2e}
+.btn-adm.primary:hover{background:#5bb8ff}
+.btn-adm.danger{border-color:rgba(192,57,43,.5);color:#e06c5c;background:rgba(192,57,43,.08)}
+.btn-adm.danger:hover{background:rgba(192,57,43,.2)}
+.btn-adm.success{background:rgba(29,107,58,.4);border-color:rgba(29,107,58,.6);color:#4dbb74}
+.uw-adm{position:relative;overflow:hidden;display:inline-block}
+.uw-adm input[type=file]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+
+/* ADMIN STATUS LOG */
+.adm-log{background:rgba(0,0,0,.3);border:1px solid rgba(59,158,232,.1);border-radius:4px;padding:12px 14px;font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.5);line-height:1.8;max-height:140px;overflow-y:auto;margin-top:12px}
+.adm-log .log-ok{color:#4dbb74}
+.adm-log .log-err{color:#e06c5c}
+.adm-log .log-info{color:var(--admin-acc)}
+.adm-log .log-warn{color:var(--gold-l)}
+
+/* PAT MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(4px)}
+.modal-box{background:#0f2233;border:1px solid rgba(59,158,232,.3);border-radius:10px;padding:28px 30px;width:440px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.modal-box h3{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--white);margin-bottom:6px}
+.modal-box p{font-size:11px;color:rgba(255,255,255,.5);line-height:1.7;margin-bottom:16px;font-family:var(--mono)}
+.modal-box .modal-input{width:100%;background:rgba(255,255,255,.07);border:1.5px solid rgba(59,158,232,.3);border-radius:5px;padding:10px 13px;color:var(--white);font-family:var(--mono);font-size:12px;outline:none;margin-bottom:6px}
+.modal-box .modal-input:focus{border-color:var(--admin-acc)}
+.modal-hint{font-size:10px;color:rgba(255,255,255,.3);font-family:var(--mono);line-height:1.6;margin-bottom:18px}
+.modal-hint a{color:var(--admin-acc);text-decoration:none}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+
+/* LOADING / ERROR */
 .state-card{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;color:var(--ts)}
 .state-card .sc-icon{font-size:40px;margin-bottom:14px;opacity:.5}
 .state-card h3{font-family:var(--serif);font-size:17px;color:var(--gd);margin-bottom:8px;font-weight:600}
 .state-card p{font-size:12px;line-height:1.7;max-width:340px;color:var(--tm)}
 .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--gl);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px;text-align:center;color:var(--ts)}
+.empty-state .es-icon{font-size:36px;margin-bottom:12px;opacity:.4}
+.empty-state h3{font-family:var(--serif);font-size:16px;color:var(--gd);margin-bottom:6px;font-weight:600}
+.empty-state p{font-size:12px;line-height:1.7;max-width:300px}
+
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
 @media print{
-  .site-header,.sb,.topbar,.bchart-controls,.bchart-legend,.mkt-toggle,#investmentSummary{display:none!important}
+  .site-header,.sb,.topbar,.bchart-controls,.bchart-legend{display:none!important}
   .app{display:block}.ws,.content{overflow:visible}
   body{overflow:visible}
   .vp{display:none!important}
@@ -199,8 +287,8 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
     <div class="ng">
       <div class="ng-lbl">Markets</div>
       <div class="ni on" onclick="nav('overview',this)"><span class="ni-ic">◈</span>Overview</div>
-      <div class="ni" onclick="nav('barchart',this)"><span class="ni-ic">▬</span>Investment Simulator</div>
       <div class="ni" onclick="nav('movers',this)"><span class="ni-ic">⇅</span>Movers</div>
+      <div class="ni" onclick="nav('activity',this)"><span class="ni-ic">◎</span>Trading Activity</div>
     </div>
     <div class="ng">
       <div class="ng-lbl">Analysis</div>
@@ -209,7 +297,13 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
     </div>
     <div class="ng">
       <div class="ng-lbl">Portfolio</div>
-      <div class="ni" onclick="nav('activity',this)"><span class="ni-ic">◎</span>Trading Activity</div>
+      <div class="ni" onclick="nav('investment',this)"><span class="ni-ic">$</span>$100 Tracker</div>
+      <div class="ni" onclick="nav('barchart',this)"><span class="ni-ic">▬</span>Investment Chart</div>
+      <div class="ni" onclick="nav('watchlist',this)"><span class="ni-ic">♡</span>Watchlist</div>
+    </div>
+    <div class="ng" style="margin-top:auto;padding-top:8px;border-top:1px solid var(--border)">
+      <div class="ng-lbl" style="color:rgba(59,158,232,.5)">System</div>
+      <div class="ni-admin" id="adminNavItem" onclick="enterAdmin()"><span class="ni-ic">🔒</span>Admin</div>
     </div>
   </nav>
   <div class="sb-foot">
@@ -219,16 +313,18 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
   </div>
 </aside>
 
-<div class="ws">
-  <div class="topbar">
+<div class="ws" id="workspace">
+  <div class="topbar" id="topbar">
     <div class="tb-left">
       <h1 id="tbTitle">Market Overview</h1>
       <div class="tb-sub" id="tbSub">Zimbabwe Stock Exchange · ZSE + VFEX</div>
     </div>
+    <div class="tb-right" id="tbRight"></div>
   </div>
 
   <div class="content">
 
+    <!-- LOADING -->
     <div class="vp on" id="page-loading">
       <div class="state-card">
         <div class="spinner"></div>
@@ -237,14 +333,10 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
       </div>
     </div>
 
-    <div class="vp" id="page-error">
-      <div class="state-card">
-        <div class="sc-icon">⚠️</div>
-        <h3>Data Unavailable</h3>
-        <p id="errMsg">Could not load market data. Please try again shortly.</p>
-      </div>
-    </div>
+    <!-- ERROR -->
+    <div class="vp" id="page-error"></div>
 
+    <!-- OVERVIEW -->
     <div class="vp" id="page-overview">
       <div class="mkt-toggle">
         <button class="mkt-btn on" onclick="setMkt('ALL',this)">All Markets</button>
@@ -254,6 +346,7 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
       <div id="overviewContent"></div>
     </div>
 
+    <!-- MOVERS -->
     <div class="vp" id="page-movers">
       <div class="mkt-toggle">
         <button class="mkt-btn on" onclick="setMktMovers('ALL',this)">All Markets</button>
@@ -268,6 +361,7 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
       </div></div>
     </div>
 
+    <!-- ACTIVITY -->
     <div class="vp" id="page-activity">
       <div class="mkt-toggle">
         <button class="mkt-btn on" onclick="setMktAct('ALL',this)">All Markets</button>
@@ -288,6 +382,7 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
       </div></div>
     </div>
 
+    <!-- SECTORS -->
     <div class="vp" id="page-sectors">
       <div class="row c1"><div class="mc"><div class="mc-title">Sector Performance Summary</div><div class="ch" style="height:240px"><canvas id="cSectPerf"></canvas></div></div></div>
       <div class="row c1"><div class="mc"><div class="mc-title">Counters by Sector</div>
@@ -295,6 +390,7 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
       </div></div>
     </div>
 
+    <!-- SCREENER -->
     <div class="vp" id="page-screener">
       <div class="fb">
         <input type="text" id="scrSearch" placeholder="Search counter or sector…" oninput="renderScreener()">
@@ -312,21 +408,153 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
       </div>
     </div>
 
-    <div class="vp" id="page-barchart">
-      <div id="barchartContent">
-        <div class="state-card"><div class="spinner"></div><h3>Preparing chart…</h3></div>
+    <!-- $100 TRACKER -->
+    <div class="vp" id="page-investment"><div id="investContent">
+      <div class="setup-panel"><h3>$100 Investment Tracker</h3><p>Loading baseline data…</p></div>
+    </div></div>
+
+    <!-- BAR CHART -->
+    <div class="vp" id="page-barchart"><div id="barchartContent">
+      <div class="state-card"><div class="spinner"></div><h3>Preparing chart…</h3></div>
+    </div></div>
+
+    <!-- WATCHLIST -->
+    <div class="vp" id="page-watchlist">
+      <div class="wl-controls">
+        <input type="text" class="wl-input" id="wlInput" placeholder="Add counter (e.g. DELTA)" onkeydown="if(event.key==='Enter')addWatch()">
+        <button class="btn-wl" onclick="addWatch()">+ Add</button>
+        <button class="btn-wl-clr" onclick="clearWatch()">Clear All</button>
+        <span style="font-size:10px;font-family:var(--mono);color:var(--ts)">Saved in your browser</span>
+      </div>
+      <div class="wl-tags" id="wlTags"></div>
+      <div class="mc">
+        <div class="tw"><table><thead><tr><th>Counter</th><th>Market</th><th>Sector</th><th>Open</th><th>Close</th><th>Change</th><th>% Today</th><th>Volume</th><th>Value</th><th>Mkt Cap (USD)</th><th>YTD G/L</th><th>$100 Now</th></tr></thead><tbody id="tblWatch"></tbody></table></div>
+        <div id="wlEmpty" class="empty-state" style="display:none;padding:20px 0"><p>Add counters above to track them.</p></div>
       </div>
     </div>
 
+    <!-- ADMIN -->
+    <div class="vp" id="page-admin">
+      <div class="admin-panel">
+        <div class="adm-header">
+          <h2>🔐 Admin — Market Data Publisher</h2>
+          <p>Import today's FBC price sheet · set baseline · push directly to GitHub. No download required.</p>
+        </div>
+        <div class="adm-body">
+
+          <!-- GITHUB CONFIG -->
+          <div class="adm-section">
+            <div class="adm-section-title">GitHub Configuration</div>
+            <div class="adm-row">
+              <span class="adm-label">Repository</span>
+              <span style="font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.7)">mukomabob/bobwealth-site</span>
+              <span class="adm-badge ok">configured</span>
+            </div>
+            <div class="adm-row">
+              <span class="adm-label">Branch</span>
+              <span style="font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.7)">main</span>
+            </div>
+            <div class="adm-row">
+              <span class="adm-label">PAT</span>
+              <span id="patStatus" class="adm-badge warn">not set</span>
+              <button class="btn-adm" onclick="promptPAT()">⚙ Set / Update PAT</button>
+              <button class="btn-adm danger" onclick="clearPAT()">✕ Clear</button>
+            </div>
+            <div style="font-size:9px;font-family:var(--mono);color:rgba(255,255,255,.25);margin-top:8px;line-height:1.7">
+              Requires a fine-grained PAT with <strong style="color:rgba(255,255,255,.4)">Contents: Read & Write</strong> on this repo.<br>
+              Stored only in localStorage — never transmitted except to api.github.com.
+            </div>
+          </div>
+
+          <!-- IMPORT CURRENT SHEET -->
+          <div class="adm-section">
+            <div class="adm-section-title">Step 1 — Import Today's Price Sheet</div>
+            <div class="adm-row">
+              <div class="uw-adm">
+                <button class="btn-adm primary" id="btnImportSheet">📂 Import FBC Sheet (.xlsx)</button>
+                <input type="file" accept=".xlsx,.xls" onchange="handleCurrentSheet(this.files[0])">
+              </div>
+              <span id="currSheetBadge" class="adm-badge warn" style="display:none"></span>
+            </div>
+            <div id="currSheetStats" style="font-size:10px;font-family:var(--mono);color:rgba(255,255,255,.4);margin-top:6px;line-height:1.8"></div>
+          </div>
+
+          <!-- BASELINE -->
+          <div class="adm-section">
+            <div class="adm-section-title">Step 2 — Baseline Sheet (Jan 6 2026)</div>
+            <div class="adm-row">
+              <span id="baselineBadge" class="adm-badge" style="display:none"></span>
+              <div class="uw-adm">
+                <button class="btn-adm" id="btnSetBaseline">📅 Load Baseline .xlsx</button>
+                <input type="file" accept=".xlsx,.xls" onchange="handleBaseline(this.files[0])">
+              </div>
+              <button class="btn-adm" id="btnFetchBaseline" onclick="fetchBaselineAdmin()">↻ Re-fetch from GitHub</button>
+            </div>
+            <div id="baselineStats" style="font-size:10px;font-family:var(--mono);color:rgba(255,255,255,.4);margin-top:6px;line-height:1.8"></div>
+          </div>
+
+          <!-- PUBLISH -->
+          <div class="adm-section">
+            <div class="adm-section-title">Step 3 — Publish to GitHub</div>
+            <div class="adm-row">
+              <button class="btn-adm primary" id="btnPublish" onclick="publishToGitHub()" disabled>⬆ Publish Snapshot → GitHub</button>
+              <span id="publishStatus" class="adm-badge" style="display:none"></span>
+            </div>
+            <div style="font-size:9px;font-family:var(--mono);color:rgba(255,255,255,.25);margin-top:6px;line-height:1.7">
+              Pushes <code style="color:rgba(255,255,255,.4)">market-data.json</code> directly to the repo root. Live on jsDelivr CDN within ~5 min.
+            </div>
+            <div class="adm-log" id="admLog">Ready. Set your PAT, import a sheet, then publish.</div>
+          </div>
+
+          <!-- EXPORT -->
+          <div class="adm-section">
+            <div class="adm-section-title">Utilities</div>
+            <div class="adm-row">
+              <button class="btn-adm" id="btnExport" onclick="exportReport()" disabled>↓ Export .xlsx Report</button>
+              <button class="btn-adm" onclick="exitAdmin()">← Back to Markets</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /ws -->
+</div><!-- /app -->
+
+<!-- PAT MODAL -->
+<div class="modal-overlay" id="patModal" style="display:none">
+  <div class="modal-box">
+    <h3>🔑 GitHub Personal Access Token</h3>
+    <p>Enter a fine-grained PAT scoped to <strong>mukomabob/bobwealth-site</strong> with <strong>Contents: Read & Write</strong> permission. It's stored only in your browser's localStorage.</p>
+    <input type="password" class="modal-input" id="patInput" placeholder="github_pat_…">
+    <div class="modal-hint">
+      Generate one at <a href="https://github.com/settings/personal-access-tokens/new" target="_blank">github.com/settings/tokens</a> → Fine-grained → Repository: bobwealth-site → Permissions: Contents (R/W).
+    </div>
+    <div class="modal-actions">
+      <button class="btn-adm" onclick="closePatModal()">Cancel</button>
+      <button class="btn-adm primary" onclick="savePAT()">Save PAT</button>
+    </div>
   </div>
-</div>
 </div>
 
 <script>
 'use strict';
-window.PS  = [];
-window.MKT = 'ALL'; window.MKT_M = 'ALL'; window.MKT_A = 'ALL';
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+window.PS   = [];
+window.BASE = {};
+window.BASE_DATE = '';
+window.MKT  = 'ALL'; window.MKT_M = 'ALL'; window.MKT_A = 'ALL';
+window.WATCH = JSON.parse(localStorage.getItem('bw_watchlist') || '[]');
 let CH = {};
+let _adminUnlocked = false;
+
+// ─── CONSTANTS ────────────────────────────────────────────────────────────────
+const REPO   = 'mukomabob/bobwealth-site';
+const BRANCH = 'main';
+const JSON_PATH = 'market-data.json';
 
 const DATA_URLS = [
   'https://cdn.jsdelivr.net/gh/mukomabob/bobwealth-site@main/market-data.json',
@@ -334,166 +562,430 @@ const DATA_URLS = [
   'https://raw.githubusercontent.com/mukomabob/bobwealth-site/main/market-data.json',
 ];
 
-const PAL = ['#1A3A2A','#2D5A40','#3D7A56','#4D9A6C','#B8872A','#D4A847','#5D9A76','#7DBA96','#6D4F1F','#8B6914','#1D6B3A','#C0392B'];
-const tt  = {backgroundColor:'#1A3A2A',titleColor:'#FAFAF7',bodyColor:'rgba(255,255,255,.82)',borderColor:'#3D7A56',borderWidth:1,cornerRadius:4};
+const BASELINE_URLS = [
+  'https://cdn.jsdelivr.net/gh/mukomabob/bobwealth-site@main/Price%20Sheet%2006.01.26.xlsx',
+  'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://raw.githubusercontent.com/mukomabob/bobwealth-site/main/Price%20Sheet%2006.01.26.xlsx'),
+];
+const BASELINE_FNAME = 'Price_Sheet_06_01_26.xlsx';
 
+const PAL = ['#1A3A2A','#2D5A40','#3D7A56','#4D9A6C','#B8872A','#D4A847','#5D9A76','#7DBA96','#6D4F1F','#8B6914','#1D6B3A','#C0392B'];
+const TT  = {backgroundColor:'#1A3A2A',titleColor:'#FAFAF7',bodyColor:'rgba(255,255,255,.82)',borderColor:'#3D7A56',borderWidth:1,cornerRadius:4};
+
+// ─── FORMATTERS ───────────────────────────────────────────────────────────────
 const fN  = v => v==null?'—':Number(v).toLocaleString();
 const fP2 = v => v==null?'—':v.toFixed(2);
-const fM  = v => { if(v==null)return'—';const a=Math.abs(v);if(a>=1e9)return'$'+(a/1e9).toFixed(2)+'B';if(a>=1e6)return'$'+(a/1e6).toFixed(2)+'M';if(a>=1e3)return'$'+(a/1e3).toFixed(1)+'K';return'$'+a.toLocaleString(); };
-const fZ  = v => { if(v==null)return'—';const a=Math.abs(v);if(a>=1e9)return(a/1e9).toFixed(2)+'B';if(a>=1e6)return(a/1e6).toFixed(2)+'M';if(a>=1e3)return(a/1e3).toFixed(0)+'K';return a.toLocaleString(); };
+const fM  = v => { if(v==null)return'—'; const a=Math.abs(v); if(a>=1e9)return'$'+(a/1e9).toFixed(2)+'B'; if(a>=1e6)return'$'+(a/1e6).toFixed(2)+'M'; if(a>=1e3)return'$'+(a/1e3).toFixed(1)+'K'; return'$'+a.toLocaleString(); };
+const fZ  = v => { if(v==null)return'—'; const a=Math.abs(v); if(a>=1e9)return(a/1e9).toFixed(2)+'B'; if(a>=1e6)return(a/1e6).toFixed(2)+'M'; if(a>=1e3)return(a/1e3).toFixed(0)+'K'; return a.toLocaleString(); };
 const pC  = v => v>0?'up':v<0?'dn':'nc';
 
-function setInvestment(amount){
-  const el = document.getElementById('investmentAmount');
-  if(el) el.value = amount;
-  renderBarChart();
+// ─── LOG HELPER ───────────────────────────────────────────────────────────────
+function admLog(msg, type='info') {
+  const el = document.getElementById('admLog');
+  if (!el) return;
+  const span = document.createElement('span');
+  span.className = 'log-' + type;
+  span.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+  el.appendChild(document.createElement('br'));
+  el.appendChild(span);
+  el.scrollTop = el.scrollHeight;
 }
 
-async function loadData(){
-  for(const url of DATA_URLS){
-    try{
-      console.log('Trying:', url);
-      const res = await fetch(url + (url.includes('?')?'&':'?') + '_=' + Date.now());
-      if(!res.ok) throw new Error('HTTP ' + res.status);
-      const text = await res.text();
-      if(text.length < 100) throw new Error('Response too small');
-      const data = JSON.parse(text);
-      ingestSnapshot(data);
+// ─── PAT MANAGEMENT ───────────────────────────────────────────────────────────
+function getPAT() { return localStorage.getItem('bw_gh_pat') || ''; }
+function promptPAT() {
+  const el = document.getElementById('patInput');
+  if (el) el.value = getPAT();
+  document.getElementById('patModal').style.display = 'flex';
+  setTimeout(() => { if (el) el.focus(); }, 100);
+}
+function closePatModal() { document.getElementById('patModal').style.display = 'none'; }
+function savePAT() {
+  const val = document.getElementById('patInput').value.trim();
+  if (!val) { alert('Please enter a PAT.'); return; }
+  localStorage.setItem('bw_gh_pat', val);
+  closePatModal();
+  updatePatStatus();
+  admLog('PAT saved to localStorage.', 'ok');
+}
+function clearPAT() {
+  localStorage.removeItem('bw_gh_pat');
+  updatePatStatus();
+  admLog('PAT cleared.', 'warn');
+}
+function updatePatStatus() {
+  const el = document.getElementById('patStatus');
+  if (!el) return;
+  const pat = getPAT();
+  if (pat) {
+    el.textContent = '✓ set (' + pat.slice(0,12) + '…)';
+    el.className = 'adm-badge ok';
+  } else {
+    el.textContent = 'not set';
+    el.className = 'adm-badge warn';
+  }
+}
+
+// ─── SHEET PARSER ─────────────────────────────────────────────────────────────
+function parseSheet(raw, fname) {
+  let hdr = -1;
+  for (let i = 0; i < raw.length; i++) {
+    if (raw[i] && raw[i].some(c => String(c||'').trim().toUpperCase() === 'COUNTER')) { hdr = i; break; }
+  }
+  if (hdr < 0) throw new Error('No COUNTER header row found.');
+  const dm = fname.match(/(\d{2})[_\-](\d{2})[_\-](\d{2,4})/);
+  const date = dm ? `20${dm[3].length===2?dm[3]:dm[3].slice(-2)}-${dm[2]}-${dm[1]}` : fname.replace(/\.(xlsx?)$/i,'');
+  let mkt = 'ZSE'; const rows = [];
+  for (let i = hdr+1; i < raw.length; i++) {
+    const r = raw[i]; if (!r || !r[0]) continue;
+    const first = String(r[0]).trim(); if (!first) continue;
+    if (first.toUpperCase().includes('VFEX PRICE SHEET')) { mkt = 'VFEX'; continue; }
+    if (/VFEX BONDS|VFEX REITS|VFEX ETF|ZSE ETF|ZSE REIT|ZSE TOP|THIS PRICE SHEET/i.test(first)) continue;
+    if (isNaN(parseFloat(r[1])) && typeof r[1] !== 'string') continue;
+    const sect = String(r[5]||'').trim();
+    if (['Fixed Term  Bond','Riet','Reit','Derivative'].includes(sect)) continue;
+    const closePx = parseFloat(r[8]);
+    const isSusp = String(r[13]||'').toUpperCase().includes('SUSPEND') || String(r[13]||'').toUpperCase().includes('NOT FOUND');
+    const usdPrice = mkt==='VFEX' ? (isNaN(closePx)?null:closePx) : (parseFloat(r[9])||null);
+    rows.push({ counter:first, isin:String(r[1]||'').trim(), shares:parseFloat(r[2])||0, mktCapIBR:parseFloat(r[3])||0, mktCapPMR:parseFloat(r[4])||0, sector:sect||'Other', pxDec31:parseFloat(r[6])||0, open:parseFloat(r[7])||null, close:isNaN(closePx)?null:closePx, usdIBR:parseFloat(r[9])||null, chg:parseFloat(r[11])||0, chgPct:parseFloat(r[12])||0, vol:isSusp?0:(parseFloat(r[13])||0), val:isSusp?0:(parseFloat(r[14])||0), divYield:parseFloat(r[15])||0, ytd:parseFloat(r[16])||0, market:mkt, suspended:isSusp, usdPrice });
+  }
+  return { rows, date };
+}
+
+// ─── BASELINE HELPERS ─────────────────────────────────────────────────────────
+function ingestBaselineBuffer(buffer, fname) {
+  const wb = XLSX.read(new Uint8Array(buffer), { type:'array', cellDates:true });
+  const ws = wb.Sheets[wb.SheetNames[0]];
+  const { rows, date } = parseSheet(XLSX.utils.sheet_to_json(ws, {header:1,defval:null}), fname);
+  window.BASE = {}; window.BASE_DATE = date;
+  rows.forEach(r => {
+    if (r.usdPrice && r.usdPrice > 0) window.BASE[r.counter.trim().toUpperCase()] = { price:r.usdPrice, market:r.market, sector:r.sector };
+  });
+  const cnt = Object.keys(window.BASE).length;
+  // Update admin UI if visible
+  const badge = document.getElementById('baselineBadge');
+  if (badge) { badge.textContent = '✓ ' + date + ' · ' + cnt + ' counters'; badge.className = 'adm-badge ok'; badge.style.display = 'inline-block'; }
+  const stats = document.getElementById('baselineStats');
+  if (stats) stats.textContent = 'Loaded ' + cnt + ' USD prices from baseline sheet (' + date + ')';
+  admLog('Baseline loaded: ' + date + ', ' + cnt + ' counters.', 'ok');
+  checkPublishReady();
+  if (window.PS.length) { renderInvestment(); if (document.getElementById('page-barchart').classList.contains('on')) renderBarChart(); }
+  renderWatchlist();
+}
+
+async function fetchBaselineAdmin() {
+  const btn = document.getElementById('btnFetchBaseline');
+  if (btn) { btn.textContent = '↻ Fetching…'; btn.disabled = true; }
+  admLog('Fetching baseline from GitHub…', 'info');
+  for (const url of BASELINE_URLS) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const buf = await res.arrayBuffer();
+      if (buf.byteLength < 1000) throw new Error('Response too small');
+      ingestBaselineBuffer(buf, BASELINE_FNAME);
+      if (btn) { btn.textContent = '↻ Re-fetch from GitHub'; btn.disabled = false; }
       return;
-    }catch(err){
-      console.warn('Failed:', url, err.message);
+    } catch(e) { admLog('URL failed: ' + e.message, 'warn'); }
+  }
+  admLog('All baseline URLs failed. Use manual upload.', 'err');
+  if (btn) { btn.textContent = '↻ Re-fetch from GitHub'; btn.disabled = false; }
+}
+
+function handleBaseline(file) {
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = e => { try { ingestBaselineBuffer(e.target.result, file.name); } catch(err) { admLog('Baseline parse failed: ' + err.message, 'err'); } };
+  r.readAsArrayBuffer(file);
+}
+
+// ─── CURRENT SHEET IMPORT (ADMIN) ─────────────────────────────────────────────
+function handleCurrentSheet(file) {
+  if (!file) return;
+  const btn = document.getElementById('btnImportSheet');
+  btn.textContent = '⏳ Reading…';
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const wb = XLSX.read(new Uint8Array(e.target.result), { type:'array', cellDates:true });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const { rows, date } = parseSheet(XLSX.utils.sheet_to_json(ws, {header:1,defval:null}), file.name);
+      window.PS = rows;
+      const zse = rows.filter(r => r.market==='ZSE').length;
+      const vfex = rows.filter(r => r.market==='VFEX').length;
+      // Update sidebar
+      document.getElementById('sbDate').textContent = date;
+      const sbS = document.getElementById('sbStats');
+      if (sbS) sbS.innerHTML = `ZSE: ${zse}<br>VFEX: ${vfex}<br><span class="sfs">${rows.length} total equities</span>`;
+      const sel = document.getElementById('scrSect');
+      sel.innerHTML = '<option value="">All Sectors</option>';
+      [...new Set(rows.map(r => r.sector))].sort().forEach(s => { const o = document.createElement('option'); o.value=s; o.textContent=s; sel.appendChild(o); });
+      // Update admin badge
+      const badge = document.getElementById('currSheetBadge');
+      if (badge) { badge.textContent = '✓ ' + date; badge.className = 'adm-badge ok'; badge.style.display = 'inline-block'; }
+      const stats = document.getElementById('currSheetStats');
+      if (stats) stats.textContent = `${rows.length} counters · ZSE: ${zse} · VFEX: ${vfex} · Date: ${date}`;
+      btn.textContent = '📂 Import FBC Sheet (.xlsx)';
+      document.getElementById('btnExport').disabled = false;
+      admLog('Current sheet loaded: ' + date + ', ' + rows.length + ' counters.', 'ok');
+      checkPublishReady();
+      renderWatchlist();
+    } catch(err) {
+      admLog('Sheet parse failed: ' + err.message, 'err');
+      btn.textContent = '📂 Import FBC Sheet (.xlsx)';
     }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function checkPublishReady() {
+  const hasPS  = window.PS.length > 0;
+  const hasBase = Object.keys(window.BASE).length > 0;
+  const btn = document.getElementById('btnPublish');
+  if (btn) btn.disabled = !(hasPS && hasBase);
+}
+
+// ─── GITHUB API PUBLISH ───────────────────────────────────────────────────────
+async function publishToGitHub() {
+  const pat = getPAT();
+  if (!pat) { alert('Please set your GitHub PAT first.'); promptPAT(); return; }
+  if (!window.PS.length) { admLog('No current sheet loaded.', 'err'); return; }
+  if (!Object.keys(window.BASE).length) { admLog('No baseline loaded.', 'err'); return; }
+
+  const btn = document.getElementById('btnPublish');
+  const statusBadge = document.getElementById('publishStatus');
+  btn.disabled = true; btn.textContent = '⏳ Publishing…';
+  statusBadge.style.display = 'none';
+  admLog('Building snapshot…', 'info');
+
+  const date = document.getElementById('sbDate').textContent;
+  const snapshot = {
+    generated: new Date().toISOString(),
+    priceDate: date,
+    baseDate: window.BASE_DATE || '',
+    counters: window.PS.map(r => ({
+      counter: r.counter.trim(), isin: r.isin, market: r.market, sector: r.sector,
+      shares: r.shares, mktCapIBR: r.mktCapIBR,
+      open: r.open, close: r.close, usdIBR: r.usdIBR,
+      chg: r.chg, chgPct: r.chgPct,
+      vol: r.vol, val: r.val,
+      divYield: r.divYield, ytd: r.ytd,
+      suspended: r.suspended, usdPrice: r.usdPrice,
+      inv100: (() => { const b = window.BASE[r.counter.trim().toUpperCase()]; return (b && b.price > 0 && r.usdPrice > 0) ? (r.usdPrice / b.price) * 100 : null; })()
+    }))
+  };
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(snapshot, null, 2))));
+
+  try {
+    admLog('Fetching current file SHA from GitHub…', 'info');
+    const headers = { 'Authorization': 'Bearer ' + pat, 'Content-Type': 'application/json', 'X-GitHub-Api-Version': '2022-11-28' };
+    const apiUrl = `https://api.github.com/repos/${REPO}/contents/${JSON_PATH}`;
+
+    let sha = null;
+    try {
+      const getRes = await fetch(apiUrl + '?ref=' + BRANCH, { headers });
+      if (getRes.ok) { const d = await getRes.json(); sha = d.sha; admLog('Got existing file SHA: ' + sha.slice(0,7), 'info'); }
+      else if (getRes.status === 404) { admLog('File does not exist yet — will create.', 'info'); }
+      else { throw new Error('GET failed: HTTP ' + getRes.status); }
+    } catch(e) { if (!e.message.includes('GET failed')) admLog('Could not fetch SHA (new file?): ' + e.message, 'warn'); else throw e; }
+
+    admLog('Pushing to GitHub…', 'info');
+    const body = { message: `market-data: ${date}`, content, branch: BRANCH };
+    if (sha) body.sha = sha;
+    const putRes = await fetch(apiUrl, { method:'PUT', headers, body: JSON.stringify(body) });
+
+    if (!putRes.ok) {
+      const errText = await putRes.text();
+      throw new Error('PUT ' + putRes.status + ': ' + errText.slice(0, 200));
+    }
+    const putData = await putRes.json();
+    admLog('✓ Pushed! Commit: ' + putData.commit.sha.slice(0,7) + ' — "' + putData.commit.message + '"', 'ok');
+    admLog('jsDelivr CDN refresh in ~5 min. Public site will auto-update.', 'ok');
+    statusBadge.textContent = '✓ Published';
+    statusBadge.className = 'adm-badge ok';
+    statusBadge.style.display = 'inline-block';
+    btn.textContent = '✓ Published';
+    btn.className = 'btn-adm success';
+    setTimeout(() => {
+      btn.textContent = '⬆ Publish Snapshot → GitHub';
+      btn.className = 'btn-adm primary';
+      btn.disabled = false;
+    }, 5000);
+    // Reload public view with new data
+    ingestSnapshot(snapshot);
+  } catch(err) {
+    admLog('Publish FAILED: ' + err.message, 'err');
+    statusBadge.textContent = '✗ Failed';
+    statusBadge.className = 'adm-badge err';
+    statusBadge.style.display = 'inline-block';
+    btn.textContent = '⬆ Publish Snapshot → GitHub';
+    btn.disabled = false;
+    if (err.message.includes('401') || err.message.includes('403')) {
+      admLog('Auth error — check your PAT has Contents: Read & Write permission.', 'err');
+    }
+  }
+}
+
+// ─── PUBLIC DATA FETCH ────────────────────────────────────────────────────────
+async function loadData() {
+  for (const url of DATA_URLS) {
+    try {
+      const res = await fetch(url + (url.includes('?')?'&':'?') + '_=' + Date.now());
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const text = await res.text();
+      if (text.length < 100) throw new Error('Response too small');
+      ingestSnapshot(JSON.parse(text));
+      return;
+    } catch(err) { console.warn('Failed:', url, err.message); }
   }
   showError();
 }
 
-function ingestSnapshot(data){
+function ingestSnapshot(data) {
   window.PS = data.counters || [];
-  const priceDate = data.priceDate || '';
-  const baseDate  = data.baseDate  || '';
-  const generated = data.generated ? new Date(data.generated) : null;
+  const priceDate  = data.priceDate  || '';
+  const baseDate   = data.baseDate   || '';
+  const generated  = data.generated ? new Date(data.generated) : null;
 
-  const sbD = document.getElementById('sbDate');
-  if(sbD) sbD.textContent = priceDate;
+  document.getElementById('sbDate').textContent = priceDate;
   const sbSt = document.getElementById('sbStats');
-  if(sbSt){
-    const zse = window.PS.filter(r=>r.market==='ZSE').length;
-    const vfex = window.PS.filter(r=>r.market==='VFEX').length;
-    sbSt.innerHTML = `ZSE: ${zse}<br>VFEX: ${vfex}<br><span class="sfs">${window.PS.length} equities</span>`;
-  }
+  if (sbSt) { const z = window.PS.filter(r=>r.market==='ZSE').length, v = window.PS.filter(r=>r.market==='VFEX').length; sbSt.innerHTML = `ZSE: ${z}<br>VFEX: ${v}<br><span class="sfs">${window.PS.length} equities</span>`; }
   const sbGen = document.getElementById('sbGenerated');
-  if(sbGen && generated) sbGen.textContent = 'Updated: ' + generated.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  if (sbGen && generated) sbGen.textContent = 'Updated: ' + generated.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  document.getElementById('tbSub').textContent = `· ${priceDate} · ZSE + VFEX${baseDate?' · Base: '+baseDate:''}`;
 
-  const tbS = document.getElementById('tbSub');
-  if(tbS) tbS.textContent = `· ${priceDate} · ZSE + VFEX${baseDate ? ' · Base: '+baseDate : ''}`;
-
-  const dot = document.getElementById('freshDot');
-  const lbl = document.getElementById('freshLbl');
-  if(dot && lbl && generated){
-    const ageHours = (Date.now() - generated.getTime()) / 3600000;
-    if(ageHours < 26){ dot.className='fresh-dot'; lbl.textContent='Data from '+priceDate; }
+  const dot = document.getElementById('freshDot'), lbl = document.getElementById('freshLbl');
+  if (dot && lbl && generated) {
+    const age = (Date.now() - generated.getTime()) / 3600000;
+    if (age < 26) { dot.className='fresh-dot'; lbl.textContent='Data from '+priceDate; }
     else { dot.className='fresh-dot stale'; lbl.textContent='Last updated: '+priceDate; }
   }
 
   const sel = document.getElementById('scrSect');
-  if(sel){
-    sel.innerHTML = '<option value="">All Sectors</option>';
-    [...new Set(window.PS.map(r=>r.sector))].sort().forEach(s=>{
-      const o=document.createElement('option'); o.value=s; o.textContent=s; sel.appendChild(o);
-    });
+  sel.innerHTML = '<option value="">All Sectors</option>';
+  [...new Set(window.PS.map(r=>r.sector))].sort().forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;sel.appendChild(o);});
+
+  // Rebuild BASE from snapshot inv100 values if no manual baseline loaded
+  if (!Object.keys(window.BASE).length && baseDate) {
+    window.BASE_DATE = baseDate;
+    // BASE not reconstructable from inv100 alone — will rely on auto-fetch
   }
 
-showPage('barchart'); 
-
-  // 2. Synchronize the view workspace heading title
-  const tbTitle = document.getElementById('tbTitle');
-  if(tbTitle) tbTitle.textContent = "Investment Chart";
-
-  // 3. Clear existing active tabs and locate the correct chart menu item to highlight
-  document.querySelectorAll('.ni').forEach(n => n.classList.remove('on'));
-  const chartNav = Array.from(document.querySelectorAll('.ni')).find(n => n.getAttribute('onclick')?.includes('barchart'));
-  if (chartNav) {
-    chartNav.classList.add('on');
-  } else {
-    // Safety fallback just in case the selector misses
-    document.querySelector('.ni')?.classList.add('on'); 
-  }
-
-  // 4. Fire the engine calculations and draw dashboards/bar calculations
   render();
+  renderWatchlist();
+  showPage('barchart');
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
+  const bc = Array.from(document.querySelectorAll('.ni')).find(n=>n.getAttribute('onclick')?.includes('barchart'));
+  if (bc) bc.classList.add('on');
+  document.getElementById('tbTitle').textContent = 'Investment Chart';
   renderBarChart();
+
+  // Auto-fetch baseline for $100 tracker (silently)
+  if (!Object.keys(window.BASE).length) fetchBaselineSilent();
 }
 
-function showError(){
-  const dot = document.getElementById('freshDot');
-  const lbl = document.getElementById('freshLbl');
-  if(dot) dot.className = 'fresh-dot stale';
-  if(lbl) lbl.textContent = 'Data unavailable';
-  const errPage = document.getElementById('page-error');
-  if(errPage) errPage.innerHTML = `
+async function fetchBaselineSilent() {
+  for (const url of BASELINE_URLS) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const buf = await res.arrayBuffer();
+      if (buf.byteLength < 1000) throw new Error('too small');
+      ingestBaselineBuffer(buf, BASELINE_FNAME);
+      return;
+    } catch(e) { /* silently try next */ }
+  }
+}
+
+function showError() {
+  const dot = document.getElementById('freshDot'), lbl = document.getElementById('freshLbl');
+  if (dot) dot.className = 'fresh-dot stale';
+  if (lbl) lbl.textContent = 'Data unavailable';
+  document.getElementById('page-error').innerHTML = `
     <div class="state-card">
       <div class="sc-icon">📂</div>
       <h3>No Published Data Yet</h3>
-      <p style="margin-bottom:18px">The superuser hasn't published a market snapshot yet, or the file is still propagating through the CDN.<br><br>
-      If you have a <strong>market-data.json</strong> file, you can load it directly below.</p>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
-        <label style="background:var(--gd);color:var(--white);padding:8px 20px;border-radius:4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;font-family:var(--font)">
-          📂 Load market-data.json
-          <input type="file" accept=".json" style="display:none" onchange="loadLocalJSON(this.files[0])">
-        </label>
-        <button onclick="loadData()" style="background:transparent;border:1.5px solid var(--border);color:var(--ts);padding:6px 16px;border-radius:4px;font-size:10px;cursor:pointer;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em">↺ Retry fetch</button>
-        <p style="font-size:10px;font-family:var(--mono);color:var(--ts);margin-top:4px">Or check that market-data.json has been uploaded to the GitHub repo root.</p>
+      <p>No market snapshot has been published yet, or the CDN is still propagating.<br><br>Use the <strong>Admin</strong> tab in the sidebar to import and publish data.</p>
+      <div style="margin-top:16px;display:flex;gap:8px;justify-content:center">
+        <button onclick="loadData()" style="background:var(--gd);color:var(--white);border:none;padding:8px 20px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font)">↺ Retry</button>
       </div>
     </div>`;
   showPage('error');
 }
 
-function loadLocalJSON(file){
-  if(!file) return;
-  const r = new FileReader();
-  r.onload = e => {
-    try{
-      const data = JSON.parse(e.target.result);
-      ingestSnapshot(data);
-    }catch(err){
-      alert('Could not parse market-data.json: ' + err.message);
-    }
-  };
-  r.readAsText(file);
-}
-
-function showPage(id){
+// ─── NAVIGATION ───────────────────────────────────────────────────────────────
+function showPage(id) {
   document.querySelectorAll('.vp').forEach(p=>p.classList.remove('on'));
   const pg = document.getElementById('page-'+id);
-  if(pg) pg.classList.add('on');
+  if (pg) pg.classList.add('on');
 }
 
-function nav(id, el){
+function nav(id, el) {
+  // Exit admin mode if switching to a regular page
+  if (_adminUnlocked && id !== 'admin') exitAdmin();
   showPage(id);
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
   el.classList.add('on');
-  const T={overview:'Market Overview',movers:'Movers',activity:'Trading Activity',sectors:'Sector Breakdown',screener:'Full Screener',barchart:'Investment Chart'};
-  const tt2 = document.getElementById('tbTitle');
-  if(tt2) tt2.textContent = T[id]||id;
-  if(id==='barchart') renderBarChart();
+  const T = {overview:'Market Overview',movers:'Movers',activity:'Trading Activity',sectors:'Sector Breakdown',screener:'Full Screener',investment:'$100 Investment Tracker',barchart:'Investment Chart',watchlist:'Watchlist'};
+  document.getElementById('tbTitle').textContent = T[id] || id;
+  document.getElementById('tbSub').textContent = 'Zimbabwe Stock Exchange · ZSE + VFEX';
+  document.getElementById('topbar').classList.remove('admin-mode');
+  document.getElementById('tbRight').innerHTML = '';
+  if (id==='investment') renderInvestment();
+  if (id==='barchart') renderBarChart();
 }
 
-function filterBy(mkt){ return mkt==='ALL'?window.PS:window.PS.filter(r=>r.market===mkt); }
-function setMkt(m,el)     { window.MKT=m;   hlBtn(el); render(); }
+function enterAdmin() {
+  _adminUnlocked = true;
+  showPage('admin');
+  document.querySelectorAll('.ni,.ni-admin').forEach(n=>n.classList.remove('on'));
+  document.getElementById('adminNavItem').classList.add('on');
+  document.getElementById('tbTitle').textContent = 'Admin';
+  document.getElementById('tbSub').textContent = 'Market Data Publisher · Direct GitHub Push';
+  document.getElementById('topbar').classList.add('admin-mode');
+  document.getElementById('tbRight').innerHTML = '<button onclick="exitAdmin()" style="background:transparent;border:1px solid rgba(59,158,232,.3);color:var(--admin-acc);padding:5px 13px;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font);text-transform:uppercase;letter-spacing:.08em">← Exit Admin</button>';
+  updatePatStatus();
+  checkPublishReady();
+  // Sync current state into admin UI
+  if (window.PS.length) {
+    const d = document.getElementById('sbDate').textContent;
+    const badge = document.getElementById('currSheetBadge');
+    if (badge) { badge.textContent = '✓ ' + d; badge.className = 'adm-badge ok'; badge.style.display = 'inline-block'; }
+    document.getElementById('btnExport').disabled = false;
+  }
+  if (Object.keys(window.BASE).length) {
+    const badge = document.getElementById('baselineBadge');
+    if (badge) { badge.textContent = '✓ ' + window.BASE_DATE + ' · ' + Object.keys(window.BASE).length + ' counters'; badge.className = 'adm-badge ok'; badge.style.display = 'inline-block'; }
+  }
+}
+
+function exitAdmin() {
+  _adminUnlocked = false;
+  document.getElementById('topbar').classList.remove('admin-mode');
+  document.getElementById('tbRight').innerHTML = '';
+  document.getElementById('adminNavItem').classList.remove('on');
+  // Go back to overview
+  const overviewNav = document.querySelector('.ni[onclick*="overview"]');
+  if (overviewNav) nav('overview', overviewNav);
+}
+
+// ─── FILTER + CHART HELPERS ───────────────────────────────────────────────────
+function filterBy(mkt) { return mkt==='ALL' ? window.PS : window.PS.filter(r=>r.market===mkt); }
+function setMkt(m,el)      { window.MKT=m;   hlBtn(el); render(); }
 function setMktMovers(m,el){ window.MKT_M=m; hlBtn(el); renderMovers(); }
 function setMktAct(m,el)   { window.MKT_A=m; hlBtn(el); renderActivity(); }
-function hlBtn(el){ el.parentNode.querySelectorAll('.mkt-btn').forEach(b=>b.classList.remove('on')); el.classList.add('on'); }
+function hlBtn(el) { el.parentNode.querySelectorAll('.mkt-btn').forEach(b=>b.classList.remove('on')); el.classList.add('on'); }
 
-function mk(id,cfg){ if(CH[id]){CH[id].destroy();delete CH[id];} const cv=document.getElementById(id); if(!cv)return; CH[id]=new Chart(cv,cfg); return CH[id]; }
-const scX = ()=>({grid:{display:false},ticks:{color:'#7A7A7A',font:{family:'DM Mono,monospace',size:10},maxRotation:30}});
-const scY = cb=>({grid:{color:'rgba(216,228,220,.5)'},ticks:{color:'#7A7A7A',font:{family:'DM Mono,monospace',size:10},callback:cb}});
+function mk(id,cfg) { if(CH[id]){CH[id].destroy();delete CH[id];} const cv=document.getElementById(id); if(!cv)return; CH[id]=new Chart(cv,cfg); return CH[id]; }
+const scX = () => ({grid:{display:false},ticks:{color:'#7A7A7A',font:{family:'DM Mono,monospace',size:10},maxRotation:30}});
+const scY = cb => ({grid:{color:'rgba(216,228,220,.5)'},ticks:{color:'#7A7A7A',font:{family:'DM Mono,monospace',size:10},callback:cb}});
 
-function render(){ if(!window.PS.length)return; renderOverview(); renderMovers(); renderActivity(); renderSectors(); renderScreener(); }
+function render() { if(!window.PS.length)return; renderOverview(); renderMovers(); renderActivity(); renderSectors(); renderScreener(); }
 
-function renderOverview(){
+// ─── RENDER FUNCTIONS (unchanged from superuser.html) ─────────────────────────
+function renderOverview() {
   const D=filterBy(window.MKT);
-  const gainers=D.filter(r=>r.chg>0), losers=D.filter(r=>r.chg<0), unch=D.filter(r=>r.chg===0&&!r.suspended);
-  const tvol=D.reduce((s,r)=>s+r.vol,0), tval=D.reduce((s,r)=>s+r.val,0);
+  const gainers=D.filter(r=>r.chg>0),losers=D.filter(r=>r.chg<0),unch=D.filter(r=>r.chg===0&&!r.suspended);
+  const tvol=D.reduce((s,r)=>s+r.vol,0),tval=D.reduce((s,r)=>s+r.val,0);
   document.getElementById('overviewContent').innerHTML=`
     <div class="kpi-row k5">
       <div class="kc" style="--kca:var(--gl)"><div class="kc-lbl">Counters</div><div class="kc-val">${D.length}</div><div class="kc-sub">${window.MKT==='ALL'?'ZSE + VFEX':window.MKT}</div></div>
@@ -512,15 +1004,15 @@ function renderOverview(){
     </div>`;
   const sm={}; D.forEach(r=>{sm[r.sector]=(sm[r.sector]||0)+r.mktCapIBR;});
   const ss=Object.entries(sm).sort((a,b)=>b[1]-a[1]);
-  mk('cSectorCap',{type:'bar',data:{labels:ss.map(([k])=>k),datasets:[{data:ss.map(([,v])=>v),backgroundColor:PAL,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...tt,callbacks:{label:c=>' '+fM(c.raw)}}},scales:{x:scX(),y:scY(fM)}}});
-  mk('cGainLoss',{type:'doughnut',data:{labels:['Gainers','Losers','Unchanged'],datasets:[{data:[gainers.length,losers.length,unch.length],backgroundColor:['#1D6B3A','#C0392B','#A7A8A9'],borderColor:'#FFF',borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{display:true,position:'bottom',labels:{color:'#4A4A4A',font:{size:10},boxWidth:10}},tooltip:{...tt}}}});
+  mk('cSectorCap',{type:'bar',data:{labels:ss.map(([k])=>k),datasets:[{data:ss.map(([,v])=>v),backgroundColor:PAL,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>' '+fM(c.raw)}}},scales:{x:scX(),y:scY(fM)}}});
+  mk('cGainLoss',{type:'doughnut',data:{labels:['Gainers','Losers','Unchanged'],datasets:[{data:[gainers.length,losers.length,unch.length],backgroundColor:['#1D6B3A','#C0392B','#A7A8A9'],borderColor:'#FFF',borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{display:true,position:'bottom',labels:{color:'#4A4A4A',font:{size:10},boxWidth:10}},tooltip:{...TT}}}});
   const g5=[...gainers].sort((a,b)=>b.chgPct-a.chgPct).slice(0,5);
   document.getElementById('tblGain5').innerHTML=g5.map(r=>`<tr><td class="tf hi">${r.counter}</td><td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td><td>${r.close!=null?fP2(r.close):'—'}</td><td class="up">+${fP2(r.chg)}</td><td class="up">▲ ${fP2(r.chgPct)}%</td></tr>`).join('');
   const l5=[...losers].sort((a,b)=>a.chgPct-b.chgPct).slice(0,5);
   document.getElementById('tblLoss5').innerHTML=l5.map(r=>`<tr><td class="tf hi">${r.counter}</td><td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td><td>${r.close!=null?fP2(r.close):'—'}</td><td class="dn">${fP2(r.chg)}</td><td class="dn">▼ ${Math.abs(r.chgPct).toFixed(2)}%</td></tr>`).join('');
 }
 
-function renderMovers(){
+function renderMovers() {
   const D=filterBy(window.MKT_M).filter(r=>!r.suspended&&r.close!=null);
   const gainers=[...D].filter(r=>r.chg>0).sort((a,b)=>b.chgPct-a.chgPct);
   const losers=[...D].filter(r=>r.chg<0).sort((a,b)=>a.chgPct-b.chgPct);
@@ -529,145 +1021,130 @@ function renderMovers(){
   document.getElementById('tblLosers').innerHTML=losers.length?losers.map((r,i)=>row(r,i,'dn','')).join(''):'<tr><td colspan="9" style="color:var(--ts);text-align:center;padding:24px">No losers.</td></tr>';
 }
 
-function renderActivity(){
+function renderActivity() {
   const D=filterBy(window.MKT_A), traded=D.filter(r=>r.vol>0).sort((a,b)=>b.val-a.val);
   document.getElementById('kActVol').textContent=fZ(D.reduce((s,r)=>s+r.vol,0));
   document.getElementById('kActVal').textContent=fZ(D.reduce((s,r)=>s+r.val,0));
   document.getElementById('kActCnt').textContent=traded.length;
   const t12=traded.slice(0,12);
-  mk('cVolBar',{type:'bar',data:{labels:t12.map(r=>r.counter),datasets:[{data:t12.map(r=>r.vol),backgroundColor:'#2D5A40',hoverBackgroundColor:'#3D7A56',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...tt,callbacks:{label:c=>' '+fN(c.raw)+' shares'}}},scales:{x:scX(),y:scY(fZ)}}});
+  mk('cVolBar',{type:'bar',data:{labels:t12.map(r=>r.counter),datasets:[{data:t12.map(r=>r.vol),backgroundColor:'#2D5A40',hoverBackgroundColor:'#3D7A56',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>' '+fN(c.raw)+' shares'}}},scales:{x:scX(),y:scY(fZ)}}});
   const t8=traded.slice(0,8);
-  mk('cValPie',{type:'doughnut',data:{labels:t8.map(r=>r.counter),datasets:[{data:t8.map(r=>r.val),backgroundColor:PAL,borderColor:'#fff',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,cutout:'50%',plugins:{legend:{display:true,position:'bottom',labels:{color:'#4A4A4A',font:{size:9},boxWidth:8}},tooltip:{...tt,callbacks:{label:c=>' '+fZ(c.raw)}}}}});
+  mk('cValPie',{type:'doughnut',data:{labels:t8.map(r=>r.counter),datasets:[{data:t8.map(r=>r.val),backgroundColor:PAL,borderColor:'#fff',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,cutout:'50%',plugins:{legend:{display:true,position:'bottom',labels:{color:'#4A4A4A',font:{size:9},boxWidth:8}},tooltip:{...TT,callbacks:{label:c=>' '+fZ(c.raw)}}}}});
   document.getElementById('tblActivity').innerHTML=traded.map((r,i)=>`<tr><td class="nc">${i+1}</td><td class="tf hi">${r.counter}</td><td><span class="sect">${r.sector}</span></td><td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td><td>${r.close!=null?fP2(r.close):'—'}</td><td>${fN(r.vol)}</td><td class="am">${fZ(r.val)}</td><td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'▲ +':'▼ ')+fP2(r.chgPct)+'%'}</td></tr>`).join('');
 }
 
-function renderSectors(){
+function renderSectors() {
   const D=window.PS, sm={};
   D.forEach(r=>{if(!sm[r.sector])sm[r.sector]={gainers:0,losers:0,unch:0,cap:0};if(r.chg>0)sm[r.sector].gainers++;else if(r.chg<0)sm[r.sector].losers++;else sm[r.sector].unch++;sm[r.sector].cap+=r.mktCapIBR;});
   const sects=Object.keys(sm).sort();
-  mk('cSectPerf',{type:'bar',data:{labels:sects,datasets:[{label:'Gainers',data:sects.map(s=>sm[s].gainers),backgroundColor:'rgba(29,107,58,.75)',borderRadius:3},{label:'Losers',data:sects.map(s=>sm[s].losers),backgroundColor:'rgba(192,57,43,.7)',borderRadius:3},{label:'Unch.',data:sects.map(s=>sm[s].unch),backgroundColor:'rgba(122,122,122,.4)',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#4A4A4A',font:{size:10},boxWidth:10}},tooltip:{...tt}},scales:{x:scX(),y:scY(v=>v)}}});
+  mk('cSectPerf',{type:'bar',data:{labels:sects,datasets:[{label:'Gainers',data:sects.map(s=>sm[s].gainers),backgroundColor:'rgba(29,107,58,.75)',borderRadius:3},{label:'Losers',data:sects.map(s=>sm[s].losers),backgroundColor:'rgba(192,57,43,.7)',borderRadius:3},{label:'Unch.',data:sects.map(s=>sm[s].unch),backgroundColor:'rgba(122,122,122,.4)',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#4A4A4A',font:{size:10},boxWidth:10}},tooltip:{...TT}},scales:{x:scX(),y:scY(v=>v)}}});
   const sorted=[...D].sort((a,b)=>a.sector.localeCompare(b.sector)||b.mktCapIBR-a.mktCapIBR);
   document.getElementById('tblSectors').innerHTML=sorted.map((r,i)=>`<tr><td class="nc">${i+1}</td><td class="tf hi">${r.counter}</td><td><span class="sect">${r.sector}</span></td><td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td><td class="am">${fM(r.mktCapIBR)}</td><td>${r.close!=null?fP2(r.close):'—'}</td><td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'▲ +':'▼ ')+fP2(r.chgPct)+'%'}</td><td class="${pC(r.ytd)}">${(r.ytd*100).toFixed(1)}%</td></tr>`).join('');
 }
 
-function renderScreener(){
-  if(!window.PS.length)return;
+function renderScreener() {
+  if (!window.PS.length) return;
   const q=document.getElementById('scrSearch').value.toLowerCase().trim();
   const m=document.getElementById('scrMkt').value, s=document.getElementById('scrSect').value, so=document.getElementById('scrSort').value;
   let D=[...window.PS];
   if(q)D=D.filter(r=>r.counter.toLowerCase().includes(q)||r.sector.toLowerCase().includes(q)||r.isin.toLowerCase().includes(q));
   if(m)D=D.filter(r=>r.market===m); if(s)D=D.filter(r=>r.sector===s);
-  if(so==='mktcap_d')D.sort((a,b)=>b.mktCapIBR-a.mktCapIBR); else if(so==='pct_d')D.sort((a,b)=>b.chgPct-a.chgPct); else if(so==='pct_a')D.sort((a,b)=>a.chgPct-b.chgPct); else if(so==='vol_d')D.sort((a,b)=>b.vol-a.vol); else if(so==='ytd_d')D.sort((a,b)=>b.ytd-a.ytd); else if(so==='ytd_a')D.sort((a,b)=>a.ytd-b.ytd); else if(so==='az')D.sort((a,b)=>a.counter.localeCompare(b.counter));
-  document.getElementById('tblScreener').innerHTML=D.map((r,i)=>`<tr><td class="nc">${i+1}</td><td class="tf hi">${r.counter}</td><td style="color:var(--ts);font-size:10px">${r.isin}</td><td><span class="sect">${r.sector}</span></td><td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td><td>${r.open!=null?fP2(r.open):'—'}</td><td class="hi">${r.close!=null?fP2(r.close):(r.suspended?'<span style="color:var(--gold)">SUSP</span>':'—')}</td><td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'+':'')+fP2(r.chg)}</td><td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'▲ +':'▼ ')+fP2(r.chgPct)+'%'}</td><td>${r.vol>0?fN(r.vol):'<span class="nc">—</span>'}</td><td>${r.val>0?fZ(r.val):'<span class="nc">—</span>'}</td><td class="am">${fM(r.mktCapIBR)}</td><td class="${pC(r.ytd)}">${(r.ytd*100).toFixed(1)}%</td><td>${r.divYield>0?(r.divYield*100).toFixed(2)+'%':'<span class="nc">—</span>'}</td></tr>`).join('');
-  document.getElementById('scrCount').textContent=`Showing ${D.length} of ${window.PS.length} counters`;
+  if(so==='mktcap_d')D.sort((a,b)=>b.mktCapIBR-a.mktCapIBR);else if(so==='pct_d')D.sort((a,b)=>b.chgPct-a.chgPct);else if(so==='pct_a')D.sort((a,b)=>a.chgPct-b.chgPct);else if(so==='vol_d')D.sort((a,b)=>b.vol-a.vol);else if(so==='ytd_d')D.sort((a,b)=>b.ytd-a.ytd);else if(so==='ytd_a')D.sort((a,b)=>a.ytd-b.ytd);else if(so==='az')D.sort((a,b)=>a.counter.localeCompare(b.counter));
+  document.getElementById('tblScreener').innerHTML=D.map((r,i)=>`<tr><td class="nc">${i+1}</td><td class="tf hi" style="cursor:pointer" onclick="quickAddWatch('${r.counter.trim()}')" title="Add to watchlist">${r.counter}</td><td style="color:var(--ts);font-size:10px">${r.isin}</td><td><span class="sect">${r.sector}</span></td><td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td><td>${r.open!=null?fP2(r.open):'—'}</td><td class="hi">${r.close!=null?fP2(r.close):(r.suspended?'<span style="color:var(--gold)">SUSP</span>':'—')}</td><td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'+':'')+fP2(r.chg)}</td><td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'▲ +':'▼ ')+fP2(r.chgPct)+'%'}</td><td>${r.vol>0?fN(r.vol):'<span class="nc">—</span>'}</td><td>${r.val>0?fZ(r.val):'<span class="nc">—</span>'}</td><td class="am">${fM(r.mktCapIBR)}</td><td class="${pC(r.ytd)}">${(r.ytd*100).toFixed(1)}%</td><td>${r.divYield>0?(r.divYield*100).toFixed(2)+'%':'<span class="nc">—</span>'}</td></tr>`).join('');
+  document.getElementById('scrCount').textContent=`Showing ${D.length} of ${window.PS.length} counters · click name to add to watchlist`;
 }
 
-function renderBarChart(){
-  const el=document.getElementById('barchartContent');
-  if(!window.PS.length){ el.innerHTML='<div class="state-card"><div class="sc-icon">📊</div><h3>No data</h3><p>Data has not been loaded yet.</p></div>'; return; }
-  const results=window.PS.filter(r=>r.inv100!=null).sort((a,b)=>a.inv100-b.inv100);
-  if(!results.length){ el.innerHTML='<div class="state-card"><div class="sc-icon">📊</div><h3>No $100 data</h3><p>The published snapshot does not include investment comparison data. The superuser needs to load a baseline before publishing.</p></div>'; return; }
-  
-  const mktF=document.getElementById('bcMktF')?.value||'';
-  const cntF=parseInt(document.getElementById('bcCntF')?.value||'999')||999;
-  let filtered=mktF?results.filter(r=>r.market===mktF):results;
-  filtered=filtered.slice(-Math.min(cntF,filtered.length));
-  
-  const investment = parseFloat(document.getElementById('investmentAmount')?.value || 100);
+function getInvValue(r) {
+  if (!window.BASE || !Object.keys(window.BASE).length) {
+    // Fall back to pre-calculated inv100 from snapshot
+    return r.inv100 != null ? r.inv100 : null;
+  }
+  const base = window.BASE[r.counter.trim().toUpperCase()];
+  if (!base || !base.price || base.price <= 0) return r.inv100 != null ? r.inv100 : null;
+  if (!r.usdPrice || r.usdPrice <= 0) return r.inv100 != null ? r.inv100 : null;
+  return (r.usdPrice / base.price) * 100;
+}
 
-  let bestStock = filtered[0];
-  let highestValue = 0;
-
-  filtered.forEach(stock => {
-    const valueToday = (stock.inv100 / 100) * investment;
-    if(valueToday > highestValue){
-      highestValue = valueToday;
-      bestStock = stock;
-    }
-  });
-
-  const maxVal=Math.max(...filtered.map(r=>(r.inv100 / 100) * investment), investment * 2);
-  const MAXPX=520;
-  const scale=v=>Math.max(4,Math.round((v/maxVal)*MAXPX));
-  const barColor=v=>(v/investment)*100>=150?'#1A3A2A':(v/investment)*100>=120?'#2D5A40':(v/investment)*100>=100?'#3D7A56':(v/investment)*100>=80?'#B8872A':'#C0392B';
-  const priceDate=document.getElementById('sbDate')?.textContent||'';
-  const winners=filtered.filter(r=>r.inv100>100).length;
-  const losers2=filtered.filter(r=>r.inv100<100).length;
-  const avg=((filtered.reduce((s,r)=>s+r.inv100,0)/filtered.length) / 100 * investment).toFixed(2);
-  
-  const rows=filtered.map(r=>{
-    const valueToday = (r.inv100 / 100) * investment;
+function renderInvestment() {
+  const results = [];
+  window.PS.forEach(r => { const iv=getInvValue(r); if(iv!=null)results.push({...r,inv100:iv,gain:iv-100,gainPct:iv-100}); });
+  const el = document.getElementById('investContent');
+  if (!results.length) { el.innerHTML='<div class="setup-panel"><h3>$100 Investment Tracker</h3><p>No investment data available. Publish a snapshot with baseline data first.</p></div>'; return; }
+  const winners=results.filter(r=>r.inv100>100), losers=results.filter(r=>r.inv100<100);
+  const best=winners.length?[...winners].sort((a,b)=>b.inv100-a.inv100)[0]:null;
+  const avg=results.reduce((s,r)=>s+r.inv100,0)/results.length;
+  const allSorted=[...results].sort((a,b)=>b.inv100-a.inv100);
+  const irow=r=>{
+    const pct=r.gainPct, bc=r.inv100>100?'#1D6B3A':r.inv100<100?'#C0392B':'#7A7A7A';
     const cls=r.inv100>100?'iv-up':r.inv100<100?'iv-dn':'iv-nc';
-    return `<div class="bc-row">
-      <div class="bc-label" title="${r.counter}">${r.counter}${r.suspended?' *':''}</div>
-      <div class="bc-bar-wrap">
-        <div class="bc-bar" style="width:${scale(valueToday)}px;background:${barColor(valueToday)}"></div>
-        <span class="bc-val ${cls}">$${valueToday.toFixed(2)}</span>
-        <span class="bc-sect">${r.sector}</span>
-        <span style="font-size:8px;font-family:var(--mono);color:var(--ts);margin-left:3px">${r.market==='VFEX'?'(VFEX)':''}</span>
-      </div>
+    const basePx=(window.BASE[r.counter.trim().toUpperCase()]||{}).price||0;
+    return `<tr><td class="tf hi" style="cursor:pointer" onclick="quickAddWatch('${r.counter.trim()}')">${r.counter}</td><td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td><td><span class="sect">${r.sector}</span></td><td class="nc" style="font-size:10px">${basePx?'$'+basePx.toFixed(5):'—'}</td><td class="nc" style="font-size:10px">$${(r.usdPrice||0).toFixed(5)}</td><td class="${cls}" style="font-size:13px;font-weight:700">$${r.inv100.toFixed(2)}</td><td class="${cls}">${r.gain>=0?'+':''}$${r.gain.toFixed(2)}</td><td class="${cls}">${pct>=0?'▲ +':'▼ '}${Math.abs(pct).toFixed(2)}%<span class="iv-bar" style="background:${bc};width:${Math.min(Math.abs(pct),120)}px"></span></td><td class="${pC(r.ytd)}">${(r.ytd*100).toFixed(1)}%</td></tr>`;
+  };
+  el.innerHTML=`
+    <div class="base-banner"><div class="bb-icon">📅</div><div class="bb-text"><h3>Baseline: ${window.BASE_DATE||'Jan 6 2026'}</h3><p>$100 invested per counter · Comparing with: ${document.getElementById('sbDate').textContent}</p></div><div class="bb-badge">$100 per counter</div></div>
+    <div class="kpi-row k4">
+      <div class="kc" style="--kca:var(--gl)"><div class="kc-lbl">Portfolio Average</div><div class="kc-val" style="color:${avg>=100?'var(--gain)':'var(--red)'}">$${avg.toFixed(2)}</div><div class="kc-sub">${avg>=100?'▲':'▼'} avg from $100</div></div>
+      <div class="kc" style="--kca:var(--gain)"><div class="kc-lbl">Winners</div><div class="kc-val" style="color:var(--gain)">${winners.length}</div><div class="kc-sub">of ${results.length} tracked</div></div>
+      <div class="kc" style="--kca:var(--red)"><div class="kc-lbl">Losers</div><div class="kc-val" style="color:var(--red)">${losers.length}</div><div class="kc-sub">of ${results.length} tracked</div></div>
+      <div class="kc" style="--kca:var(--gold)"><div class="kc-lbl">Best Performer</div><div class="kc-val" style="color:var(--gain);font-size:14px">${best?best.counter:'—'}</div><div class="kc-sub">${best?'$100 → $'+best.inv100.toFixed(2):'no winners'}</div></div>
+    </div>
+    <div class="mc"><div class="mc-title">All Counters — $100 Value <span class="hint">best to worst · click name to watchlist</span></div>
+      <div class="tw"><table><thead><tr><th>Counter</th><th>Market</th><th>Sector</th><th>Base Price</th><th>Current Price</th><th>$100 Now Worth</th><th>Gain/Loss</th><th>% Change</th><th>YTD G/L</th></tr></thead><tbody>${allSorted.map(irow).join('')}</tbody></table></div>
+      <div class="inv-note">Prices in USD. VFEX = native USD; ZSE = USD@IBR from sheet. ${results.length} of ${window.PS.length} counters have data.</div>
     </div>`;
+}
+
+function renderBarChart() {
+  const el = document.getElementById('barchartContent');
+  const results = window.PS.filter(r => getInvValue(r) != null).map(r => ({...r, inv100: getInvValue(r)}));
+  if (!results.length) { el.innerHTML='<div class="state-card"><div class="sc-icon">📊</div><h3>No investment data</h3><p>Data will appear after a snapshot with baseline is published.</p></div>'; return; }
+  results.sort((a,b) => a.inv100 - b.inv100);
+  const mktF = document.getElementById('bcMktF')?.value || '';
+  const cntF = parseInt(document.getElementById('bcCntF')?.value || '999') || 999;
+  let filtered = mktF ? results.filter(r=>r.market===mktF) : results;
+  filtered = filtered.slice(-Math.min(cntF, filtered.length));
+  const investment = parseFloat(document.getElementById('investmentAmount')?.value || 100);
+  const maxVal = Math.max(...filtered.map(r=>(r.inv100/100)*investment), investment*2);
+  const MAXPX = 520;
+  const scale = v => Math.max(4, Math.round((v/maxVal)*MAXPX));
+  const barColor = v => { const p=(v/investment)*100; return p>=150?'#1A3A2A':p>=120?'#2D5A40':p>=100?'#3D7A56':p>=80?'#B8872A':'#C0392B'; };
+  const priceDate = document.getElementById('sbDate')?.textContent || '';
+  const winners = filtered.filter(r=>r.inv100>100).length, losers2 = filtered.filter(r=>r.inv100<100).length;
+  const avg = ((filtered.reduce((s,r)=>s+r.inv100,0)/filtered.length)/100*investment).toFixed(2);
+  let best = filtered[0], bestVal = 0;
+  filtered.forEach(r=>{ const v=(r.inv100/100)*investment; if(v>bestVal){bestVal=v;best=r;} });
+  const rows = filtered.map(r => {
+    const v=(r.inv100/100)*investment, cls=r.inv100>100?'iv-up':r.inv100<100?'iv-dn':'iv-nc';
+    return `<div class="bc-row"><div class="bc-label" title="${r.counter}">${r.counter}${r.suspended?' *':''}</div><div class="bc-bar-wrap"><div class="bc-bar" style="width:${scale(v)}px;background:${barColor(v)}"></div><span class="bc-val ${cls}">$${v.toFixed(2)}</span><span class="bc-sect">${r.sector}</span>${r.market==='VFEX'?'<span style="font-size:8px;font-family:var(--mono);color:var(--ts);margin-left:3px">(VFEX)</span>':''}</div></div>`;
   }).join('');
-  
   el.innerHTML=`
     <div class="bchart-wrap" id="printArea">
       <div class="bchart-header">
-        <div class="bch-org">
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px">
           <img src="https://bobwealth.org/images/bob_logo.png" style="height:36px;object-fit:contain" onerror="this.style.display='none'">
-          <div>
-            <div style="font-family:var(--serif);font-size:15px;font-weight:700;color:var(--gd)">Bob Wealth Holdings</div>
-            <div style="font-family:var(--mono);font-size:9px;color:var(--ts);letter-spacing:.1em;text-transform:uppercase">Zimbabwe Capital Markets</div>
-          </div>
+          <div><div style="font-family:var(--serif);font-size:15px;font-weight:700;color:var(--gd)">Bob Wealth Holdings</div><div style="font-family:var(--mono);font-size:9px;color:var(--ts);letter-spacing:.1em;text-transform:uppercase">Zimbabwe Capital Markets</div></div>
         </div>
-        <div style="font-size:14px;font-weight:600;color:var(--text);font-family:var(--font)">If you invested US$<span id="dynamicLabelAmount">100</span> in each of these counters at the beginning of the year,</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);font-family:var(--font)">If you invested US$<span id="dynamicLabelAmount">${investment.toLocaleString()}</span> in each counter at the beginning of the year,</div>
         <div style="font-size:14px;font-weight:600;color:var(--text);font-family:var(--font);margin-top:2px">on <strong>${priceDate}</strong> it would be worth;</div>
-        <div style="margin-top:8px;display:flex;gap:20px;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--ts)">
-          <span>Start: ${results.length} counters</span><span>End: ${filtered.length} shown</span>
-        </div>
+        <div style="margin-top:8px;display:flex;gap:20px;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--ts)"><span>${results.length} counters tracked</span><span>${filtered.length} shown</span></div>
       </div>
-      
-      <div class="bchart-controls" style="margin-bottom:16px;">
-          <label style="font-family:var(--mono);font-size:10px;">
-              Investment Amount ($)
-          </label>
-          <input
-              type="number"
-              id="investmentAmount"
-              value="${investment}"
-              min="1"
-              step="1"
-              style="width:120px;"
-              oninput="renderBarChart()"
-          >
-          <button class="mkt-btn" onclick="setInvestment(1)">$1</button>
-          <button class="mkt-btn" onclick="setInvestment(100)">$100</button>
-          <button class="mkt-btn" onclick="setInvestment(1000)">$1,000</button>
-          <button class="mkt-btn" onclick="setInvestment(10000)">$10,000</button>
+      <div class="bchart-controls" style="margin-bottom:16px">
+        <label style="font-family:var(--mono);font-size:10px">Investment Amount ($)</label>
+        <input type="number" id="investmentAmount" value="${investment}" min="1" step="1" style="width:120px" oninput="renderBarChart()">
+        <button class="mkt-btn" onclick="setInvestment(1)">$1</button>
+        <button class="mkt-btn" onclick="setInvestment(100)">$100</button>
+        <button class="mkt-btn" onclick="setInvestment(1000)">$1,000</button>
+        <button class="mkt-btn" onclick="setInvestment(10000)">$10,000</button>
       </div>
-
-      <div class="kpi-row k3" id="investmentSummary">
-          <div class="kc" style="--kca:var(--gl)">
-              <div class="kc-lbl">Investment Amount</div>
-              <div class="kc-val" id="kpiInvestment">$100</div>
-          </div>
-          <div class="kc" style="--kca:var(--gold)">
-              <div class="kc-lbl">Best Performer</div>
-              <div class="kc-val" id="kpiBest">-</div>
-          </div>
-          <div class="kc" style="--kca:var(--gain)">
-              <div class="kc-lbl">Highest Value</div>
-              <div class="kc-val" id="kpiHighest">-</div>
-          </div>
+      <div class="kpi-row k3">
+        <div class="kc" style="--kca:var(--gl)"><div class="kc-lbl">Investment Amount</div><div class="kc-val">$${investment.toLocaleString()}</div></div>
+        <div class="kc" style="--kca:var(--gold)"><div class="kc-lbl">Best Performer</div><div class="kc-val" style="font-size:14px">${best?best.counter:'—'}</div></div>
+        <div class="kc" style="--kca:var(--gain)"><div class="kc-lbl">Highest Value</div><div class="kc-val">$${bestVal.toFixed(2)}</div></div>
       </div>
-
       <div class="bchart-controls" id="bcControls">
         <select id="bcMktF" onchange="renderBarChart()"><option value="">All Markets</option><option ${mktF==='ZSE'?'selected':''}>ZSE</option><option ${mktF==='VFEX'?'selected':''}>VFEX</option></select>
-        <select id="bcCntF" onchange="renderBarChart()">
-          <option value="999" ${cntF===999?'selected':''}>All counters</option><option value="20" ${cntF===20?'selected':''}>Top/bottom 20</option>
-          <option value="30" ${cntF===30?'selected':''}>Top/bottom 30</option><option value="50" ${cntF===50?'selected':''}>Top/bottom 50</option>
-        </select>
+        <select id="bcCntF" onchange="renderBarChart()"><option value="999" ${cntF===999?'selected':''}>All counters</option><option value="20" ${cntF===20?'selected':''}>Top/bottom 20</option><option value="30" ${cntF===30?'selected':''}>Top/bottom 30</option><option value="50" ${cntF===50?'selected':''}>Top/bottom 50</option></select>
         <button class="btn-print" onclick="printChart()">🖨 Print / Save PDF</button>
-        <span style="font-size:9px;font-family:var(--mono);color:var(--ts)"> </span>
       </div>
       <div class="bchart-legend">
         <div class="bl-item"><div class="bl-dot" style="background:#1A3A2A"></div> &gt;$${(investment*1.5).toFixed(0)}</div>
@@ -678,29 +1155,65 @@ function renderBarChart(){
       </div>
       <div id="bcRows">${rows}</div>
       <div class="bchart-footer">
-        <p>Data: FBC Securities (Pvt) Ltd · Prices in USD (IBR rate for ZSE counters) · For informational purposes only<br></p>
+        <p>Data: FBC Securities (Pvt) Ltd · Prices in USD (IBR rate for ZSE) · For informational purposes only</p>
         <div class="bchart-stats">
           <span class="bcs">Winners: <b style="color:var(--gain)">${winners}</b></span>
           <span class="bcs">Losers: <b style="color:var(--red)">${losers2}</b></span>
-          <span class="bcs">Avg Value: <b style="color:${parseFloat(avg)>=investment?'var(--gain)':'var(--red)'}">$${avg}</b></span>
+          <span class="bcs">Avg: <b style="color:${parseFloat(avg)>=investment?'var(--gain)':'var(--red)'}">$${avg}</b></span>
         </div>
       </div>
     </div>`;
-
-  document.getElementById("kpiInvestment").textContent = "$" + investment.toLocaleString();
-  document.getElementById("kpiBest").textContent = bestStock ? bestStock.counter : '-';
-  document.getElementById("kpiHighest").textContent = "$" + highestValue.toFixed(2);
-  document.getElementById("dynamicLabelAmount").textContent = investment.toLocaleString();
 }
 
-function printChart(){
-  const ctrl=document.getElementById('bcControls');
-  if(ctrl) ctrl.style.display='none';
-  window.print();
-  setTimeout(()=>{ if(ctrl) ctrl.style.display='flex'; },500);
+function setInvestment(amount) { const el=document.getElementById('investmentAmount'); if(el)el.value=amount; renderBarChart(); }
+function printChart() { const c=document.getElementById('bcControls'); if(c)c.style.display='none'; window.print(); setTimeout(()=>{if(c)c.style.display='flex';},500); }
+
+// ─── WATCHLIST ────────────────────────────────────────────────────────────────
+function saveWatch() { localStorage.setItem('bw_watchlist', JSON.stringify(window.WATCH)); }
+function addWatch(t) { const raw=t||document.getElementById('wlInput').value.trim().toUpperCase(); if(!raw)return; if(!window.WATCH.includes(raw))window.WATCH.push(raw); saveWatch(); document.getElementById('wlInput').value=''; renderWatchlist(); }
+function quickAddWatch(t) { addWatch(t.trim().toUpperCase()); }
+function removeWatch(t) { window.WATCH=window.WATCH.filter(w=>w!==t); saveWatch(); renderWatchlist(); }
+function clearWatch() { window.WATCH=[]; saveWatch(); renderWatchlist(); }
+
+function renderWatchlist() {
+  document.getElementById('wlTags').innerHTML=window.WATCH.map(t=>`<div class="wl-tag">${t}<button onclick="removeWatch('${t}')">✕</button></div>`).join('');
+  const rows=window.WATCH.map(t=>{const r=window.PS.find(p=>p.counter.trim().toUpperCase()===t);return r?r:{counter:t,_missing:true};});
+  if(!rows.length){document.getElementById('tblWatch').innerHTML='';document.getElementById('wlEmpty').style.display='flex';return;}
+  document.getElementById('wlEmpty').style.display='none';
+  document.getElementById('tblWatch').innerHTML=rows.map(r=>{
+    if(r._missing)return`<tr><td class="tf" style="color:var(--gold)">${r.counter}</td><td colspan="11" class="nc">Not in current data</td></tr>`;
+    const iv=getInvValue(r);
+    const ivCell=iv!=null?`<span class="${iv>100?'iv-up':iv<100?'iv-dn':'iv-nc'}">$${iv.toFixed(2)}</span>`:'<span class="nc">—</span>';
+    return`<tr><td class="tf hi">${r.counter}</td><td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td><td><span class="sect">${r.sector}</span></td><td>${r.open!=null?fP2(r.open):'—'}</td><td class="hi">${r.close!=null?fP2(r.close):(r.suspended?'<span class="am">SUSP</span>':'—')}</td><td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'+':'')+fP2(r.chg)}</td><td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'▲ +':'▼ ')+fP2(r.chgPct)+'%'}</td><td>${r.vol>0?fN(r.vol):'<span class="nc">—</span>'}</td><td>${r.val>0?fZ(r.val):'<span class="nc">—</span>'}</td><td class="am">${fM(r.mktCapIBR)}</td><td class="${pC(r.ytd)}">${(r.ytd*100).toFixed(1)}%</td><td>${ivCell}</td></tr>`;
+  }).join('');
 }
 
+// ─── EXPORT ───────────────────────────────────────────────────────────────────
+function exportReport() {
+  if (!window.PS.length) return;
+  const btn = document.getElementById('btnExport'); btn.textContent='Building…'; btn.disabled=true;
+  setTimeout(() => {
+    try {
+      const wb=XLSX.utils.book_new(), date=document.getElementById('sbDate').textContent;
+      const h1=['Counter','ISIN','Market','Sector','Shares','Mkt Cap USD','Open','Close','USD@IBR','Change','% Change','Volume','Value (ZiG)','YTD G/L %','Div Yield %'];
+      const r1=window.PS.map(r=>[r.counter.trim(),r.isin,r.market,r.sector,r.shares,+r.mktCapIBR.toFixed(2),r.open,r.close,r.usdIBR,r.chg,+r.chgPct.toFixed(4),r.vol,+r.val.toFixed(2),+(r.ytd*100).toFixed(2),+(r.divYield*100).toFixed(4)]);
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([h1,...r1]), 'PRICE DATA');
+      if (Object.keys(window.BASE).length) {
+        const h2=['Counter','Market','Sector','Base Price (USD)','Current Price (USD)','$100 Value','Gain/Loss ($)','% Change','YTD G/L %'];
+        const r2=window.PS.map(r=>{const iv=getInvValue(r);const b=window.BASE[r.counter.trim().toUpperCase()];return iv!=null?[r.counter.trim(),r.market,r.sector,b?+b.price.toFixed(6):null,+r.usdPrice.toFixed(6),+iv.toFixed(4),+(iv-100).toFixed(4),+(iv-100).toFixed(4),+(r.ytd*100).toFixed(2)]:null;}).filter(Boolean).sort((a,b)=>b[5]-a[5]);
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([h2,...r2]), '$100 TRACKER');
+      }
+      XLSX.writeFile(wb, `BobWealth_Markets_${date.replace(/-/g,'')}.xlsx`);
+      btn.textContent='↓ Export .xlsx Report'; btn.disabled=false;
+    } catch(err) { console.error(err); btn.textContent='↓ Export .xlsx Report'; btn.disabled=false; }
+  }, 50);
+}
+
+// ─── BOOT ─────────────────────────────────────────────────────────────────────
+renderWatchlist();
 loadData();
 </script>
 </body>
 </html>
+HTMLEOF
+echo "Done. File size: $(wc -c < /mnt/user-data/outputs/markets.html) bytes"
