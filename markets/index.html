@@ -1,12 +1,14 @@
-cat > /mnt/user-data/outputs/markets.html << 'HTMLEOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Markets — Bob Wealth Holdings</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -252,6 +254,144 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
   .bchart-wrap{box-shadow:none;border:none;padding:8px}
   .bc-label{width:175px;font-size:9px}.bc-val{font-size:9px}
 }
+
+/* ─── MOBILE ──────────────────────────────────────────────────────────────── */
+@media(max-width:768px){
+  /* Prevent scroll bounce on iOS */
+  html,body{height:100%;overflow:hidden;position:fixed;width:100%}
+
+  /* HEADER — compact */
+  .site-header{height:52px;padding:0 14px}
+  .hd-name{font-size:14px}
+  .hd-name span{display:none}
+  .site-nav{display:none}
+  .freshness{gap:5px}
+  .fresh-lbl{font-size:9px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  /* LAYOUT — no sidebar, full width */
+  .app{flex-direction:column}
+
+  /* SIDEBAR — slide-over drawer */
+  .sb{
+    position:fixed;left:0;top:52px;bottom:56px;z-index:200;
+    width:240px;transform:translateX(-100%);
+    transition:transform .25s cubic-bezier(.4,0,.2,1);
+    box-shadow:4px 0 24px rgba(0,0,0,.18);
+  }
+  .sb.open{transform:translateX(0)}
+  .sb-foot{display:none}
+
+  /* Overlay behind sidebar */
+  .sb-overlay{display:none;position:fixed;inset:0;top:52px;bottom:56px;background:rgba(0,0,0,.45);z-index:199}
+  .sb-overlay.show{display:block}
+
+  /* TOPBAR */
+  .topbar{padding:8px 14px;gap:6px}
+  .tb-left h1{font-size:14px}
+  .tb-left .tb-sub{display:none}
+  .tb-right{gap:5px}
+
+  /* CONTENT */
+  .content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px}
+  .vp{padding:12px 12px 24px}
+
+  /* BOTTOM NAV BAR */
+  .mob-nav{
+    display:flex;position:fixed;bottom:0;left:0;right:0;z-index:300;
+    height:56px;background:var(--gd);border-top:2px solid var(--gold);
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .mob-nav-item{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:2px;cursor:pointer;color:rgba(255,255,255,.55);
+    font-family:var(--mono);font-size:8px;text-transform:uppercase;letter-spacing:.06em;
+    transition:color .12s;padding:4px 2px;border:none;background:none;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .mob-nav-item .mn-ic{font-size:16px;line-height:1}
+  .mob-nav-item.on{color:var(--gold)}
+  .mob-nav-item.menu-btn{color:rgba(255,255,255,.55)}
+
+  /* KPI GRIDS — stack on mobile */
+  .k5,.k4,.k3{grid-template-columns:repeat(2,1fr)}
+  .k5 .kc:last-child{grid-column:span 2}
+  .kc-val{font-size:17px}
+
+  /* LAYOUT GRIDS — single column */
+  .c2,.c21,.row.c2,.row.c21{grid-template-columns:1fr}
+  .setup-steps{grid-template-columns:1fr}
+
+  /* CHARTS — shorter on mobile */
+  .ch[style*="height:260px"]{height:200px!important}
+  .ch[style*="height:250px"]{height:190px!important}
+  .ch[style*="height:240px"]{height:180px!important}
+
+  /* TABLES — horizontal scroll with sticky first col */
+  .tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{font-size:10px;min-width:500px}
+  thead th{font-size:8px;padding:5px 7px}
+  tbody td{padding:6px 7px;font-size:10px}
+  /* Sticky counter column */
+  thead th:nth-child(2),tbody td:nth-child(2){
+    position:sticky;left:0;background:var(--gb);z-index:1;
+  }
+  tbody tr:hover td:nth-child(2){background:var(--gb)}
+
+  /* BAR CHART — narrower labels */
+  .bc-label{width:90px;font-size:9px}
+  .bchart-wrap{padding:14px 10px}
+  .bchart-header{margin-bottom:12px;padding-bottom:10px}
+  .bchart-controls{gap:5px}
+  .bchart-controls select,.bchart-controls input{font-size:9px;padding:4px 6px}
+  .bchart-legend{gap:8px}
+  .bchart-legend .bl-item{font-size:9px}
+
+  /* FILTER BAR — stack */
+  .fb{flex-direction:column;gap:6px}
+  .fb input,.fb select{width:100%;min-width:unset;font-size:12px;padding:8px 10px}
+
+  /* WATCHLIST */
+  .wl-controls{gap:6px}
+  .wl-input{width:100%}
+
+  /* MKTCAP toggle bigger tap targets */
+  .mkt-btn{padding:7px 14px;font-size:10px}
+  .mkt-toggle{gap:6px}
+
+  /* ADMIN */
+  .adm-input{width:100%}
+  .adm-row{flex-direction:column;align-items:flex-start;gap:7px}
+  .adm-label{min-width:unset}
+  .adm-body{padding:14px 12px 40px}
+  .adm-header{padding:14px 14px 12px}
+
+  /* Modal */
+  .modal-box{width:92vw;padding:20px 18px}
+
+  /* State cards */
+  .state-card{padding:40px 16px}
+
+  /* mc padding */
+  .mc{padding:12px}
+
+  /* Topbar hamburger */
+  .mob-menu-btn{
+    display:flex;align-items:center;justify-content:center;
+    width:36px;height:36px;border-radius:4px;cursor:pointer;
+    background:rgba(255,255,255,.08);border:none;color:var(--white);
+    font-size:18px;flex-shrink:0;-webkit-tap-highlight-color:transparent;
+  }
+}
+
+/* Hide bottom nav on desktop, show hamburger only on mobile */
+.mob-nav{display:none}
+.mob-menu-btn{display:none}
+.sb-overlay{display:none}
+
+@media(max-width:768px){
+  .mob-nav{display:flex}
+  .mob-menu-btn{display:flex}
+}
 </style>
 </head>
 <body>
@@ -263,7 +403,7 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
     <div class="hd-logo-fb">B</div>
     <div class="hd-name">Bob Wealth Holdings<span>Wealth · Purpose · Impact</span></div>
   </a>
-  <div style="display:flex;align-items:center;gap:20px">
+  <div style="display:flex;align-items:center;gap:12px">
     <nav class="site-nav">
       <a href="https://bobwealth.org/index.html">Home</a>
       <a href="#" class="active">Markets</a>
@@ -272,10 +412,12 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
     </nav>
     <div class="freshness">
       <div class="fresh-dot loading" id="freshDot"></div>
-      <span class="fresh-lbl" id="freshLbl">Loading data…</span>
+      <span class="fresh-lbl" id="freshLbl">Loading…</span>
     </div>
+    <button class="mob-menu-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
   </div>
 </header>
+<div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
 
 <div class="app">
 <aside class="sb">
@@ -538,6 +680,15 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
     </div>
   </div>
 </div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mob-nav" id="mobNav">
+  <button class="mob-nav-item on" id="mn-overview" onclick="mobNav('overview',this)"><span class="mn-ic">◈</span>Overview</button>
+  <button class="mob-nav-item" id="mn-movers" onclick="mobNav('movers',this)"><span class="mn-ic">⇅</span>Movers</button>
+  <button class="mob-nav-item" id="mn-barchart" onclick="mobNav('barchart',this)"><span class="mn-ic">▬</span>Chart</button>
+  <button class="mob-nav-item" id="mn-screener" onclick="mobNav('screener',this)"><span class="mn-ic">≡</span>Screen</button>
+  <button class="mob-nav-item menu-btn" onclick="toggleSidebar()"><span class="mn-ic">⋯</span>More</button>
+</nav>
 
 <script>
 'use strict';
@@ -922,9 +1073,14 @@ function showPage(id) {
 function nav(id, el) {
   // Exit admin mode if switching to a regular page
   if (_adminUnlocked && id !== 'admin') exitAdmin();
+  closeSidebar && closeSidebar();
   showPage(id);
-  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
+  document.querySelectorAll('.ni,.ni-admin').forEach(n=>n.classList.remove('on'));
   el.classList.add('on');
+  // Sync bottom nav
+  const mnEl = document.getElementById('mn-'+id);
+  document.querySelectorAll('.mob-nav-item').forEach(b=>b.classList.remove('on'));
+  if (mnEl) mnEl.classList.add('on');
   const T = {overview:'Market Overview',movers:'Movers',activity:'Trading Activity',sectors:'Sector Breakdown',screener:'Full Screener',investment:'$100 Investment Tracker',barchart:'Investment Chart',watchlist:'Watchlist'};
   document.getElementById('tbTitle').textContent = T[id] || id;
   document.getElementById('tbSub').textContent = 'Zimbabwe Stock Exchange · ZSE + VFEX';
@@ -1212,8 +1368,40 @@ function exportReport() {
 // ─── BOOT ─────────────────────────────────────────────────────────────────────
 renderWatchlist();
 loadData();
+
+// ─── MOBILE HELPERS ───────────────────────────────────────────────────────────
+function toggleSidebar() {
+  const sb = document.querySelector('.sb');
+  const ov = document.getElementById('sbOverlay');
+  const isOpen = sb.classList.contains('open');
+  if (isOpen) { sb.classList.remove('open'); ov.classList.remove('show'); }
+  else { sb.classList.add('open'); ov.classList.add('show'); }
+}
+function closeSidebar() {
+  document.querySelector('.sb').classList.remove('open');
+  document.getElementById('sbOverlay').classList.remove('show');
+}
+// Bottom nav — mirrors sidebar nav but updates both
+function mobNav(id, el) {
+  // Close sidebar if open
+  closeSidebar();
+  // Update bottom nav active state
+  document.querySelectorAll('.mob-nav-item').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  // Also update sidebar nav
+  const sideItem = Array.from(document.querySelectorAll('.ni')).find(n => n.getAttribute('onclick')?.includes("'"+id+"'"));
+  if (sideItem) { document.querySelectorAll('.ni,.ni-admin').forEach(n=>n.classList.remove('on')); sideItem.classList.add('on'); }
+  // Trigger the regular nav
+  showPage(id);
+  const T = {overview:'Market Overview',movers:'Movers',activity:'Trading Activity',sectors:'Sector Breakdown',screener:'Full Screener',investment:'$100 Investment Tracker',barchart:'Investment Chart',watchlist:'Watchlist'};
+  document.getElementById('tbTitle').textContent = T[id] || id;
+  document.getElementById('tbSub').textContent = 'Zimbabwe Stock Exchange · ZSE + VFEX';
+  document.getElementById('topbar').classList.remove('admin-mode');
+  document.getElementById('tbRight').innerHTML = '';
+  if (id==='investment') renderInvestment();
+  if (id==='barchart') renderBarChart();
+}
+// Keep bottom nav in sync when sidebar nav items are clicked
 </script>
 </body>
 </html>
-HTMLEOF
-echo "Done. File size: $(wc -c < /mnt/user-data/outputs/markets.html) bytes"
