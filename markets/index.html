@@ -950,7 +950,22 @@ async function publishToGitHub() {
     }
     const putData = await putRes.json();
     admLog('✓ Pushed! Commit: ' + putData.commit.sha.slice(0,7) + ' — "' + putData.commit.message + '"', 'ok');
-    admLog('jsDelivr CDN refresh in ~5 min. Public site will auto-update.', 'ok');
+
+    // Auto-purge jsDelivr CDN cache
+    admLog('Purging jsDelivr CDN cache…', 'info');
+    try {
+      const purgeUrl = `https://purge.jsdelivr.net/gh/${REPO}@${BRANCH}/${JSON_PATH}`;
+      const purgeRes = await fetch(purgeUrl);
+      const purgeData = await purgeRes.json();
+      if (purgeData.status === 'finished') {
+        admLog('✓ CDN cache purged — public site will reflect new data immediately.', 'ok');
+      } else {
+        admLog('CDN purge queued (status: ' + purgeData.status + ') — may take 1–2 min.', 'warn');
+      }
+    } catch(e) {
+      admLog('CDN purge request failed (' + e.message + ') — data will update within ~5 min naturally.', 'warn');
+    }
+
     statusBadge.textContent = '✓ Published';
     statusBadge.className = 'adm-badge ok';
     statusBadge.style.display = 'inline-block';
