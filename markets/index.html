@@ -7,6 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Markets — Bob Wealth Holdings</title>
+<link rel="icon" type="image/png" href="https://bobwealth.org/images/bob_logo.png">
+<link rel="apple-touch-icon" href="https://bobwealth.org/images/bob_logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -648,11 +650,12 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
             <div class="adm-log" id="admLog">Ready. Set your PAT, import a sheet, then publish.</div>
           </div>
 
-          <!-- EXPORT -->
+          <!-- UTILITIES -->
           <div class="adm-section">
             <div class="adm-section-title">Utilities</div>
             <div class="adm-row">
               <button class="btn-adm" id="btnExport" onclick="exportReport()" disabled>↓ Export .xlsx Report</button>
+              <button class="btn-adm danger" onclick="resetAdminPIN()">🔑 Reset PIN</button>
               <button class="btn-adm" onclick="exitAdmin()">← Back to Markets</button>
             </div>
           </div>
@@ -681,7 +684,36 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
   </div>
 </div>
 
-<!-- MOBILE BOTTOM NAV -->
+<!-- ADMIN PIN MODAL -->
+<div class="modal-overlay" id="pinModal" style="display:none">
+  <div class="modal-box">
+    <h3>🔐 Admin Access</h3>
+    <p>Enter your admin PIN to continue.</p>
+    <input type="password" class="modal-input" id="pinInput" placeholder="Enter PIN" inputmode="numeric" maxlength="12"
+           onkeydown="if(event.key==='Enter')verifyPIN()">
+    <div id="pinError" style="color:#e06c5c;font-family:var(--mono);font-size:10px;margin-top:6px;display:none">Incorrect PIN. Try again.</div>
+    <div class="modal-hint" style="margin-top:10px">PIN is stored as a hash in your browser. First time? You'll be prompted to set one.</div>
+    <div class="modal-actions">
+      <button class="btn-adm" onclick="closePinModal()">Cancel</button>
+      <button class="btn-adm primary" onclick="verifyPIN()">Enter</button>
+    </div>
+  </div>
+</div>
+
+<!-- SET PIN MODAL -->
+<div class="modal-overlay" id="setPinModal" style="display:none">
+  <div class="modal-box">
+    <h3>🔐 Set Admin PIN</h3>
+    <p>Choose a PIN to protect the Admin panel. Stored as a SHA-256 hash — never the raw PIN.</p>
+    <input type="password" class="modal-input" id="setPinInput" placeholder="Choose PIN" inputmode="numeric" maxlength="12">
+    <input type="password" class="modal-input" id="setPinConfirm" placeholder="Confirm PIN" inputmode="numeric" maxlength="12" style="margin-top:8px"
+           onkeydown="if(event.key==='Enter')saveNewPIN()">
+    <div id="setPinError" style="color:#e06c5c;font-family:var(--mono);font-size:10px;margin-top:6px;display:none"></div>
+    <div class="modal-actions">
+      <button class="btn-adm primary" onclick="saveNewPIN()">Set PIN</button>
+    </div>
+  </div>
+</div>
 <nav class="mob-nav" id="mobNav">
   <button class="mob-nav-item on" id="mn-overview" onclick="mobNav('overview',this)"><span class="mn-ic">◈</span>Overview</button>
   <button class="mob-nav-item" id="mn-movers" onclick="mobNav('movers',this)"><span class="mn-ic">⇅</span>Movers</button>
@@ -773,6 +805,55 @@ function updatePatStatus() {
   } else {
     el.textContent = 'not set';
     el.className = 'adm-badge warn';
+  }
+}
+
+// ─── PIN MANAGEMENT ───────────────────────────────────────────────────────────
+async function hashPIN(pin) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin + 'bw_salt_2026'));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function closePinModal() {
+  document.getElementById('pinModal').style.display = 'none';
+  document.getElementById('pinInput').value = '';
+}
+
+async function verifyPIN() {
+  const pin = document.getElementById('pinInput').value;
+  if (!pin) return;
+  const hash = await hashPIN(pin);
+  const stored = localStorage.getItem('bw_admin_pin');
+  if (hash === stored) {
+    closePinModal();
+    _openAdminPanel();
+  } else {
+    document.getElementById('pinError').style.display = 'block';
+    document.getElementById('pinInput').value = '';
+    document.getElementById('pinInput').focus();
+  }
+}
+
+async function saveNewPIN() {
+  const pin = document.getElementById('setPinInput').value;
+  const confirm = document.getElementById('setPinConfirm').value;
+  const errEl = document.getElementById('setPinError');
+  if (!pin) { errEl.textContent = 'Please enter a PIN.'; errEl.style.display = 'block'; return; }
+  if (pin.length < 4) { errEl.textContent = 'PIN must be at least 4 characters.'; errEl.style.display = 'block'; return; }
+  if (pin !== confirm) { errEl.textContent = 'PINs do not match.'; errEl.style.display = 'block'; return; }
+  const hash = await hashPIN(pin);
+  localStorage.setItem('bw_admin_pin', hash);
+  document.getElementById('setPinModal').style.display = 'none';
+  document.getElementById('setPinInput').value = '';
+  document.getElementById('setPinConfirm').value = '';
+  errEl.style.display = 'none';
+  _openAdminPanel();
+}
+
+function resetAdminPIN() {
+  if (confirm('Reset admin PIN? You will need to set a new one on next Admin access.')) {
+    localStorage.removeItem('bw_admin_pin');
+    admLog('Admin PIN reset. You will be prompted to set a new PIN next time.', 'warn');
   }
 }
 
@@ -1106,6 +1187,22 @@ function nav(id, el) {
 }
 
 function enterAdmin() {
+  // Check PIN first
+  const storedHash = localStorage.getItem('bw_admin_pin');
+  if (!storedHash) {
+    // No PIN set yet — prompt to create one
+    document.getElementById('setPinModal').style.display = 'flex';
+    setTimeout(() => document.getElementById('setPinInput').focus(), 100);
+    return;
+  }
+  // PIN exists — prompt to verify
+  document.getElementById('pinModal').style.display = 'flex';
+  document.getElementById('pinInput').value = '';
+  document.getElementById('pinError').style.display = 'none';
+  setTimeout(() => document.getElementById('pinInput').focus(), 100);
+}
+
+function _openAdminPanel() {
   _adminUnlocked = true;
   showPage('admin');
   document.querySelectorAll('.ni,.ni-admin').forEach(n=>n.classList.remove('on'));
@@ -1116,7 +1213,6 @@ function enterAdmin() {
   document.getElementById('tbRight').innerHTML = '<button onclick="exitAdmin()" style="background:transparent;border:1px solid rgba(59,158,232,.3);color:var(--admin-acc);padding:5px 13px;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font);text-transform:uppercase;letter-spacing:.08em">← Exit Admin</button>';
   updatePatStatus();
   checkPublishReady();
-  // Sync current state into admin UI
   if (window.PS.length) {
     const d = document.getElementById('sbDate').textContent;
     const badge = document.getElementById('currSheetBadge');
