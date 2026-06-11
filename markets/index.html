@@ -111,6 +111,14 @@ body{font-family:var(--font);background:var(--cream);color:var(--text);display:f
 .sect{display:inline-block;font-size:9px;font-family:var(--mono);padding:2px 6px;border-radius:3px;background:var(--gp);color:var(--gm);border:1px solid var(--border);white-space:nowrap;font-weight:500}
 .sect-v{background:var(--gold-p);color:var(--gold);border-color:rgba(184,135,42,.25)}
 
+/* LIQUIDITY PILLS */
+.liq-pill{display:inline-block;font-size:9px;font-family:var(--mono);padding:2px 7px;border-radius:3px;font-weight:700;letter-spacing:.06em;white-space:nowrap}
+.liq-active  {background:rgba(29,107,58,.15);color:var(--gain);border:1px solid rgba(29,107,58,.3)}
+.liq-moderate{background:rgba(61,122,86,.1);color:var(--gm);border:1px solid rgba(61,122,86,.25)}
+.liq-thin    {background:rgba(184,135,42,.15);color:var(--gold);border:1px solid rgba(184,135,42,.3)}
+.liq-illiquid{background:rgba(192,57,43,.12);color:var(--red);border:1px solid rgba(192,57,43,.25)}
+.liq-score-bar{display:inline-block;height:4px;border-radius:2px;vertical-align:middle;margin-left:4px}
+
 /* TABLES */
 .tw{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:11px}
@@ -259,21 +267,14 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 
 /* ─── MOBILE ──────────────────────────────────────────────────────────────── */
 @media(max-width:768px){
-  /* Prevent scroll bounce on iOS */
   html,body{height:100%;overflow:hidden;position:fixed;width:100%}
-
-  /* HEADER — compact */
   .site-header{height:52px;padding:0 14px}
   .hd-name{font-size:14px}
   .hd-name span{display:none}
   .site-nav{display:none}
   .freshness{gap:5px}
   .fresh-lbl{font-size:9px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-  /* LAYOUT — no sidebar, full width */
   .app{flex-direction:column}
-
-  /* SIDEBAR — slide-over drawer */
   .sb{
     position:fixed;left:0;top:52px;bottom:56px;z-index:200;
     width:240px;transform:translateX(-100%);
@@ -282,22 +283,14 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
   }
   .sb.open{transform:translateX(0)}
   .sb-foot{display:none}
-
-  /* Overlay behind sidebar */
   .sb-overlay{display:none;position:fixed;inset:0;top:52px;bottom:56px;background:rgba(0,0,0,.45);z-index:199}
   .sb-overlay.show{display:block}
-
-  /* TOPBAR */
   .topbar{padding:8px 14px;gap:6px}
   .tb-left h1{font-size:14px}
   .tb-left .tb-sub{display:none}
   .tb-right{gap:5px}
-
-  /* CONTENT */
   .content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px}
   .vp{padding:12px 12px 24px}
-
-  /* BOTTOM NAV BAR */
   .mob-nav{
     display:flex;position:fixed;bottom:0;left:0;right:0;z-index:300;
     height:56px;background:var(--gd);border-top:2px solid var(--gold);
@@ -313,33 +306,22 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
   .mob-nav-item .mn-ic{font-size:16px;line-height:1}
   .mob-nav-item.on{color:var(--gold)}
   .mob-nav-item.menu-btn{color:rgba(255,255,255,.55)}
-
-  /* KPI GRIDS — stack on mobile */
   .k5,.k4,.k3{grid-template-columns:repeat(2,1fr)}
   .k5 .kc:last-child{grid-column:span 2}
   .kc-val{font-size:17px}
-
-  /* LAYOUT GRIDS — single column */
   .c2,.c21,.row.c2,.row.c21{grid-template-columns:1fr}
   .setup-steps{grid-template-columns:1fr}
-
-  /* CHARTS — shorter on mobile */
   .ch[style*="height:260px"]{height:200px!important}
   .ch[style*="height:250px"]{height:190px!important}
   .ch[style*="height:240px"]{height:180px!important}
-
-  /* TABLES — horizontal scroll with sticky first col */
   .tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
   table{font-size:10px;min-width:500px}
   thead th{font-size:8px;padding:5px 7px}
   tbody td{padding:6px 7px;font-size:10px}
-  /* Sticky counter column */
   thead th:nth-child(2),tbody td:nth-child(2){
     position:sticky;left:0;background:var(--gb);z-index:1;
   }
   tbody tr:hover td:nth-child(2){background:var(--gb)}
-
-  /* BAR CHART — narrower labels */
   .bc-label{width:90px;font-size:9px}
   .bchart-wrap{padding:14px 10px}
   .bchart-header{margin-bottom:12px;padding-bottom:10px}
@@ -347,36 +329,20 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
   .bchart-controls select,.bchart-controls input{font-size:9px;padding:4px 6px}
   .bchart-legend{gap:8px}
   .bchart-legend .bl-item{font-size:9px}
-
-  /* FILTER BAR — stack */
   .fb{flex-direction:column;gap:6px}
   .fb input,.fb select{width:100%;min-width:unset;font-size:12px;padding:8px 10px}
-
-  /* WATCHLIST */
   .wl-controls{gap:6px}
   .wl-input{width:100%}
-
-  /* MKTCAP toggle bigger tap targets */
   .mkt-btn{padding:7px 14px;font-size:10px}
   .mkt-toggle{gap:6px}
-
-  /* ADMIN */
   .adm-input{width:100%}
   .adm-row{flex-direction:column;align-items:flex-start;gap:7px}
   .adm-label{min-width:unset}
   .adm-body{padding:14px 12px 40px}
   .adm-header{padding:14px 14px 12px}
-
-  /* Modal */
   .modal-box{width:92vw;padding:20px 18px}
-
-  /* State cards */
   .state-card{padding:40px 16px}
-
-  /* mc padding */
   .mc{padding:12px}
-
-  /* Topbar hamburger */
   .mob-menu-btn{
     display:flex;align-items:center;justify-content:center;
     width:36px;height:36px;border-radius:4px;cursor:pointer;
@@ -385,7 +351,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
   }
 }
 
-/* Hide bottom nav on desktop, show hamburger only on mobile */
 .mob-nav{display:none}
 .mob-menu-btn{display:none}
 .sb-overlay{display:none}
@@ -438,6 +403,7 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
       <div class="ng-lbl">Analysis</div>
       <div class="ni" onclick="nav('sectors',this)"><span class="ni-ic">▦</span>Sector Breakdown</div>
       <div class="ni" onclick="nav('screener',this)"><span class="ni-ic">≡</span>Full Screener</div>
+      <div class="ni" onclick="nav('liquidity',this)"><span class="ni-ic">◉</span>Liquidity Rank</div>
     </div>
     <div class="ng">
       <div class="ng-lbl">Portfolio</div>
@@ -541,15 +507,32 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
         <select id="scrMkt" onchange="renderScreener()"><option value="">All Markets</option><option>ZSE</option><option>VFEX</option></select>
         <select id="scrSect" onchange="renderScreener()"><option value="">All Sectors</option></select>
         <select id="scrSort" onchange="renderScreener()">
-          <option value="mktcap_d">Market Cap ↓</option><option value="pct_d">% Change ↓</option>
-          <option value="pct_a">% Change ↑</option><option value="vol_d">Volume ↓</option>
-          <option value="ytd_d">YTD ↓</option><option value="ytd_a">YTD ↑</option><option value="az">A–Z</option>
+          <option value="mktcap_d">Market Cap ↓</option>
+          <option value="pct_d">% Change ↓</option>
+          <option value="pct_a">% Change ↑</option>
+          <option value="vol_d">Volume ↓</option>
+          <option value="ytd_d">YTD ↓</option>
+          <option value="ytd_a">YTD ↑</option>
+          <option value="liq_d">Liquidity ↓</option>
+          <option value="liq_a">Liquidity ↑</option>
+          <option value="az">A–Z</option>
         </select>
       </div>
       <div class="mc">
-        <div class="tw"><table><thead><tr><th>#</th><th>Counter</th><th>ISIN</th><th>Sector</th><th>Mkt</th><th>Open</th><th>Close</th><th>Change</th><th>% Chg</th><th>Volume</th><th>Value</th><th>Mkt Cap (USD)</th><th>YTD G/L</th><th>Div Yield</th></tr></thead><tbody id="tblScreener"></tbody></table></div>
+        <div class="tw"><table><thead><tr><th>#</th><th>Counter</th><th>ISIN</th><th>Sector</th><th>Mkt</th><th>Open</th><th>Close</th><th>Change</th><th>% Chg</th><th>Volume</th><th>Value</th><th>Mkt Cap (USD)</th><th>YTD G/L</th><th>Div Yield</th><th>Liquidity</th><th>Score</th><th>Turnover %</th><th>Days Out †</th></tr></thead><tbody id="tblScreener"></tbody></table></div>
         <div style="margin-top:8px;font-size:10px;font-family:var(--mono);color:var(--ts)" id="scrCount"></div>
+        <div style="margin-top:4px;font-size:9px;font-family:var(--mono);color:var(--ts)">† Days Out: ZSE = directional estimate only (ZiG/USD conversion not applied). VFEX = USD native.</div>
       </div>
+    </div>
+
+    <!-- LIQUIDITY RANK -->
+    <div class="vp" id="page-liquidity">
+      <div class="mkt-toggle">
+        <button class="mkt-btn on" onclick="setMktLiq('ALL',this)">All Markets</button>
+        <button class="mkt-btn" onclick="setMktLiq('ZSE',this)">ZSE</button>
+        <button class="mkt-btn" onclick="setMktLiq('VFEX',this)">VFEX</button>
+      </div>
+      <div id="liquidityContent"></div>
     </div>
 
     <!-- $100 TRACKER -->
@@ -572,8 +555,9 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
       </div>
       <div class="wl-tags" id="wlTags"></div>
       <div class="mc">
-        <div class="tw"><table><thead><tr><th>Counter</th><th>Market</th><th>Sector</th><th>Open</th><th>Close</th><th>Change</th><th>% Today</th><th>Volume</th><th>Value</th><th>Mkt Cap (USD)</th><th>YTD G/L</th><th>$100 Now</th></tr></thead><tbody id="tblWatch"></tbody></table></div>
+        <div class="tw"><table><thead><tr><th>Counter</th><th>Market</th><th>Sector</th><th>Open</th><th>Close</th><th>Change</th><th>% Today</th><th>Volume</th><th>Value</th><th>Mkt Cap (USD)</th><th>YTD G/L</th><th>$100 Now</th><th>Liquidity</th><th>Score</th><th>Days Out †</th></tr></thead><tbody id="tblWatch"></tbody></table></div>
         <div id="wlEmpty" class="empty-state" style="display:none;padding:20px 0"><p>Add counters above to track them.</p></div>
+        <div style="margin-top:6px;font-size:9px;font-family:var(--mono);color:var(--ts)">† Days Out: ZSE = directional estimate only. VFEX = USD native.</div>
       </div>
     </div>
 
@@ -586,7 +570,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
         </div>
         <div class="adm-body">
 
-          <!-- GITHUB CONFIG -->
           <div class="adm-section">
             <div class="adm-section-title">GitHub Configuration</div>
             <div class="adm-row">
@@ -610,7 +593,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
             </div>
           </div>
 
-          <!-- IMPORT CURRENT SHEET -->
           <div class="adm-section">
             <div class="adm-section-title">Step 1 — Import Today's Price Sheet</div>
             <div class="adm-row">
@@ -623,7 +605,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
             <div id="currSheetStats" style="font-size:10px;font-family:var(--mono);color:rgba(255,255,255,.4);margin-top:6px;line-height:1.8"></div>
           </div>
 
-          <!-- BASELINE -->
           <div class="adm-section">
             <div class="adm-section-title">Step 2 — Baseline Sheet (Jan 6 2026)</div>
             <div class="adm-row">
@@ -637,7 +618,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
             <div id="baselineStats" style="font-size:10px;font-family:var(--mono);color:rgba(255,255,255,.4);margin-top:6px;line-height:1.8"></div>
           </div>
 
-          <!-- PUBLISH -->
           <div class="adm-section">
             <div class="adm-section-title">Step 3 — Publish to GitHub</div>
             <div class="adm-row">
@@ -650,7 +630,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
             <div class="adm-log" id="admLog">Ready. Set your PAT, import a sheet, then publish.</div>
           </div>
 
-          <!-- UTILITIES -->
           <div class="adm-section">
             <div class="adm-section-title">Utilities</div>
             <div class="adm-row">
@@ -714,11 +693,12 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
     </div>
   </div>
 </div>
+
 <nav class="mob-nav" id="mobNav">
   <button class="mob-nav-item on" id="mn-overview" onclick="mobNav('overview',this)"><span class="mn-ic">◈</span>Overview</button>
   <button class="mob-nav-item" id="mn-movers" onclick="mobNav('movers',this)"><span class="mn-ic">⇅</span>Movers</button>
   <button class="mob-nav-item" id="mn-barchart" onclick="mobNav('barchart',this)"><span class="mn-ic">▬</span>Chart</button>
-  <button class="mob-nav-item" id="mn-screener" onclick="mobNav('screener',this)"><span class="mn-ic">≡</span>Screen</button>
+  <button class="mob-nav-item" id="mn-liquidity" onclick="mobNav('liquidity',this)"><span class="mn-ic">◉</span>Liquidity</button>
   <button class="mob-nav-item menu-btn" onclick="toggleSidebar()"><span class="mn-ic">⋯</span>More</button>
 </nav>
 
@@ -729,7 +709,7 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 window.PS   = [];
 window.BASE = {};
 window.BASE_DATE = '';
-window.MKT  = 'ALL'; window.MKT_M = 'ALL'; window.MKT_A = 'ALL';
+window.MKT  = 'ALL'; window.MKT_M = 'ALL'; window.MKT_A = 'ALL'; window.MKT_L = 'ALL';
 window.WATCH = JSON.parse(localStorage.getItem('bw_watchlist') || '[]');
 let CH = {};
 let _adminUnlocked = false;
@@ -760,6 +740,68 @@ const fP2 = v => v==null?'—':v.toFixed(2);
 const fM  = v => { if(v==null)return'—'; const a=Math.abs(v); if(a>=1e9)return'$'+(a/1e9).toFixed(2)+'B'; if(a>=1e6)return'$'+(a/1e6).toFixed(2)+'M'; if(a>=1e3)return'$'+(a/1e3).toFixed(1)+'K'; return'$'+a.toLocaleString(); };
 const fZ  = v => { if(v==null)return'—'; const a=Math.abs(v); if(a>=1e9)return(a/1e9).toFixed(2)+'B'; if(a>=1e6)return(a/1e6).toFixed(2)+'M'; if(a>=1e3)return(a/1e3).toFixed(0)+'K'; return a.toLocaleString(); };
 const pC  = v => v>0?'up':v<0?'dn':'nc';
+
+// ─── LIQUIDITY ────────────────────────────────────────────────────────────────
+function calcLiquidity(r) {
+  // Turnover ratio: value traded ÷ market cap (USD/ZiG proxy)
+  const mktCap = r.mktCapIBR || 0;
+  const turnover = (mktCap > 0 && r.val > 0)
+    ? Math.min(r.val / mktCap, 1)
+    : 0;
+
+  // Spread proxy: |open – close| / close — tight spread = liquid market
+  // Invert: tight spread → high score
+  let spreadScore = 0;
+  if (r.open != null && r.close != null && r.close > 0) {
+    const spreadPct = Math.abs(r.open - r.close) / r.close;
+    spreadScore = Math.max(0, 1 - spreadPct * 10); // spread >10% → 0
+  }
+
+  // Volume activity: binary — did it trade at all?
+  const activity = (r.vol > 0 && !r.suspended) ? 1 : 0;
+
+  // Weighted composite: turnover 50%, spread 25%, activity 25%
+  const raw = (turnover * 50) + (spreadScore * 25) + (activity * 25);
+  const score = Math.round(Math.min(100, raw));
+
+  // Tier classification
+  let tier, tierClass;
+  if (r.vol === 0 || r.suspended) {
+    tier = 'ILLIQUID'; tierClass = 'liq-illiquid';
+  } else if (score >= 60) {
+    tier = 'ACTIVE';   tierClass = 'liq-active';
+  } else if (score >= 30) {
+    tier = 'MODERATE'; tierClass = 'liq-moderate';
+  } else {
+    tier = 'THIN';     tierClass = 'liq-thin';
+  }
+
+  // Days to liquidate: how many trading sessions to exit a $100 position
+  // Assumes can move up to 10% of that counter's daily value without impact
+  const avgDailyVal = r.val > 0 ? r.val : 0;
+  const positionSize = 100;
+  const dtl = avgDailyVal > 0
+    ? Math.max(1, Math.round(positionSize / (avgDailyVal * 0.1)))
+    : null;
+
+  return {
+    score,
+    tier,
+    tierClass,
+    turnoverPct: (turnover * 100).toFixed(3),
+    dtl
+  };
+}
+
+const LIQ_PILL = liq =>
+  `<span class="liq-pill ${liq.tierClass}" title="Liquidity score: ${liq.score}/100">${liq.tier}</span>`;
+
+const LIQ_SCORE_CELL = liq =>
+  `<span style="font-family:var(--mono);font-size:10px;color:var(--tm)">${liq.score}</span>` +
+  `<span class="liq-score-bar" style="background:${liq.score>=60?'var(--gain)':liq.score>=30?'var(--gl)':liq.score>0?'var(--gold)':'var(--red)'};width:${Math.min(liq.score,60)}px"></span>`;
+
+const LIQ_DTL = dtl =>
+  dtl != null ? (dtl === 1 ? '&lt;1d' : `~${dtl}d`) : '<span class="nc">—</span>';
 
 // ─── LOG HELPER ───────────────────────────────────────────────────────────────
 function admLog(msg, type='info') {
@@ -893,7 +935,6 @@ function ingestBaselineBuffer(buffer, fname) {
     if (r.usdPrice && r.usdPrice > 0) window.BASE[r.counter.trim().toUpperCase()] = { price:r.usdPrice, market:r.market, sector:r.sector };
   });
   const cnt = Object.keys(window.BASE).length;
-  // Update admin UI if visible
   const badge = document.getElementById('baselineBadge');
   if (badge) { badge.textContent = '✓ ' + date + ' · ' + cnt + ' counters'; badge.className = 'adm-badge ok'; badge.style.display = 'inline-block'; }
   const stats = document.getElementById('baselineStats');
@@ -944,14 +985,12 @@ function handleCurrentSheet(file) {
       window.PS = rows;
       const zse = rows.filter(r => r.market==='ZSE').length;
       const vfex = rows.filter(r => r.market==='VFEX').length;
-      // Update sidebar
       document.getElementById('sbDate').textContent = date;
       const sbS = document.getElementById('sbStats');
       if (sbS) sbS.innerHTML = `ZSE: ${zse}<br>VFEX: ${vfex}<br><span class="sfs">${rows.length} total equities</span>`;
       const sel = document.getElementById('scrSect');
       sel.innerHTML = '<option value="">All Sectors</option>';
       [...new Set(rows.map(r => r.sector))].sort().forEach(s => { const o = document.createElement('option'); o.value=s; o.textContent=s; sel.appendChild(o); });
-      // Update admin badge
       const badge = document.getElementById('currSheetBadge');
       if (badge) { badge.textContent = '✓ ' + date; badge.className = 'adm-badge ok'; badge.style.display = 'inline-block'; }
       const stats = document.getElementById('currSheetStats');
@@ -1032,7 +1071,6 @@ async function publishToGitHub() {
     const putData = await putRes.json();
     admLog('✓ Pushed! Commit: ' + putData.commit.sha.slice(0,7) + ' — "' + putData.commit.message + '"', 'ok');
 
-    // Auto-purge jsDelivr CDN cache
     admLog('Purging jsDelivr CDN cache…', 'info');
     try {
       const purgeUrl = `https://purge.jsdelivr.net/gh/${REPO}@${BRANCH}/${JSON_PATH}`;
@@ -1057,7 +1095,6 @@ async function publishToGitHub() {
       btn.className = 'btn-adm primary';
       btn.disabled = false;
     }, 5000);
-    // Reload public view with new data
     ingestSnapshot(snapshot);
   } catch(err) {
     admLog('Publish FAILED: ' + err.message, 'err');
@@ -1111,10 +1148,8 @@ function ingestSnapshot(data) {
   sel.innerHTML = '<option value="">All Sectors</option>';
   [...new Set(window.PS.map(r=>r.sector))].sort().forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;sel.appendChild(o);});
 
-  // Rebuild BASE from snapshot inv100 values if no manual baseline loaded
   if (!Object.keys(window.BASE).length && baseDate) {
     window.BASE_DATE = baseDate;
-    // BASE not reconstructable from inv100 alone — will rely on auto-fetch
   }
 
   render();
@@ -1126,7 +1161,6 @@ function ingestSnapshot(data) {
   document.getElementById('tbTitle').textContent = 'Investment Chart';
   renderBarChart();
 
-  // Auto-fetch baseline for $100 tracker (silently)
   if (!Object.keys(window.BASE).length) fetchBaselineSilent();
 }
 
@@ -1167,35 +1201,31 @@ function showPage(id) {
 }
 
 function nav(id, el) {
-  // Exit admin mode if switching to a regular page
   if (_adminUnlocked && id !== 'admin') exitAdmin();
   closeSidebar && closeSidebar();
   showPage(id);
   document.querySelectorAll('.ni,.ni-admin').forEach(n=>n.classList.remove('on'));
   el.classList.add('on');
-  // Sync bottom nav
   const mnEl = document.getElementById('mn-'+id);
   document.querySelectorAll('.mob-nav-item').forEach(b=>b.classList.remove('on'));
   if (mnEl) mnEl.classList.add('on');
-  const T = {overview:'Market Overview',movers:'Movers',activity:'Trading Activity',sectors:'Sector Breakdown',screener:'Full Screener',investment:'$100 Investment Tracker',barchart:'Investment Chart',watchlist:'Watchlist'};
+  const T = {overview:'Market Overview',movers:'Movers',activity:'Trading Activity',sectors:'Sector Breakdown',screener:'Full Screener',liquidity:'Liquidity Rank',investment:'$100 Investment Tracker',barchart:'Investment Chart',watchlist:'Watchlist'};
   document.getElementById('tbTitle').textContent = T[id] || id;
   document.getElementById('tbSub').textContent = 'Zimbabwe Stock Exchange · ZSE + VFEX';
   document.getElementById('topbar').classList.remove('admin-mode');
   document.getElementById('tbRight').innerHTML = '';
   if (id==='investment') renderInvestment();
   if (id==='barchart') renderBarChart();
+  if (id==='liquidity') renderLiquidity();
 }
 
 function enterAdmin() {
-  // Check PIN first
   const storedHash = localStorage.getItem('bw_admin_pin');
   if (!storedHash) {
-    // No PIN set yet — prompt to create one
     document.getElementById('setPinModal').style.display = 'flex';
     setTimeout(() => document.getElementById('setPinInput').focus(), 100);
     return;
   }
-  // PIN exists — prompt to verify
   document.getElementById('pinModal').style.display = 'flex';
   document.getElementById('pinInput').value = '';
   document.getElementById('pinError').style.display = 'none';
@@ -1230,7 +1260,6 @@ function exitAdmin() {
   document.getElementById('topbar').classList.remove('admin-mode');
   document.getElementById('tbRight').innerHTML = '';
   document.getElementById('adminNavItem').classList.remove('on');
-  // Go back to overview
   const overviewNav = document.querySelector('.ni[onclick*="overview"]');
   if (overviewNav) nav('overview', overviewNav);
 }
@@ -1240,6 +1269,7 @@ function filterBy(mkt) { return mkt==='ALL' ? window.PS : window.PS.filter(r=>r.
 function setMkt(m,el)      { window.MKT=m;   hlBtn(el); render(); }
 function setMktMovers(m,el){ window.MKT_M=m; hlBtn(el); renderMovers(); }
 function setMktAct(m,el)   { window.MKT_A=m; hlBtn(el); renderActivity(); }
+function setMktLiq(m,el)   { window.MKT_L=m; hlBtn(el); renderLiquidity(); }
 function hlBtn(el) { el.parentNode.querySelectorAll('.mkt-btn').forEach(b=>b.classList.remove('on')); el.classList.add('on'); }
 
 function mk(id,cfg) { if(CH[id]){CH[id].destroy();delete CH[id];} const cv=document.getElementById(id); if(!cv)return; CH[id]=new Chart(cv,cfg); return CH[id]; }
@@ -1248,7 +1278,7 @@ const scY = cb => ({grid:{color:'rgba(216,228,220,.5)'},ticks:{color:'#7A7A7A',f
 
 function render() { if(!window.PS.length)return; renderOverview(); renderMovers(); renderActivity(); renderSectors(); renderScreener(); }
 
-// ─── RENDER FUNCTIONS (unchanged from superuser.html) ─────────────────────────
+// ─── RENDER FUNCTIONS ─────────────────────────────────────────────────────────
 function renderOverview() {
   const D=filterBy(window.MKT);
   const gainers=D.filter(r=>r.chg>0),losers=D.filter(r=>r.chg<0),unch=D.filter(r=>r.chg===0&&!r.suspended);
@@ -1316,14 +1346,198 @@ function renderScreener() {
   let D=[...window.PS];
   if(q)D=D.filter(r=>r.counter.toLowerCase().includes(q)||r.sector.toLowerCase().includes(q)||r.isin.toLowerCase().includes(q));
   if(m)D=D.filter(r=>r.market===m); if(s)D=D.filter(r=>r.sector===s);
-  if(so==='mktcap_d')D.sort((a,b)=>b.mktCapIBR-a.mktCapIBR);else if(so==='pct_d')D.sort((a,b)=>b.chgPct-a.chgPct);else if(so==='pct_a')D.sort((a,b)=>a.chgPct-b.chgPct);else if(so==='vol_d')D.sort((a,b)=>b.vol-a.vol);else if(so==='ytd_d')D.sort((a,b)=>b.ytd-a.ytd);else if(so==='ytd_a')D.sort((a,b)=>a.ytd-b.ytd);else if(so==='az')D.sort((a,b)=>a.counter.localeCompare(b.counter));
-  document.getElementById('tblScreener').innerHTML=D.map((r,i)=>`<tr><td class="nc">${i+1}</td><td class="tf hi" style="cursor:pointer" onclick="quickAddWatch('${r.counter.trim()}')" title="Add to watchlist">${r.counter}</td><td style="color:var(--ts);font-size:10px">${r.isin}</td><td><span class="sect">${r.sector}</span></td><td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td><td>${r.open!=null?fP2(r.open):'—'}</td><td class="hi">${r.close!=null?fP2(r.close):(r.suspended?'<span style="color:var(--gold)">SUSP</span>':'—')}</td><td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'+':'')+fP2(r.chg)}</td><td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'▲ +':'▼ ')+fP2(r.chgPct)+'%'}</td><td>${r.vol>0?fN(r.vol):'<span class="nc">—</span>'}</td><td>${r.val>0?fZ(r.val):'<span class="nc">—</span>'}</td><td class="am">${fM(r.mktCapIBR)}</td><td class="${pC(r.ytd)}">${(r.ytd*100).toFixed(1)}%</td><td>${r.divYield>0?(r.divYield*100).toFixed(2)+'%':'<span class="nc">—</span>'}</td></tr>`).join('');
+  if(so==='mktcap_d')     D.sort((a,b)=>b.mktCapIBR-a.mktCapIBR);
+  else if(so==='pct_d')   D.sort((a,b)=>b.chgPct-a.chgPct);
+  else if(so==='pct_a')   D.sort((a,b)=>a.chgPct-b.chgPct);
+  else if(so==='vol_d')   D.sort((a,b)=>b.vol-a.vol);
+  else if(so==='ytd_d')   D.sort((a,b)=>b.ytd-a.ytd);
+  else if(so==='ytd_a')   D.sort((a,b)=>a.ytd-b.ytd);
+  else if(so==='liq_d')   D.sort((a,b)=>calcLiquidity(b).score-calcLiquidity(a).score);
+  else if(so==='liq_a')   D.sort((a,b)=>calcLiquidity(a).score-calcLiquidity(b).score);
+  else if(so==='az')      D.sort((a,b)=>a.counter.localeCompare(b.counter));
+
+  document.getElementById('tblScreener').innerHTML=D.map((r,i)=>{
+    const liq = calcLiquidity(r);
+    return `<tr>
+      <td class="nc">${i+1}</td>
+      <td class="tf hi" style="cursor:pointer" onclick="quickAddWatch('${r.counter.trim()}')" title="Add to watchlist">${r.counter}</td>
+      <td style="color:var(--ts);font-size:10px">${r.isin}</td>
+      <td><span class="sect">${r.sector}</span></td>
+      <td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td>
+      <td>${r.open!=null?fP2(r.open):'—'}</td>
+      <td class="hi">${r.close!=null?fP2(r.close):(r.suspended?'<span style="color:var(--gold)">SUSP</span>':'—')}</td>
+      <td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'+':'')+fP2(r.chg)}</td>
+      <td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'▲ +':'▼ ')+fP2(r.chgPct)+'%'}</td>
+      <td>${r.vol>0?fN(r.vol):'<span class="nc">—</span>'}</td>
+      <td>${r.val>0?fZ(r.val):'<span class="nc">—</span>'}</td>
+      <td class="am">${fM(r.mktCapIBR)}</td>
+      <td class="${pC(r.ytd)}">${(r.ytd*100).toFixed(1)}%</td>
+      <td>${r.divYield>0?(r.divYield*100).toFixed(2)+'%':'<span class="nc">—</span>'}</td>
+      <td>${LIQ_PILL(liq)}</td>
+      <td>${LIQ_SCORE_CELL(liq)}</td>
+      <td class="nc">${liq.turnoverPct}%</td>
+      <td class="nc">${LIQ_DTL(liq.dtl)}</td>
+    </tr>`;
+  }).join('');
   document.getElementById('scrCount').textContent=`Showing ${D.length} of ${window.PS.length} counters · click name to add to watchlist`;
+}
+
+// ─── LIQUIDITY RANK PAGE ──────────────────────────────────────────────────────
+function renderLiquidity() {
+  if (!window.PS.length) {
+    document.getElementById('liquidityContent').innerHTML = '<div class="state-card"><div class="sc-icon">◉</div><h3>No data</h3><p>Load a market snapshot first.</p></div>';
+    return;
+  }
+
+  const D = filterBy(window.MKT_L).map(r => ({ ...r, _liq: calcLiquidity(r) }));
+  const sorted = [...D].sort((a,b) => b._liq.score - a._liq.score);
+
+  // KPI counts by tier
+  const active   = D.filter(r => r._liq.tier === 'ACTIVE').length;
+  const moderate = D.filter(r => r._liq.tier === 'MODERATE').length;
+  const thin     = D.filter(r => r._liq.tier === 'THIN').length;
+  const illiquid = D.filter(r => r._liq.tier === 'ILLIQUID').length;
+  const avgScore = D.length ? Math.round(D.reduce((s,r) => s + r._liq.score, 0) / D.length) : 0;
+
+  // Top 10 most liquid (for chart)
+  const top10 = sorted.slice(0, 10);
+
+  document.getElementById('liquidityContent').innerHTML = `
+    <div class="kpi-row k5">
+      <div class="kc" style="--kca:var(--gain)">
+        <div class="kc-lbl">Active</div>
+        <div class="kc-val" style="color:var(--gain)">${active}</div>
+        <div class="kc-sub">score ≥ 60</div>
+      </div>
+      <div class="kc" style="--kca:var(--gl)">
+        <div class="kc-lbl">Moderate</div>
+        <div class="kc-val" style="color:var(--gm)">${moderate}</div>
+        <div class="kc-sub">score 30–59</div>
+      </div>
+      <div class="kc" style="--kca:var(--gold)">
+        <div class="kc-lbl">Thin</div>
+        <div class="kc-val" style="color:var(--gold)">${thin}</div>
+        <div class="kc-sub">score 1–29</div>
+      </div>
+      <div class="kc" style="--kca:var(--red)">
+        <div class="kc-lbl">Illiquid</div>
+        <div class="kc-val" style="color:var(--red)">${illiquid}</div>
+        <div class="kc-sub">zero volume</div>
+      </div>
+      <div class="kc" style="--kca:var(--gd)">
+        <div class="kc-lbl">Avg Score</div>
+        <div class="kc-val">${avgScore}</div>
+        <div class="kc-sub">market avg / 100</div>
+      </div>
+    </div>
+    <div class="row c21">
+      <div class="mc">
+        <div class="mc-title">Top 10 Most Liquid <span class="hint">by composite score</span></div>
+        <div class="ch" style="height:260px"><canvas id="cLiqTop10"></canvas></div>
+      </div>
+      <div class="mc">
+        <div class="mc-title">Tier Distribution</div>
+        <div class="ch" style="height:260px"><canvas id="cLiqTiers"></canvas></div>
+      </div>
+    </div>
+    <div class="row c1">
+      <div class="mc">
+        <div class="mc-title">Full Liquidity Ranking <span class="hint">all counters · best to worst</span></div>
+        <div class="tw">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th><th>Counter</th><th>Sector</th><th>Market</th>
+                <th>Liquidity</th><th>Score</th><th>Turnover %</th>
+                <th>Volume</th><th>Value</th><th>Mkt Cap (USD)</th>
+                <th>Days Out †</th><th>Close</th><th>% Today</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${sorted.map((r,i) => `
+                <tr>
+                  <td class="nc">${i+1}</td>
+                  <td class="tf hi" style="cursor:pointer" onclick="quickAddWatch('${r.counter.trim()}')" title="Add to watchlist">${r.counter}</td>
+                  <td><span class="sect">${r.sector}</span></td>
+                  <td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td>
+                  <td>${LIQ_PILL(r._liq)}</td>
+                  <td>${LIQ_SCORE_CELL(r._liq)}</td>
+                  <td class="nc">${r._liq.turnoverPct}%</td>
+                  <td>${r.vol>0?fN(r.vol):'<span class="nc">—</span>'}</td>
+                  <td>${r.val>0?fZ(r.val):'<span class="nc">—</span>'}</td>
+                  <td class="am">${fM(r.mktCapIBR)}</td>
+                  <td class="nc">${LIQ_DTL(r._liq.dtl)}</td>
+                  <td>${r.close!=null?fP2(r.close):(r.suspended?'<span style="color:var(--gold)">SUSP</span>':'—')}</td>
+                  <td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'▲ +':'▼ ')+fP2(r.chgPct)+'%'}</td>
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+        <div style="margin-top:6px;font-size:9px;font-family:var(--mono);color:var(--ts)">
+          Score = weighted composite: turnover ratio 50% · spread proxy 25% · volume activity 25% · max 100.<br>
+          † Days Out: ZSE = directional estimate only (ZiG/USD not applied). VFEX = USD native. Click counter name to add to Watchlist.
+        </div>
+      </div>
+    </div>`;
+
+  // Chart: top 10 horizontal bar by score
+  const liqColors = top10.map(r => {
+    if (r._liq.tier==='ACTIVE')   return '#1D6B3A';
+    if (r._liq.tier==='MODERATE') return '#3D7A56';
+    if (r._liq.tier==='THIN')     return '#B8872A';
+    return '#C0392B';
+  });
+  mk('cLiqTop10', {
+    type: 'bar',
+    data: {
+      labels: top10.map(r => r.counter),
+      datasets: [{
+        data: top10.map(r => r._liq.score),
+        backgroundColor: liqColors,
+        borderRadius: 3,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { ...TT, callbacks: { label: c => ' Score: ' + c.raw + '/100' } }
+      },
+      scales: {
+        x: { ...scX(), max: 100, ticks: { ...scX().ticks, callback: v => v } },
+        y: { grid: { display: false }, ticks: { color: '#1A1A1A', font: { family: 'DM Mono,monospace', size: 10 } } }
+      }
+    }
+  });
+
+  // Chart: tier donut
+  mk('cLiqTiers', {
+    type: 'doughnut',
+    data: {
+      labels: ['Active', 'Moderate', 'Thin', 'Illiquid'],
+      datasets: [{
+        data: [active, moderate, thin, illiquid],
+        backgroundColor: ['#1D6B3A', '#3D7A56', '#B8872A', '#C0392B'],
+        borderColor: '#fff',
+        borderWidth: 3
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '56%',
+      plugins: {
+        legend: { display: true, position: 'bottom', labels: { color: '#4A4A4A', font: { size: 10 }, boxWidth: 10 } },
+        tooltip: { ...TT }
+      }
+    }
+  });
 }
 
 function getInvValue(r) {
   if (!window.BASE || !Object.keys(window.BASE).length) {
-    // Fall back to pre-calculated inv100 from snapshot
     return r.inv100 != null ? r.inv100 : null;
   }
   const base = window.BASE[r.counter.trim().toUpperCase()];
@@ -1345,7 +1559,20 @@ function renderInvestment() {
     const pct=r.gainPct, bc=r.inv100>100?'#1D6B3A':r.inv100<100?'#C0392B':'#7A7A7A';
     const cls=r.inv100>100?'iv-up':r.inv100<100?'iv-dn':'iv-nc';
     const basePx=(window.BASE[r.counter.trim().toUpperCase()]||{}).price||0;
-    return `<tr><td class="tf hi" style="cursor:pointer" onclick="quickAddWatch('${r.counter.trim()}')">${r.counter}</td><td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td><td><span class="sect">${r.sector}</span></td><td class="nc" style="font-size:10px">${basePx?'$'+basePx.toFixed(5):'—'}</td><td class="nc" style="font-size:10px">$${(r.usdPrice||0).toFixed(5)}</td><td class="${cls}" style="font-size:13px;font-weight:700">$${r.inv100.toFixed(2)}</td><td class="${cls}">${r.gain>=0?'+':''}$${r.gain.toFixed(2)}</td><td class="${cls}">${pct>=0?'▲ +':'▼ '}${Math.abs(pct).toFixed(2)}%<span class="iv-bar" style="background:${bc};width:${Math.min(Math.abs(pct),120)}px"></span></td><td class="${pC(r.ytd)}">${(r.ytd*100).toFixed(1)}%</td></tr>`;
+    const liq=calcLiquidity(r);
+    return `<tr>
+      <td class="tf hi" style="cursor:pointer" onclick="quickAddWatch('${r.counter.trim()}')">${r.counter}</td>
+      <td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td>
+      <td><span class="sect">${r.sector}</span></td>
+      <td class="nc" style="font-size:10px">${basePx?'$'+basePx.toFixed(5):'—'}</td>
+      <td class="nc" style="font-size:10px">$${(r.usdPrice||0).toFixed(5)}</td>
+      <td class="${cls}" style="font-size:13px;font-weight:700">$${r.inv100.toFixed(2)}</td>
+      <td class="${cls}">${r.gain>=0?'+':''}$${r.gain.toFixed(2)}</td>
+      <td class="${cls}">${pct>=0?'▲ +':'▼ '}${Math.abs(pct).toFixed(2)}%<span class="iv-bar" style="background:${bc};width:${Math.min(Math.abs(pct),120)}px"></span></td>
+      <td class="${pC(r.ytd)}">${(r.ytd*100).toFixed(1)}%</td>
+      <td>${LIQ_PILL(liq)}</td>
+      <td class="nc">${LIQ_DTL(liq.dtl)}</td>
+    </tr>`;
   };
   el.innerHTML=`
     <div class="base-banner"><div class="bb-icon">📅</div><div class="bb-text"><h3>Baseline: ${window.BASE_DATE||'Jan 6 2026'}</h3><p>$100 invested per counter · Comparing with: ${document.getElementById('sbDate').textContent}</p></div><div class="bb-badge">$100 per counter</div></div>
@@ -1356,8 +1583,8 @@ function renderInvestment() {
       <div class="kc" style="--kca:var(--gold)"><div class="kc-lbl">Best Performer</div><div class="kc-val" style="color:var(--gain);font-size:14px">${best?best.counter:'—'}</div><div class="kc-sub">${best?'$100 → $'+best.inv100.toFixed(2):'no winners'}</div></div>
     </div>
     <div class="mc"><div class="mc-title">All Counters — $100 Value <span class="hint">best to worst · click name to watchlist</span></div>
-      <div class="tw"><table><thead><tr><th>Counter</th><th>Market</th><th>Sector</th><th>Base Price</th><th>Current Price</th><th>$100 Now Worth</th><th>Gain/Loss</th><th>% Change</th><th>YTD G/L</th></tr></thead><tbody>${allSorted.map(irow).join('')}</tbody></table></div>
-      <div class="inv-note">Prices in USD. VFEX = native USD; ZSE = USD@IBR from sheet. ${results.length} of ${window.PS.length} counters have data.</div>
+      <div class="tw"><table><thead><tr><th>Counter</th><th>Market</th><th>Sector</th><th>Base Price</th><th>Current Price</th><th>$100 Now Worth</th><th>Gain/Loss</th><th>% Change</th><th>YTD G/L</th><th>Liquidity</th><th>Days Out †</th></tr></thead><tbody>${allSorted.map(irow).join('')}</tbody></table></div>
+      <div class="inv-note">Prices in USD. VFEX = native USD; ZSE = USD@IBR from sheet. ${results.length} of ${window.PS.length} counters have data.<br>† Days Out: ZSE = directional estimate only. VFEX = USD native.</div>
     </div>`;
 }
 
@@ -1382,7 +1609,8 @@ function renderBarChart() {
   filtered.forEach(r=>{ const v=(r.inv100/100)*investment; if(v>bestVal){bestVal=v;best=r;} });
   const rows = filtered.map(r => {
     const v=(r.inv100/100)*investment, cls=r.inv100>100?'iv-up':r.inv100<100?'iv-dn':'iv-nc';
-    return `<div class="bc-row"><div class="bc-label" title="${r.counter}">${r.counter}${r.suspended?' *':''}</div><div class="bc-bar-wrap"><div class="bc-bar" style="width:${scale(v)}px;background:${barColor(v)}"></div><span class="bc-val ${cls}">$${v.toFixed(2)}</span><span class="bc-sect">${r.sector}</span>${r.market==='VFEX'?'<span style="font-size:8px;font-family:var(--mono);color:var(--ts);margin-left:3px">(VFEX)</span>':''}</div></div>`;
+    const liq=calcLiquidity(r);
+    return `<div class="bc-row"><div class="bc-label" title="${r.counter}">${r.counter}${r.suspended?' *':''}</div><div class="bc-bar-wrap"><div class="bc-bar" style="width:${scale(v)}px;background:${barColor(v)}"></div><span class="bc-val ${cls}">$${v.toFixed(2)}</span><span class="bc-sect">${r.sector}</span>${r.market==='VFEX'?'<span style="font-size:8px;font-family:var(--mono);color:var(--ts);margin-left:3px">(VFEX)</span>':''}<span style="margin-left:6px">${LIQ_PILL(liq)}</span></div></div>`;
   }).join('');
   el.innerHTML=`
     <div class="bchart-wrap" id="printArea">
@@ -1448,10 +1676,27 @@ function renderWatchlist() {
   if(!rows.length){document.getElementById('tblWatch').innerHTML='';document.getElementById('wlEmpty').style.display='flex';return;}
   document.getElementById('wlEmpty').style.display='none';
   document.getElementById('tblWatch').innerHTML=rows.map(r=>{
-    if(r._missing)return`<tr><td class="tf" style="color:var(--gold)">${r.counter}</td><td colspan="11" class="nc">Not in current data</td></tr>`;
+    if(r._missing)return`<tr><td class="tf" style="color:var(--gold)">${r.counter}</td><td colspan="14" class="nc">Not in current data</td></tr>`;
     const iv=getInvValue(r);
     const ivCell=iv!=null?`<span class="${iv>100?'iv-up':iv<100?'iv-dn':'iv-nc'}">$${iv.toFixed(2)}</span>`:'<span class="nc">—</span>';
-    return`<tr><td class="tf hi">${r.counter}</td><td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td><td><span class="sect">${r.sector}</span></td><td>${r.open!=null?fP2(r.open):'—'}</td><td class="hi">${r.close!=null?fP2(r.close):(r.suspended?'<span class="am">SUSP</span>':'—')}</td><td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'+':'')+fP2(r.chg)}</td><td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'▲ +':'▼ ')+fP2(r.chgPct)+'%'}</td><td>${r.vol>0?fN(r.vol):'<span class="nc">—</span>'}</td><td>${r.val>0?fZ(r.val):'<span class="nc">—</span>'}</td><td class="am">${fM(r.mktCapIBR)}</td><td class="${pC(r.ytd)}">${(r.ytd*100).toFixed(1)}%</td><td>${ivCell}</td></tr>`;
+    const liq=calcLiquidity(r);
+    return`<tr>
+      <td class="tf hi">${r.counter}</td>
+      <td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td>
+      <td><span class="sect">${r.sector}</span></td>
+      <td>${r.open!=null?fP2(r.open):'—'}</td>
+      <td class="hi">${r.close!=null?fP2(r.close):(r.suspended?'<span class="am">SUSP</span>':'—')}</td>
+      <td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'+':'')+fP2(r.chg)}</td>
+      <td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'▲ +':'▼ ')+fP2(r.chgPct)+'%'}</td>
+      <td>${r.vol>0?fN(r.vol):'<span class="nc">—</span>'}</td>
+      <td>${r.val>0?fZ(r.val):'<span class="nc">—</span>'}</td>
+      <td class="am">${fM(r.mktCapIBR)}</td>
+      <td class="${pC(r.ytd)}">${(r.ytd*100).toFixed(1)}%</td>
+      <td>${ivCell}</td>
+      <td>${LIQ_PILL(liq)}</td>
+      <td>${LIQ_SCORE_CELL(liq)}</td>
+      <td class="nc">${LIQ_DTL(liq.dtl)}</td>
+    </tr>`;
   }).join('');
 }
 
@@ -1462,14 +1707,24 @@ function exportReport() {
   setTimeout(() => {
     try {
       const wb=XLSX.utils.book_new(), date=document.getElementById('sbDate').textContent;
-      const h1=['Counter','ISIN','Market','Sector','Shares','Mkt Cap USD','Open','Close','USD@IBR','Change','% Change','Volume','Value (ZiG)','YTD G/L %','Div Yield %'];
-      const r1=window.PS.map(r=>[r.counter.trim(),r.isin,r.market,r.sector,r.shares,+r.mktCapIBR.toFixed(2),r.open,r.close,r.usdIBR,r.chg,+r.chgPct.toFixed(4),r.vol,+r.val.toFixed(2),+(r.ytd*100).toFixed(2),+(r.divYield*100).toFixed(4)]);
+      const h1=['Counter','ISIN','Market','Sector','Shares','Mkt Cap USD','Open','Close','USD@IBR','Change','% Change','Volume','Value (ZiG)','YTD G/L %','Div Yield %','Liq Score','Liq Tier','Turnover %','Days to Exit'];
+      const r1=window.PS.map(r=>{
+        const liq=calcLiquidity(r);
+        return [r.counter.trim(),r.isin,r.market,r.sector,r.shares,+r.mktCapIBR.toFixed(2),r.open,r.close,r.usdIBR,r.chg,+r.chgPct.toFixed(4),r.vol,+r.val.toFixed(2),+(r.ytd*100).toFixed(2),+(r.divYield*100).toFixed(4),liq.score,liq.tier,+liq.turnoverPct,liq.dtl||''];
+      });
       XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([h1,...r1]), 'PRICE DATA');
       if (Object.keys(window.BASE).length) {
-        const h2=['Counter','Market','Sector','Base Price (USD)','Current Price (USD)','$100 Value','Gain/Loss ($)','% Change','YTD G/L %'];
-        const r2=window.PS.map(r=>{const iv=getInvValue(r);const b=window.BASE[r.counter.trim().toUpperCase()];return iv!=null?[r.counter.trim(),r.market,r.sector,b?+b.price.toFixed(6):null,+r.usdPrice.toFixed(6),+iv.toFixed(4),+(iv-100).toFixed(4),+(iv-100).toFixed(4),+(r.ytd*100).toFixed(2)]:null;}).filter(Boolean).sort((a,b)=>b[5]-a[5]);
+        const h2=['Counter','Market','Sector','Base Price (USD)','Current Price (USD)','$100 Value','Gain/Loss ($)','% Change','YTD G/L %','Liq Score','Liq Tier','Days to Exit'];
+        const r2=window.PS.map(r=>{const iv=getInvValue(r);const b=window.BASE[r.counter.trim().toUpperCase()];const liq=calcLiquidity(r);return iv!=null?[r.counter.trim(),r.market,r.sector,b?+b.price.toFixed(6):null,+r.usdPrice.toFixed(6),+iv.toFixed(4),+(iv-100).toFixed(4),+(iv-100).toFixed(4),+(r.ytd*100).toFixed(2),liq.score,liq.tier,liq.dtl||'']:null;}).filter(Boolean).sort((a,b)=>b[5]-a[5]);
         XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([h2,...r2]), '$100 TRACKER');
       }
+      // Liquidity sheet
+      const h3=['Counter','Market','Sector','Liq Score','Liq Tier','Turnover %','Volume','Value','Mkt Cap USD','Days to Exit','Close','% Today'];
+      const r3=[...window.PS].sort((a,b)=>calcLiquidity(b).score-calcLiquidity(a).score).map(r=>{
+        const liq=calcLiquidity(r);
+        return [r.counter.trim(),r.market,r.sector,liq.score,liq.tier,+liq.turnoverPct,r.vol,+r.val.toFixed(2),+r.mktCapIBR.toFixed(2),liq.dtl||'',r.close,+r.chgPct.toFixed(4)];
+      });
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([h3,...r3]), 'LIQUIDITY RANK');
       XLSX.writeFile(wb, `BobWealth_Markets_${date.replace(/-/g,'')}.xlsx`);
       btn.textContent='↓ Export .xlsx Report'; btn.disabled=false;
     } catch(err) { console.error(err); btn.textContent='↓ Export .xlsx Report'; btn.disabled=false; }
@@ -1492,27 +1747,22 @@ function closeSidebar() {
   document.querySelector('.sb').classList.remove('open');
   document.getElementById('sbOverlay').classList.remove('show');
 }
-// Bottom nav — mirrors sidebar nav but updates both
 function mobNav(id, el) {
-  // Close sidebar if open
   closeSidebar();
-  // Update bottom nav active state
   document.querySelectorAll('.mob-nav-item').forEach(b => b.classList.remove('on'));
   el.classList.add('on');
-  // Also update sidebar nav
   const sideItem = Array.from(document.querySelectorAll('.ni')).find(n => n.getAttribute('onclick')?.includes("'"+id+"'"));
   if (sideItem) { document.querySelectorAll('.ni,.ni-admin').forEach(n=>n.classList.remove('on')); sideItem.classList.add('on'); }
-  // Trigger the regular nav
   showPage(id);
-  const T = {overview:'Market Overview',movers:'Movers',activity:'Trading Activity',sectors:'Sector Breakdown',screener:'Full Screener',investment:'$100 Investment Tracker',barchart:'Investment Chart',watchlist:'Watchlist'};
+  const T = {overview:'Market Overview',movers:'Movers',activity:'Trading Activity',sectors:'Sector Breakdown',screener:'Full Screener',liquidity:'Liquidity Rank',investment:'$100 Investment Tracker',barchart:'Investment Chart',watchlist:'Watchlist'};
   document.getElementById('tbTitle').textContent = T[id] || id;
   document.getElementById('tbSub').textContent = 'Zimbabwe Stock Exchange · ZSE + VFEX';
   document.getElementById('topbar').classList.remove('admin-mode');
   document.getElementById('tbRight').innerHTML = '';
   if (id==='investment') renderInvestment();
   if (id==='barchart') renderBarChart();
+  if (id==='liquidity') renderLiquidity();
 }
-// Keep bottom nav in sync when sidebar nav items are clicked
 </script>
 </body>
 </html>
