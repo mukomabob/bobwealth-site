@@ -393,26 +393,11 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
     <div class="sb-date" id="sbDate">Loading…</div>
   </div>
   <nav class="sb-nav">
-    <div class="ng">
-      <div class="ng-lbl">Markets</div>
-      <div class="ni on" onclick="nav('overview',this)"><span class="ni-ic">◈</span>Overview</div>
-      <div class="ni" onclick="nav('movers',this)"><span class="ni-ic">⇅</span>Movers</div>
-      <div class="ni" onclick="nav('activity',this)"><span class="ni-ic">◎</span>Trading Activity</div>
-    </div>
-    <div class="ng">
-      <div class="ng-lbl">Analysis</div>
-      <div class="ni" onclick="nav('sectors',this)"><span class="ni-ic">▦</span>Sector Breakdown</div>
-      <div class="ni" onclick="nav('screener',this)"><span class="ni-ic">≡</span>Full Screener</div>
-      <div class="ni" onclick="nav('liquidity',this)"><span class="ni-ic">◉</span>Q Score Rankings</div>
-    </div>
-    <div class="ng">
-      <div class="ng-lbl">Portfolio</div>
-      <div class="ni" onclick="nav('investment',this)"><span class="ni-ic">$</span>$100 Tracker</div>
-      <div class="ni" onclick="nav('barchart',this)"><span class="ni-ic">▬</span>Investment Chart</div>
-      <div class="ni" onclick="nav('watchlist',this)"><span class="ni-ic">♡</span>Watchlist</div>
-    </div>
-    <div class="ng" style="margin-top:auto;padding-top:8px;border-top:1px solid var(--border)">
-      <div class="ng-lbl" style="color:rgba(59,158,232,.5)">System</div>
+    <div class="ni on" onclick="nav('overview',this)"><span class="ni-ic">◈</span>Overview</div>
+    <div class="ni" onclick="nav('movers',this)"><span class="ni-ic">⇅</span>Daily Movers</div>
+    <div class="ni" onclick="nav('barchart',this)"><span class="ni-ic">▬</span>Investment Simulator</div>
+    <div class="ni" onclick="nav('liquidity',this)"><span class="ni-ic">◉</span>Liquidity Score Rankings</div>
+    <div style="margin-top:auto;padding-top:10px;border-top:1px solid var(--border)">
       <div class="ni-admin" id="adminNavItem" onclick="enterAdmin()"><span class="ni-ic">🔒</span>Admin</div>
     </div>
   </nav>
@@ -446,7 +431,7 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
     <!-- ERROR -->
     <div class="vp" id="page-error"></div>
 
-    <!-- OVERVIEW -->
+    <!-- OVERVIEW (merged with Screener) -->
     <div class="vp" id="page-overview">
       <div class="mkt-toggle">
         <button class="mkt-btn on" onclick="setMkt('ALL',this)">All Markets</button>
@@ -454,6 +439,33 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
         <button class="mkt-btn" onclick="setMkt('VFEX',this)">VFEX</button>
       </div>
       <div id="overviewContent"></div>
+      <!-- SCREENER section embedded below -->
+      <div style="margin-top:8px">
+        <div class="mc">
+          <div class="mc-title">All Counters <span class="hint">click name to add to watchlist</span>
+            <span style="float:right;display:flex;gap:6px;align-items:center">
+              <input type="text" id="scrSearch" placeholder="Search…" oninput="renderScreener()" style="background:var(--white);border:1.5px solid var(--border);border-radius:4px;padding:4px 8px;color:var(--text);font-family:var(--mono);font-size:10px;outline:none;width:140px">
+              <select id="scrSect" onchange="renderScreener()" style="background:var(--white);border:1.5px solid var(--border);border-radius:4px;padding:4px 8px;color:var(--text);font-family:var(--mono);font-size:10px;outline:none"><option value="">All Sectors</option></select>
+              <select id="scrSort" onchange="renderScreener()" style="background:var(--white);border:1.5px solid var(--border);border-radius:4px;padding:4px 8px;color:var(--text);font-family:var(--mono);font-size:10px;outline:none">
+                <option value="mktcap_d">Mkt Cap ↓</option>
+                <option value="pct_d">% Change ↓</option>
+                <option value="pct_a">% Change ↑</option>
+                <option value="vol_d">Volume ↓</option>
+                <option value="ytd_d">YTD ↓</option>
+                <option value="ytd_a">YTD ↑</option>
+                <option value="liq_d">Liquidity Score ↓</option>
+                <option value="liq_a">Liquidity Score ↑</option>
+                <option value="az">A–Z</option>
+              </select>
+            </span>
+          </div>
+          <div class="tw"><table><thead><tr><th>#</th><th>Counter</th><th>ISIN</th><th>Sector</th><th>Mkt</th><th>Open</th><th>Close</th><th>Change</th><th>% Chg</th><th>Volume</th><th>Value</th><th>Mkt Cap (USD)</th><th>YTD G/L</th><th>Div Yield</th><th>Liq Score</th><th>Days Out †</th></tr></thead><tbody id="tblScreener"></tbody></table></div>
+          <div style="margin-top:6px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px">
+            <span style="font-size:10px;font-family:var(--mono);color:var(--ts)" id="scrCount"></span>
+            <span style="font-size:9px;font-family:var(--mono);color:var(--ts)">† Days Out: ZSE = directional estimate only. VFEX = USD native.</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- MOVERS -->
@@ -697,8 +709,8 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 <nav class="mob-nav" id="mobNav">
   <button class="mob-nav-item on" id="mn-overview" onclick="mobNav('overview',this)"><span class="mn-ic">◈</span>Overview</button>
   <button class="mob-nav-item" id="mn-movers" onclick="mobNav('movers',this)"><span class="mn-ic">⇅</span>Movers</button>
-  <button class="mob-nav-item" id="mn-barchart" onclick="mobNav('barchart',this)"><span class="mn-ic">▬</span>Chart</button>
-  <button class="mob-nav-item" id="mn-liquidity" onclick="mobNav('liquidity',this)"><span class="mn-ic">◉</span>Q Score</button>
+  <button class="mob-nav-item" id="mn-barchart" onclick="mobNav('barchart',this)"><span class="mn-ic">▬</span>Sim</button>
+  <button class="mob-nav-item" id="mn-liquidity" onclick="mobNav('liquidity',this)"><span class="mn-ic">◉</span>Liquidity</button>
   <button class="mob-nav-item menu-btn" onclick="toggleSidebar()"><span class="mn-ic">⋯</span>More</button>
 </nav>
 
@@ -1129,7 +1141,7 @@ function ingestSnapshot(data) {
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
   const bc = Array.from(document.querySelectorAll('.ni')).find(n=>n.getAttribute('onclick')?.includes('barchart'));
   if (bc) bc.classList.add('on');
-  document.getElementById('tbTitle').textContent = 'Investment Chart';
+  document.getElementById('tbTitle').textContent = 'Investment Simulator';
   renderBarChart();
 
   if (!Object.keys(window.BASE).length) fetchBaselineSilent();
@@ -1180,7 +1192,7 @@ function nav(id, el) {
   const mnEl = document.getElementById('mn-'+id);
   document.querySelectorAll('.mob-nav-item').forEach(b=>b.classList.remove('on'));
   if (mnEl) mnEl.classList.add('on');
-  const T = {overview:'Market Overview',movers:'Movers',activity:'Trading Activity',sectors:'Sector Breakdown',screener:'Full Screener',liquidity:'Q Score Rankings',investment:'$100 Investment Tracker',barchart:'Investment Chart',watchlist:'Watchlist'};
+  const T = {overview:'Market Overview',movers:'Movers',activity:'Trading Activity',sectors:'Sector Breakdown',screener:'Full Screener',liquidity:'Q Score Rankings',investment:'$100 Investment Tracker',barchart:'Investment Simulator',watchlist:'Watchlist'};
   document.getElementById('tbTitle').textContent = T[id] || id;
   document.getElementById('tbSub').textContent = 'Zimbabwe Stock Exchange · ZSE + VFEX';
   document.getElementById('topbar').classList.remove('admin-mode');
@@ -1727,7 +1739,7 @@ function mobNav(id, el) {
   const sideItem = Array.from(document.querySelectorAll('.ni')).find(n => n.getAttribute('onclick')?.includes("'"+id+"'"));
   if (sideItem) { document.querySelectorAll('.ni,.ni-admin').forEach(n=>n.classList.remove('on')); sideItem.classList.add('on'); }
   showPage(id);
-  const T = {overview:'Market Overview',movers:'Movers',activity:'Trading Activity',sectors:'Sector Breakdown',screener:'Full Screener',liquidity:'Q Score Rankings',investment:'$100 Investment Tracker',barchart:'Investment Chart',watchlist:'Watchlist'};
+  const T = {overview:'Market Overview',movers:'Movers',activity:'Trading Activity',sectors:'Sector Breakdown',screener:'Full Screener',liquidity:'Q Score Rankings',investment:'$100 Investment Tracker',barchart:'Investment Simulator',watchlist:'Watchlist'};
   document.getElementById('tbTitle').textContent = T[id] || id;
   document.getElementById('tbSub').textContent = 'Zimbabwe Stock Exchange · ZSE + VFEX';
   document.getElementById('topbar').classList.remove('admin-mode');
