@@ -111,7 +111,7 @@ body{font-family:var(--font);background:var(--cream);color:var(--text);display:f
 .sect{display:inline-block;font-size:9px;font-family:var(--mono);padding:2px 6px;border-radius:3px;background:var(--gp);color:var(--gm);border:1px solid var(--border);white-space:nowrap;font-weight:500}
 .sect-v{background:var(--gold-p);color:var(--gold);border-color:rgba(184,135,42,.25)}
 
-/* Q SCORE */
+/* LIQUIDITY SCORE */
 .qscore{display:inline-block;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--gd);min-width:28px;text-align:right}
 .qscore.qs-high{color:var(--gain)}
 .qscore.qs-mid {color:var(--gm)}
@@ -135,18 +135,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 .fb input,.fb select{background:var(--white);border:1.5px solid var(--border);border-radius:4px;padding:6px 9px;color:var(--text);font-family:var(--mono);font-size:10px;outline:none;transition:border-color .14s}
 .fb input:focus,.fb select:focus{border-color:var(--gl)}
 .fb input{min-width:180px}
-
-/* WATCHLIST */
-.wl-controls{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
-.wl-input{background:var(--white);border:1.5px solid var(--border);border-radius:4px;padding:6px 10px;color:var(--text);font-family:var(--mono);font-size:10px;outline:none;width:170px;text-transform:uppercase}
-.wl-input:focus{border-color:var(--gl)}
-.wl-input::placeholder{text-transform:none;color:var(--ts)}
-.btn-wl{background:var(--gd);border:none;color:var(--white);font-family:var(--mono);font-size:10px;padding:6px 12px;border-radius:4px;cursor:pointer;text-transform:uppercase;letter-spacing:.08em}
-.btn-wl-clr{background:transparent;border:1.5px solid var(--border);color:var(--ts);font-family:var(--mono);font-size:10px;padding:6px 10px;border-radius:4px;cursor:pointer}
-.btn-wl-clr:hover{border-color:var(--red);color:var(--red)}
-.wl-tag{display:inline-flex;align-items:center;gap:4px;background:var(--gp);border:1px solid var(--border);border-radius:3px;padding:3px 8px;font-size:10px;font-family:var(--mono);color:var(--gm);font-weight:500}
-.wl-tag button{background:none;border:none;color:var(--ts);cursor:pointer;font-size:11px;line-height:1;padding:0 2px}
-.wl-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
 
 /* BAR CHART */
 .bchart-wrap{background:var(--white);border:1px solid var(--border);border-radius:6px;padding:24px 28px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
@@ -178,15 +166,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 .base-banner .bb-badge{margin-left:auto;background:var(--gold);color:var(--gd);font-family:var(--mono);font-size:9px;font-weight:700;padding:4px 10px;border-radius:3px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;flex-shrink:0}
 .iv-bar{display:inline-block;height:4px;border-radius:2px;min-width:3px;vertical-align:middle;margin-left:5px}
 .inv-note{font-size:10px;font-family:var(--mono);color:var(--ts);margin-top:8px;padding-top:8px;border-top:1px solid var(--bl);line-height:1.6}
-
-/* SETUP PANEL */
-.setup-panel{background:var(--white);border:1px solid var(--border);border-radius:6px;padding:22px;margin-bottom:16px}
-.setup-panel h3{font-family:var(--serif);font-size:16px;font-weight:700;color:var(--gd);margin-bottom:6px}
-.setup-panel>p{font-size:11px;color:var(--tm);margin-bottom:16px;line-height:1.7}
-.setup-steps{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.setup-step{background:var(--gb);border:1px solid var(--bl);border-radius:5px;padding:14px 16px}
-.setup-step .step-num{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
-.setup-step p{font-size:11px;color:var(--tm);margin:0;line-height:1.6}
 
 /* ADMIN PANEL */
 .admin-panel{background:var(--admin);min-height:100%}
@@ -244,10 +223,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 .state-card h3{font-family:var(--serif);font-size:17px;color:var(--gd);margin-bottom:8px;font-weight:600}
 .state-card p{font-size:12px;line-height:1.7;max-width:340px;color:var(--tm)}
 .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--gl);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
-.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px;text-align:center;color:var(--ts)}
-.empty-state .es-icon{font-size:36px;margin-bottom:12px;opacity:.4}
-.empty-state h3{font-family:var(--serif);font-size:16px;color:var(--gd);margin-bottom:6px;font-weight:600}
-.empty-state p{font-size:12px;line-height:1.7;max-width:300px}
 
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
@@ -310,7 +285,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
   .k5 .kc:last-child{grid-column:span 2}
   .kc-val{font-size:17px}
   .c2,.c21,.row.c2,.row.c21{grid-template-columns:1fr}
-  .setup-steps{grid-template-columns:1fr}
   .ch[style*="height:260px"]{height:200px!important}
   .ch[style*="height:250px"]{height:190px!important}
   .ch[style*="height:240px"]{height:180px!important}
@@ -483,60 +457,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
       </div></div>
     </div>
 
-    <!-- ACTIVITY -->
-    <div class="vp" id="page-activity">
-      <div class="mkt-toggle">
-        <button class="mkt-btn on" onclick="setMktAct('ALL',this)">All Markets</button>
-        <button class="mkt-btn" onclick="setMktAct('ZSE',this)">ZSE</button>
-        <button class="mkt-btn" onclick="setMktAct('VFEX',this)">VFEX</button>
-      </div>
-      <div class="kpi-row k3">
-        <div class="kc" style="--kca:var(--gl)"><div class="kc-lbl">Total Volume</div><div class="kc-val" id="kActVol">—</div></div>
-        <div class="kc" style="--kca:var(--gold)"><div class="kc-lbl">Total Value</div><div class="kc-val" id="kActVal">—</div></div>
-        <div class="kc" style="--kca:var(--gain)"><div class="kc-lbl">Active Counters</div><div class="kc-val" id="kActCnt">—</div><div class="kc-sub">volume > 0</div></div>
-      </div>
-      <div class="row c21">
-        <div class="mc"><div class="mc-title">Volume by Counter <span class="hint">top 12</span></div><div class="ch" style="height:260px"><canvas id="cVolBar"></canvas></div></div>
-        <div class="mc"><div class="mc-title">Value Share</div><div class="ch" style="height:260px"><canvas id="cValPie"></canvas></div></div>
-      </div>
-      <div class="row c1"><div class="mc"><div class="mc-title">All Traded Counters</div>
-        <div class="tw"><table><thead><tr><th>#</th><th>Counter</th><th>Sector</th><th>Market</th><th>Close</th><th>Volume</th><th>Value Traded</th><th>% Change</th></tr></thead><tbody id="tblActivity"></tbody></table></div>
-      </div></div>
-    </div>
-
-    <!-- SECTORS -->
-    <div class="vp" id="page-sectors">
-      <div class="row c1"><div class="mc"><div class="mc-title">Sector Performance Summary</div><div class="ch" style="height:240px"><canvas id="cSectPerf"></canvas></div></div></div>
-      <div class="row c1"><div class="mc"><div class="mc-title">Counters by Sector</div>
-        <div class="tw"><table><thead><tr><th>#</th><th>Counter</th><th>Sector</th><th>Market</th><th>Mkt Cap (USD)</th><th>Close</th><th>% Today</th><th>YTD G/L</th></tr></thead><tbody id="tblSectors"></tbody></table></div>
-      </div></div>
-    </div>
-
-    <!-- SCREENER -->
-    <div class="vp" id="page-screener">
-      <div class="fb">
-        <input type="text" id="scrSearch" placeholder="Search counter or sector…" oninput="renderScreener()">
-        <select id="scrMkt" onchange="renderScreener()"><option value="">All Markets</option><option>ZSE</option><option>VFEX</option></select>
-        <select id="scrSect" onchange="renderScreener()"><option value="">All Sectors</option></select>
-        <select id="scrSort" onchange="renderScreener()">
-          <option value="mktcap_d">Market Cap ↓</option>
-          <option value="pct_d">% Change ↓</option>
-          <option value="pct_a">% Change ↑</option>
-          <option value="vol_d">Volume ↓</option>
-          <option value="ytd_d">YTD ↓</option>
-          <option value="ytd_a">YTD ↑</option>
-          <option value="liq_d">Q Score ↓</option>
-          <option value="liq_a">Q Score ↑</option>
-          <option value="az">A–Z</option>
-        </select>
-      </div>
-      <div class="mc">
-        <div class="tw"><table><thead><tr><th>#</th><th>Counter</th><th>ISIN</th><th>Sector</th><th>Mkt</th><th>Open</th><th>Close</th><th>Change</th><th>% Chg</th><th>Volume</th><th>Value</th><th>Mkt Cap (USD)</th><th>YTD G/L</th><th>Div Yield</th><th>Q Score</th><th>Days Out †</th></tr></thead><tbody id="tblScreener"></tbody></table></div>
-        <div style="margin-top:8px;font-size:10px;font-family:var(--mono);color:var(--ts)" id="scrCount"></div>
-        <div style="margin-top:4px;font-size:9px;font-family:var(--mono);color:var(--ts)">† Days Out: ZSE = directional estimate only (ZiG/USD conversion not applied). VFEX = USD native.</div>
-      </div>
-    </div>
-
     <!-- LIQUIDITY RANK -->
     <div class="vp" id="page-liquidity">
       <div class="mkt-toggle">
@@ -547,31 +467,10 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
       <div id="liquidityContent"></div>
     </div>
 
-    <!-- $100 TRACKER -->
-    <div class="vp" id="page-investment"><div id="investContent">
-      <div class="setup-panel"><h3>$100 Investment Tracker</h3><p>Loading baseline data…</p></div>
-    </div></div>
-
-    <!-- BAR CHART -->
+    <!-- BAR CHART (Investment Simulator + $100 Tracker merged) -->
     <div class="vp" id="page-barchart"><div id="barchartContent">
       <div class="state-card"><div class="spinner"></div><h3>Preparing chart…</h3></div>
     </div></div>
-
-    <!-- WATCHLIST -->
-    <div class="vp" id="page-watchlist">
-      <div class="wl-controls">
-        <input type="text" class="wl-input" id="wlInput" placeholder="Add counter (e.g. DELTA)" onkeydown="if(event.key==='Enter')addWatch()">
-        <button class="btn-wl" onclick="addWatch()">+ Add</button>
-        <button class="btn-wl-clr" onclick="clearWatch()">Clear All</button>
-        <span style="font-size:10px;font-family:var(--mono);color:var(--ts)">Saved in your browser</span>
-      </div>
-      <div class="wl-tags" id="wlTags"></div>
-      <div class="mc">
-        <div class="tw"><table><thead><tr><th>Counter</th><th>Market</th><th>Sector</th><th>Open</th><th>Close</th><th>Change</th><th>% Today</th><th>Volume</th><th>Value</th><th>Mkt Cap (USD)</th><th>YTD G/L</th><th>$100 Now</th><th>Q Score</th><th>Days Out †</th></tr></thead><tbody id="tblWatch"></tbody></table></div>
-        <div id="wlEmpty" class="empty-state" style="display:none;padding:20px 0"><p>Add counters above to track them.</p></div>
-        <div style="margin-top:6px;font-size:9px;font-family:var(--mono);color:var(--ts)">† Days Out: ZSE = directional estimate only. VFEX = USD native.</div>
-      </div>
-    </div>
 
     <!-- ADMIN -->
     <div class="vp" id="page-admin">
@@ -721,8 +620,7 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 window.PS   = [];
 window.BASE = {};
 window.BASE_DATE = '';
-window.MKT  = 'ALL'; window.MKT_M = 'ALL'; window.MKT_A = 'ALL'; window.MKT_L = 'ALL';
-window.WATCH = JSON.parse(localStorage.getItem('bw_watchlist') || '[]');
+window.MKT  = 'ALL'; window.MKT_M = 'ALL'; window.MKT_L = 'ALL';
 let CH = {};
 let _adminUnlocked = false;
 
@@ -753,7 +651,7 @@ const fM  = v => { if(v==null)return'—'; const a=Math.abs(v); if(a>=1e9)return
 const fZ  = v => { if(v==null)return'—'; const a=Math.abs(v); if(a>=1e9)return(a/1e9).toFixed(2)+'B'; if(a>=1e6)return(a/1e6).toFixed(2)+'M'; if(a>=1e3)return(a/1e3).toFixed(0)+'K'; return a.toLocaleString(); };
 const pC  = v => v>0?'up':v<0?'dn':'nc';
 
-// ─── Q SCORE ──────────────────────────────────────────────────────────────────
+// ─── LIQUIDITY SCORE ─────────────────────────────────────────────────────────
 function calcLiquidity(r) {
   // Turnover ratio: value traded ÷ market cap (proxy; ZSE uses ZiG values)
   const mktCap = r.mktCapIBR || 0;
@@ -780,7 +678,7 @@ function calcLiquidity(r) {
 
 const Q_SCORE_CELL = liq => {
   const cls = liq.score >= 70 ? 'qs-high' : liq.score >= 40 ? 'qs-mid' : liq.score > 0 ? 'qs-low' : 'qs-zero';
-  return `<span class="qscore ${cls}" title="Q Score: ${liq.score}/100">${liq.score}</span>`;
+  return `<span class="qscore ${cls}" title="Liquidity Score: ${liq.score}/100">${liq.score}</span>`;
 };
 
 const LIQ_DTL = dtl =>
@@ -924,8 +822,7 @@ function ingestBaselineBuffer(buffer, fname) {
   if (stats) stats.textContent = 'Loaded ' + cnt + ' USD prices from baseline sheet (' + date + ')';
   admLog('Baseline loaded: ' + date + ', ' + cnt + ' counters.', 'ok');
   checkPublishReady();
-  if (window.PS.length) { renderInvestment(); if (document.getElementById('page-barchart').classList.contains('on')) renderBarChart(); }
-  renderWatchlist();
+  if (window.PS.length) { renderBarChart(); }
 }
 
 async function fetchBaselineAdmin() {
@@ -982,7 +879,6 @@ function handleCurrentSheet(file) {
       document.getElementById('btnExport').disabled = false;
       admLog('Current sheet loaded: ' + date + ', ' + rows.length + ' counters.', 'ok');
       checkPublishReady();
-      renderWatchlist();
     } catch(err) {
       admLog('Sheet parse failed: ' + err.message, 'err');
       btn.textContent = '📂 Import FBC Sheet (.xlsx)';
@@ -1136,7 +1032,6 @@ function ingestSnapshot(data) {
   }
 
   render();
-  renderWatchlist();
   showPage('barchart');
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
   const bc = Array.from(document.querySelectorAll('.ni')).find(n=>n.getAttribute('onclick')?.includes('barchart'));
@@ -1192,12 +1087,11 @@ function nav(id, el) {
   const mnEl = document.getElementById('mn-'+id);
   document.querySelectorAll('.mob-nav-item').forEach(b=>b.classList.remove('on'));
   if (mnEl) mnEl.classList.add('on');
-  const T = {overview:'Market Overview',movers:'Movers',activity:'Trading Activity',sectors:'Sector Breakdown',screener:'Full Screener',liquidity:'Q Score Rankings',investment:'$100 Investment Tracker',barchart:'Investment Simulator',watchlist:'Watchlist'};
+  const T = {overview:'Market Overview',movers:'Daily Movers',liquidity:'Liquidity Score Rankings',barchart:'Investment Simulator'};
   document.getElementById('tbTitle').textContent = T[id] || id;
   document.getElementById('tbSub').textContent = 'Zimbabwe Stock Exchange · ZSE + VFEX';
   document.getElementById('topbar').classList.remove('admin-mode');
   document.getElementById('tbRight').innerHTML = '';
-  if (id==='investment') renderInvestment();
   if (id==='barchart') renderBarChart();
   if (id==='liquidity') renderLiquidity();
 }
@@ -1251,7 +1145,6 @@ function exitAdmin() {
 function filterBy(mkt) { return mkt==='ALL' ? window.PS : window.PS.filter(r=>r.market===mkt); }
 function setMkt(m,el)      { window.MKT=m;   hlBtn(el); render(); }
 function setMktMovers(m,el){ window.MKT_M=m; hlBtn(el); renderMovers(); }
-function setMktAct(m,el)   { window.MKT_A=m; hlBtn(el); renderActivity(); }
 function setMktLiq(m,el)   { window.MKT_L=m; hlBtn(el); renderLiquidity(); }
 function hlBtn(el) { el.parentNode.querySelectorAll('.mkt-btn').forEach(b=>b.classList.remove('on')); el.classList.add('on'); }
 
@@ -1259,7 +1152,7 @@ function mk(id,cfg) { if(CH[id]){CH[id].destroy();delete CH[id];} const cv=docum
 const scX = () => ({grid:{display:false},ticks:{color:'#7A7A7A',font:{family:'DM Mono,monospace',size:10},maxRotation:30}});
 const scY = cb => ({grid:{color:'rgba(216,228,220,.5)'},ticks:{color:'#7A7A7A',font:{family:'DM Mono,monospace',size:10},callback:cb}});
 
-function render() { if(!window.PS.length)return; renderOverview(); renderMovers(); renderActivity(); renderSectors(); renderScreener(); }
+function render() { if(!window.PS.length)return; renderOverview(); renderMovers(); renderScreener(); }
 
 // ─── RENDER FUNCTIONS ─────────────────────────────────────────────────────────
 function renderOverview() {
@@ -1301,31 +1194,10 @@ function renderMovers() {
   document.getElementById('tblLosers').innerHTML=losers.length?losers.map((r,i)=>row(r,i,'dn','')).join(''):'<tr><td colspan="9" style="color:var(--ts);text-align:center;padding:24px">No losers.</td></tr>';
 }
 
-function renderActivity() {
-  const D=filterBy(window.MKT_A), traded=D.filter(r=>r.vol>0).sort((a,b)=>b.val-a.val);
-  document.getElementById('kActVol').textContent=fZ(D.reduce((s,r)=>s+r.vol,0));
-  document.getElementById('kActVal').textContent=fZ(D.reduce((s,r)=>s+r.val,0));
-  document.getElementById('kActCnt').textContent=traded.length;
-  const t12=traded.slice(0,12);
-  mk('cVolBar',{type:'bar',data:{labels:t12.map(r=>r.counter),datasets:[{data:t12.map(r=>r.vol),backgroundColor:'#2D5A40',hoverBackgroundColor:'#3D7A56',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>' '+fN(c.raw)+' shares'}}},scales:{x:scX(),y:scY(fZ)}}});
-  const t8=traded.slice(0,8);
-  mk('cValPie',{type:'doughnut',data:{labels:t8.map(r=>r.counter),datasets:[{data:t8.map(r=>r.val),backgroundColor:PAL,borderColor:'#fff',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,cutout:'50%',plugins:{legend:{display:true,position:'bottom',labels:{color:'#4A4A4A',font:{size:9},boxWidth:8}},tooltip:{...TT,callbacks:{label:c=>' '+fZ(c.raw)}}}}});
-  document.getElementById('tblActivity').innerHTML=traded.map((r,i)=>`<tr><td class="nc">${i+1}</td><td class="tf hi">${r.counter}</td><td><span class="sect">${r.sector}</span></td><td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td><td>${r.close!=null?fP2(r.close):'—'}</td><td>${fN(r.vol)}</td><td class="am">${fZ(r.val)}</td><td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'▲ +':'▼ ')+fP2(r.chgPct)+'%'}</td></tr>`).join('');
-}
-
-function renderSectors() {
-  const D=window.PS, sm={};
-  D.forEach(r=>{if(!sm[r.sector])sm[r.sector]={gainers:0,losers:0,unch:0,cap:0};if(r.chg>0)sm[r.sector].gainers++;else if(r.chg<0)sm[r.sector].losers++;else sm[r.sector].unch++;sm[r.sector].cap+=r.mktCapIBR;});
-  const sects=Object.keys(sm).sort();
-  mk('cSectPerf',{type:'bar',data:{labels:sects,datasets:[{label:'Gainers',data:sects.map(s=>sm[s].gainers),backgroundColor:'rgba(29,107,58,.75)',borderRadius:3},{label:'Losers',data:sects.map(s=>sm[s].losers),backgroundColor:'rgba(192,57,43,.7)',borderRadius:3},{label:'Unch.',data:sects.map(s=>sm[s].unch),backgroundColor:'rgba(122,122,122,.4)',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#4A4A4A',font:{size:10},boxWidth:10}},tooltip:{...TT}},scales:{x:scX(),y:scY(v=>v)}}});
-  const sorted=[...D].sort((a,b)=>a.sector.localeCompare(b.sector)||b.mktCapIBR-a.mktCapIBR);
-  document.getElementById('tblSectors').innerHTML=sorted.map((r,i)=>`<tr><td class="nc">${i+1}</td><td class="tf hi">${r.counter}</td><td><span class="sect">${r.sector}</span></td><td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td><td class="am">${fM(r.mktCapIBR)}</td><td>${r.close!=null?fP2(r.close):'—'}</td><td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'▲ +':'▼ ')+fP2(r.chgPct)+'%'}</td><td class="${pC(r.ytd)}">${(r.ytd*100).toFixed(1)}%</td></tr>`).join('');
-}
-
 function renderScreener() {
   if (!window.PS.length) return;
   const q=document.getElementById('scrSearch').value.toLowerCase().trim();
-  const m=document.getElementById('scrMkt').value, s=document.getElementById('scrSect').value, so=document.getElementById('scrSort').value;
+  const m=window.MKT==='ALL'?'':window.MKT, s=document.getElementById('scrSect').value, so=document.getElementById('scrSort').value;
   let D=[...window.PS];
   if(q)D=D.filter(r=>r.counter.toLowerCase().includes(q)||r.sector.toLowerCase().includes(q)||r.isin.toLowerCase().includes(q));
   if(m)D=D.filter(r=>r.market===m); if(s)D=D.filter(r=>r.sector===s);
@@ -1343,7 +1215,7 @@ function renderScreener() {
     const liq = calcLiquidity(r);
     return `<tr>
       <td class="nc">${i+1}</td>
-      <td class="tf hi" style="cursor:pointer" onclick="quickAddWatch('${r.counter.trim()}')" title="Add to watchlist">${r.counter}</td>
+      <td class="tf hi">${r.counter}</td>
       <td style="color:var(--ts);font-size:10px">${r.isin}</td>
       <td><span class="sect">${r.sector}</span></td>
       <td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td>
@@ -1363,7 +1235,7 @@ function renderScreener() {
   document.getElementById('scrCount').textContent=`Showing ${D.length} of ${window.PS.length} counters · click name to add to watchlist`;
 }
 
-// ─── Q SCORE RANKINGS PAGE ────────────────────────────────────────────────────
+// ─── LIQUIDITY SCORE RANKINGS PAGE ───────────────────────────────────────────
 function renderLiquidity() {
   if (!window.PS.length) {
     document.getElementById('liquidityContent').innerHTML = '<div class="state-card"><div class="sc-icon">◉</div><h3>No data</h3><p>Load a market snapshot first.</p></div>';
@@ -1385,19 +1257,19 @@ function renderLiquidity() {
 
   document.getElementById('liquidityContent').innerHTML = `
     <div style="background:linear-gradient(135deg,var(--gd),var(--gm));border-radius:6px;padding:14px 20px;margin-bottom:16px;border:1px solid rgba(184,135,42,.2)">
-      <div style="font-family:var(--serif);font-size:13px;font-weight:700;color:var(--white);margin-bottom:4px">Q Score — Quality of Exit Analysis</div>
+      <div style="font-family:var(--serif);font-size:13px;font-weight:700;color:var(--white);margin-bottom:4px">Liquidity Score — Quality of Exit Analysis</div>
       <div style="font-size:10px;font-family:var(--mono);color:rgba(255,255,255,.6);line-height:1.7;max-width:740px">
-        Q Score is Bob Wealth Holdings' proprietary liquidity metric. It measures the quality of exit available to investors by assessing trading activity, value traded and market capitalisation. Scores range from 0–100, with higher scores indicating stronger liquidity and more efficient execution.
+        Liquidity Score is Bob Wealth Holdings' proprietary liquidity metric. It measures the quality of exit available to investors by assessing trading activity, value traded and market capitalisation. Scores range from 0–100, with higher scores indicating stronger liquidity and more efficient execution.
       </div>
     </div>
     <div class="kpi-row k4">
       <div class="kc" style="--kca:var(--gold)">
         <div class="kc-lbl">Most Liquid Counter</div>
         <div class="kc-val" style="font-size:15px;color:var(--gd)">${mostLiquid ? mostLiquid.counter : '—'}</div>
-        <div class="kc-sub">${mostLiquid ? 'Q Score ' + mostLiquid._liq.score : 'no data'}</div>
+        <div class="kc-sub">${mostLiquid ? 'Liquidity Score ' + mostLiquid._liq.score : 'no data'}</div>
       </div>
       <div class="kc" style="--kca:var(--gl)">
-        <div class="kc-lbl">Market Q Score</div>
+        <div class="kc-lbl">Market Liquidity Score</div>
         <div class="kc-val" style="color:${marketQScore>=50?'var(--gain)':marketQScore>=25?'var(--gm)':'var(--red)'}">${marketQScore}</div>
         <div class="kc-sub">market average / 100</div>
       </div>
@@ -1414,7 +1286,7 @@ function renderLiquidity() {
     </div>
     <div class="row c21">
       <div class="mc">
-        <div class="mc-title">Top 10 Q Scores <span class="hint">highest quality of exit</span></div>
+        <div class="mc-title">Top 10 Liquidity Scores <span class="hint">highest quality of exit</span></div>
         <div class="ch" style="height:260px"><canvas id="cLiqTop10"></canvas></div>
       </div>
       <div class="mc">
@@ -1424,7 +1296,7 @@ function renderLiquidity() {
     </div>
     <div class="row c1">
       <div class="mc">
-        <div class="mc-title">Full Q Score Ranking <span class="hint">all counters · best to worst exit quality</span></div>
+        <div class="mc-title">Full Liquidity Score Ranking <span class="hint">all counters · best to worst exit quality</span></div>
         <div class="tw">
           <table>
             <thead>
@@ -1443,7 +1315,7 @@ function renderLiquidity() {
               ${sorted.map((r,i) => `
                 <tr>
                   <td class="nc" style="font-weight:600;color:${i<3?'var(--gold)':'var(--ts)'}">${i+1}</td>
-                  <td class="tf hi" style="cursor:pointer" onclick="quickAddWatch('${r.counter.trim()}')" title="Add to watchlist">${r.counter}</td>
+                  <td class="tf hi">${r.counter}</td>
                   <td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td>
                   <td><span class="sect">${r.sector}</span></td>
                   <td class="am">${fM(r.mktCapIBR)}</td>
@@ -1455,7 +1327,7 @@ function renderLiquidity() {
           </table>
         </div>
         <div style="margin-top:8px;font-size:9px;font-family:var(--mono);color:var(--ts);line-height:1.8">
-          Q Score = weighted composite: trading activity 25% · value-to-market-cap ratio 75% · max 100. Bob Wealth Holdings proprietary metric.<br>
+          Liquidity Score = weighted composite: trading activity 25% · value-to-market-cap ratio 75% · max 100. Bob Wealth Holdings proprietary metric.<br>
           † Days Out: ZSE = directional estimate only (ZiG/USD conversion not applied). VFEX = USD native. Click counter name to add to Watchlist.
         </div>
       </div>
@@ -1482,7 +1354,7 @@ function renderLiquidity() {
       maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
-        tooltip: { ...TT, callbacks: { label: c => ' Q Score: ' + c.raw + ' / 100' } }
+        tooltip: { ...TT, callbacks: { label: c => ' Liquidity Score: ' + c.raw + ' / 100' } }
       },
       scales: {
         x: { ...scX(), max: 100, ticks: { ...scX().ticks, callback: v => v } },
@@ -1536,44 +1408,6 @@ function getInvValue(r) {
   return (r.usdPrice / base.price) * 100;
 }
 
-function renderInvestment() {
-  const results = [];
-  window.PS.forEach(r => { const iv=getInvValue(r); if(iv!=null)results.push({...r,inv100:iv,gain:iv-100,gainPct:iv-100}); });
-  const el = document.getElementById('investContent');
-  if (!results.length) { el.innerHTML='<div class="setup-panel"><h3>$100 Investment Tracker</h3><p>No investment data available. Publish a snapshot with baseline data first.</p></div>'; return; }
-  const winners=results.filter(r=>r.inv100>100), losers=results.filter(r=>r.inv100<100);
-  const best=winners.length?[...winners].sort((a,b)=>b.inv100-a.inv100)[0]:null;
-  const avg=results.reduce((s,r)=>s+r.inv100,0)/results.length;
-  const allSorted=[...results].sort((a,b)=>b.inv100-a.inv100);
-  const irow=r=>{
-    const pct=r.gainPct, bc=r.inv100>100?'#1D6B3A':r.inv100<100?'#C0392B':'#7A7A7A';
-    const cls=r.inv100>100?'iv-up':r.inv100<100?'iv-dn':'iv-nc';
-    const basePx=(window.BASE[r.counter.trim().toUpperCase()]||{}).price||0;
-    const liq=calcLiquidity(r);
-    return `<tr>
-      <td class="tf hi" style="cursor:pointer" onclick="quickAddWatch('${r.counter.trim()}')">${r.counter}</td>
-      <td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td>
-      <td><span class="sect">${r.sector}</span></td>
-      <td class="nc" style="font-size:10px">${basePx?'$'+basePx.toFixed(5):'—'}</td>
-      <td class="nc" style="font-size:10px">$${(r.usdPrice||0).toFixed(5)}</td>
-      <td class="${cls}" style="font-size:13px;font-weight:700">$${r.inv100.toFixed(2)}</td>
-      <td class="${cls}">${r.gain>=0?'+':''}$${r.gain.toFixed(2)}</td>
-      <td class="${cls}">${pct>=0?'▲ +':'▼ '}${Math.abs(pct).toFixed(2)}%<span class="iv-bar" style="background:${bc};width:${Math.min(Math.abs(pct),120)}px"></span></td>
-      <td class="${pC(r.ytd)}">${(r.ytd*100).toFixed(1)}%</td>
-      <td>${Q_SCORE_CELL(liq)}</td>
-      <td class="nc">${LIQ_DTL(liq.dtl)}</td><div class="bb-icon">📅</div><div class="bb-text"><h3>Baseline: ${window.BASE_DATE||'Jan 6 2026'}</h3><p>$100 invested per counter · Comparing with: ${document.getElementById('sbDate').textContent}</p></div><div class="bb-badge">$100 per counter</div></div>
-    <div class="kpi-row k4">
-      <div class="kc" style="--kca:var(--gl)"><div class="kc-lbl">Portfolio Average</div><div class="kc-val" style="color:${avg>=100?'var(--gain)':'var(--red)'}">$${avg.toFixed(2)}</div><div class="kc-sub">${avg>=100?'▲':'▼'} avg from $100</div></div>
-      <div class="kc" style="--kca:var(--gain)"><div class="kc-lbl">Winners</div><div class="kc-val" style="color:var(--gain)">${winners.length}</div><div class="kc-sub">of ${results.length} tracked</div></div>
-      <div class="kc" style="--kca:var(--red)"><div class="kc-lbl">Losers</div><div class="kc-val" style="color:var(--red)">${losers.length}</div><div class="kc-sub">of ${results.length} tracked</div></div>
-      <div class="kc" style="--kca:var(--gold)"><div class="kc-lbl">Best Performer</div><div class="kc-val" style="color:var(--gain);font-size:14px">${best?best.counter:'—'}</div><div class="kc-sub">${best?'$100 → $'+best.inv100.toFixed(2):'no winners'}</div></div>
-    </div>
-    <div class="mc"><div class="mc-title">All Counters — $100 Value <span class="hint">best to worst · click name to watchlist</span></div>
-      <div class="tw"><table><thead><tr><th>Counter</th><th>Market</th><th>Sector</th><th>Base Price</th><th>Current Price</th><th>$100 Now Worth</th><th>Gain/Loss</th><th>% Change</th><th>YTD G/L</th><th>Q Score</th><th>Days Out †</th></tr></thead><tbody>${allSorted.map(irow).join('')}</tbody></table></div>
-      <div class="inv-note">Prices in USD. VFEX = native USD; ZSE = USD@IBR from sheet. ${results.length} of ${window.PS.length} counters have data.<br>† Days Out: ZSE = directional estimate only. VFEX = USD native.</div>
-    </div>`;
-}
-
 function renderBarChart() {
   const el = document.getElementById('barchartContent');
   const results = window.PS.filter(r => getInvValue(r) != null).map(r => ({...r, inv100: getInvValue(r)}));
@@ -1598,6 +1432,32 @@ function renderBarChart() {
     const liq=calcLiquidity(r);
     return `<div class="bc-row"><div class="bc-label" title="${r.counter}">${r.counter}${r.suspended?' *':''}</div><div class="bc-bar-wrap"><div class="bc-bar" style="width:${scale(v)}px;background:${barColor(v)}"></div><span class="bc-val ${cls}">$${v.toFixed(2)}</span><span class="bc-sect">${r.sector}</span>${r.market==='VFEX'?'<span style="font-size:8px;font-family:var(--mono);color:var(--ts);margin-left:3px">(VFEX)</span>':''}<span style="margin-left:6px">${Q_SCORE_CELL(liq)}</span></div></div>`;
   }).join('');
+
+  // $100 table (merged in)
+  const allSorted = [...results].sort((a,b) => b.inv100 - a.inv100);
+  const irow = r => {
+    const pct=r.inv100-100, bc=r.inv100>100?'#1D6B3A':r.inv100<100?'#C0392B':'#7A7A7A';
+    const cls=r.inv100>100?'iv-up':r.inv100<100?'iv-dn':'iv-nc';
+    const basePx=(window.BASE[r.counter.trim().toUpperCase()]||{}).price||0;
+    const liq=calcLiquidity(r);
+    return `<tr>
+      <td class="tf hi">${r.counter}</td>
+      <td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td>
+      <td><span class="sect">${r.sector}</span></td>
+      <td class="nc" style="font-size:10px">${basePx?'$'+basePx.toFixed(5):'—'}</td>
+      <td class="nc" style="font-size:10px">$${(r.usdPrice||0).toFixed(5)}</td>
+      <td class="${cls}" style="font-size:13px;font-weight:700">$${r.inv100.toFixed(2)}</td>
+      <td class="${cls}">${(r.inv100-100)>=0?'+':''}$${(r.inv100-100).toFixed(2)}</td>
+      <td class="${cls}">${pct>=0?'▲ +':'▼ '}${Math.abs(pct).toFixed(2)}%<span class="iv-bar" style="background:${bc};width:${Math.min(Math.abs(pct),120)}px"></span></td>
+      <td class="${pC(r.ytd)}">${(r.ytd*100).toFixed(1)}%</td>
+      <td>${Q_SCORE_CELL(liq)}</td>
+      <td class="nc">${LIQ_DTL(liq.dtl)}</td>
+    </tr>`;
+  };
+  const portWinners = results.filter(r=>r.inv100>100), portLosers = results.filter(r=>r.inv100<100);
+  const portBest = portWinners.length ? [...portWinners].sort((a,b)=>b.inv100-a.inv100)[0] : null;
+  const portAvg = results.reduce((s,r)=>s+r.inv100,0)/results.length;
+
   el.innerHTML=`
     <div class="bchart-wrap" id="printArea">
       <div class="bchart-header">
@@ -1643,47 +1503,27 @@ function renderBarChart() {
           <span class="bcs">Avg: <b style="color:${parseFloat(avg)>=investment?'var(--gain)':'var(--red)'}">$${avg}</b></span>
         </div>
       </div>
+    </div>
+
+    <div class="base-banner" style="margin-top:16px">
+      <div class="bb-icon">📅</div>
+      <div class="bb-text"><h3>$100 Tracker — Baseline: ${window.BASE_DATE||'Jan 6 2026'}</h3><p>$100 invested per counter · Comparing with: ${priceDate}</p></div>
+      <div class="bb-badge">$100 per counter</div>
+    </div>
+    <div class="kpi-row k4">
+      <div class="kc" style="--kca:var(--gl)"><div class="kc-lbl">Portfolio Average</div><div class="kc-val" style="color:${portAvg>=100?'var(--gain)':'var(--red)'}">$${portAvg.toFixed(2)}</div><div class="kc-sub">${portAvg>=100?'▲':'▼'} avg from $100</div></div>
+      <div class="kc" style="--kca:var(--gain)"><div class="kc-lbl">Winners</div><div class="kc-val" style="color:var(--gain)">${portWinners.length}</div><div class="kc-sub">of ${results.length} tracked</div></div>
+      <div class="kc" style="--kca:var(--red)"><div class="kc-lbl">Losers</div><div class="kc-val" style="color:var(--red)">${portLosers.length}</div><div class="kc-sub">of ${results.length} tracked</div></div>
+      <div class="kc" style="--kca:var(--gold)"><div class="kc-lbl">Best Performer</div><div class="kc-val" style="color:var(--gain);font-size:14px">${portBest?portBest.counter:'—'}</div><div class="kc-sub">${portBest?'$100 → $'+portBest.inv100.toFixed(2):'no winners'}</div></div>
+    </div>
+    <div class="mc"><div class="mc-title">All Counters — $100 Value <span class="hint">best to worst</span></div>
+      <div class="tw"><table><thead><tr><th>Counter</th><th>Market</th><th>Sector</th><th>Base Price</th><th>Current Price</th><th>$100 Now Worth</th><th>Gain/Loss</th><th>% Change</th><th>YTD G/L</th><th>Liq Score</th><th>Days Out †</th></tr></thead><tbody>${allSorted.map(irow).join('')}</tbody></table></div>
+      <div class="inv-note">Prices in USD. VFEX = native USD; ZSE = USD@IBR from sheet. ${results.length} of ${window.PS.length} counters have data.<br>† Days Out: ZSE = directional estimate only. VFEX = USD native.</div>
     </div>`;
 }
 
 function setInvestment(amount) { const el=document.getElementById('investmentAmount'); if(el)el.value=amount; renderBarChart(); }
 function printChart() { const c=document.getElementById('bcControls'); if(c)c.style.display='none'; window.print(); setTimeout(()=>{if(c)c.style.display='flex';},500); }
-
-// ─── WATCHLIST ────────────────────────────────────────────────────────────────
-function saveWatch() { localStorage.setItem('bw_watchlist', JSON.stringify(window.WATCH)); }
-function addWatch(t) { const raw=t||document.getElementById('wlInput').value.trim().toUpperCase(); if(!raw)return; if(!window.WATCH.includes(raw))window.WATCH.push(raw); saveWatch(); document.getElementById('wlInput').value=''; renderWatchlist(); }
-function quickAddWatch(t) { addWatch(t.trim().toUpperCase()); }
-function removeWatch(t) { window.WATCH=window.WATCH.filter(w=>w!==t); saveWatch(); renderWatchlist(); }
-function clearWatch() { window.WATCH=[]; saveWatch(); renderWatchlist(); }
-
-function renderWatchlist() {
-  document.getElementById('wlTags').innerHTML=window.WATCH.map(t=>`<div class="wl-tag">${t}<button onclick="removeWatch('${t}')">✕</button></div>`).join('');
-  const rows=window.WATCH.map(t=>{const r=window.PS.find(p=>p.counter.trim().toUpperCase()===t);return r?r:{counter:t,_missing:true};});
-  if(!rows.length){document.getElementById('tblWatch').innerHTML='';document.getElementById('wlEmpty').style.display='flex';return;}
-  document.getElementById('wlEmpty').style.display='none';
-  document.getElementById('tblWatch').innerHTML=rows.map(r=>{
-    if(r._missing)return`<tr><td class="tf" style="color:var(--gold)">${r.counter}</td><td colspan="14" class="nc">Not in current data</td></tr>`;
-    const iv=getInvValue(r);
-    const ivCell=iv!=null?`<span class="${iv>100?'iv-up':iv<100?'iv-dn':'iv-nc'}">$${iv.toFixed(2)}</span>`:'<span class="nc">—</span>';
-    const liq=calcLiquidity(r);
-    return`<tr>
-      <td class="tf hi">${r.counter}</td>
-      <td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td>
-      <td><span class="sect">${r.sector}</span></td>
-      <td>${r.open!=null?fP2(r.open):'—'}</td>
-      <td class="hi">${r.close!=null?fP2(r.close):(r.suspended?'<span class="am">SUSP</span>':'—')}</td>
-      <td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'+':'')+fP2(r.chg)}</td>
-      <td class="${pC(r.chg)}">${r.chg===0?'—':(r.chg>0?'▲ +':'▼ ')+fP2(r.chgPct)+'%'}</td>
-      <td>${r.vol>0?fN(r.vol):'<span class="nc">—</span>'}</td>
-      <td>${r.val>0?fZ(r.val):'<span class="nc">—</span>'}</td>
-      <td class="am">${fM(r.mktCapIBR)}</td>
-      <td class="${pC(r.ytd)}">${(r.ytd*100).toFixed(1)}%</td>
-      <td>${ivCell}</td>
-      <td>${Q_SCORE_CELL(liq)}</td>
-      <td class="nc">${LIQ_DTL(liq.dtl)}</td>
-    </tr>`;
-  }).join('');
-}
 
 // ─── EXPORT ───────────────────────────────────────────────────────────────────
 function exportReport() {
@@ -1692,24 +1532,24 @@ function exportReport() {
   setTimeout(() => {
     try {
       const wb=XLSX.utils.book_new(), date=document.getElementById('sbDate').textContent;
-      const h1=['Counter','ISIN','Market','Sector','Shares','Mkt Cap USD','Open','Close','USD@IBR','Change','% Change','Volume','Value (ZiG)','YTD G/L %','Div Yield %','Q Score','Days to Exit'];
+      const h1=['Counter','ISIN','Market','Sector','Shares','Mkt Cap USD','Open','Close','USD@IBR','Change','% Change','Volume','Value (ZiG)','YTD G/L %','Div Yield %','Liquidity Score','Days to Exit'];
       const r1=window.PS.map(r=>{
         const liq=calcLiquidity(r);
         return [r.counter.trim(),r.isin,r.market,r.sector,r.shares,+r.mktCapIBR.toFixed(2),r.open,r.close,r.usdIBR,r.chg,+r.chgPct.toFixed(4),r.vol,+r.val.toFixed(2),+(r.ytd*100).toFixed(2),+(r.divYield*100).toFixed(4),liq.score,liq.dtl||''];
       });
       XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([h1,...r1]), 'PRICE DATA');
       if (Object.keys(window.BASE).length) {
-        const h2=['Counter','Market','Sector','Base Price (USD)','Current Price (USD)','$100 Value','Gain/Loss ($)','% Change','YTD G/L %','Q Score','Days to Exit'];
+        const h2=['Counter','Market','Sector','Base Price (USD)','Current Price (USD)','$100 Value','Gain/Loss ($)','% Change','YTD G/L %','Liquidity Score','Days to Exit'];
         const r2=window.PS.map(r=>{const iv=getInvValue(r);const b=window.BASE[r.counter.trim().toUpperCase()];const liq=calcLiquidity(r);return iv!=null?[r.counter.trim(),r.market,r.sector,b?+b.price.toFixed(6):null,+r.usdPrice.toFixed(6),+iv.toFixed(4),+(iv-100).toFixed(4),+(iv-100).toFixed(4),+(r.ytd*100).toFixed(2),liq.score,liq.dtl||'']:null;}).filter(Boolean).sort((a,b)=>b[5]-a[5]);
         XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([h2,...r2]), '$100 TRACKER');
       }
-      // Q Score Rankings sheet
-      const h3=['Rank','Counter','Market','Sector','Mkt Cap USD','Value Traded','Q Score','Days to Exit'];
+      // Liquidity Score Rankings sheet
+      const h3=['Rank','Counter','Market','Sector','Mkt Cap USD','Value Traded','Liquidity Score','Days to Exit'];
       const r3=[...window.PS].sort((a,b)=>calcLiquidity(b).score-calcLiquidity(a).score).map((r,i)=>{
         const liq=calcLiquidity(r);
         return [i+1,r.counter.trim(),r.market,r.sector,+r.mktCapIBR.toFixed(2),+r.val.toFixed(2),liq.score,liq.dtl||''];
       });
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([h3,...r3]), 'Q SCORE RANKINGS');
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([h3,...r3]), 'LIQUIDITY SCORE RANKINGS');
       XLSX.writeFile(wb, `BobWealth_Markets_${date.replace(/-/g,'')}.xlsx`);
       btn.textContent='↓ Export .xlsx Report'; btn.disabled=false;
     } catch(err) { console.error(err); btn.textContent='↓ Export .xlsx Report'; btn.disabled=false; }
@@ -1717,7 +1557,6 @@ function exportReport() {
 }
 
 // ─── BOOT ─────────────────────────────────────────────────────────────────────
-renderWatchlist();
 loadData();
 
 // ─── MOBILE HELPERS ───────────────────────────────────────────────────────────
@@ -1739,12 +1578,11 @@ function mobNav(id, el) {
   const sideItem = Array.from(document.querySelectorAll('.ni')).find(n => n.getAttribute('onclick')?.includes("'"+id+"'"));
   if (sideItem) { document.querySelectorAll('.ni,.ni-admin').forEach(n=>n.classList.remove('on')); sideItem.classList.add('on'); }
   showPage(id);
-  const T = {overview:'Market Overview',movers:'Movers',activity:'Trading Activity',sectors:'Sector Breakdown',screener:'Full Screener',liquidity:'Q Score Rankings',investment:'$100 Investment Tracker',barchart:'Investment Simulator',watchlist:'Watchlist'};
+  const T = {overview:'Market Overview',movers:'Daily Movers',liquidity:'Liquidity Score Rankings',barchart:'Investment Simulator'};
   document.getElementById('tbTitle').textContent = T[id] || id;
   document.getElementById('tbSub').textContent = 'Zimbabwe Stock Exchange · ZSE + VFEX';
   document.getElementById('topbar').classList.remove('admin-mode');
   document.getElementById('tbRight').innerHTML = '';
-  if (id==='investment') renderInvestment();
   if (id==='barchart') renderBarChart();
   if (id==='liquidity') renderLiquidity();
 }
