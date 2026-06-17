@@ -1445,11 +1445,11 @@ function renderBarChart() {
   const el = document.getElementById('barchartContent');
   const results = window.PS.filter(r => getInvValue(r) != null).map(r => ({...r, inv100: getInvValue(r)}));
   if (!results.length) { el.innerHTML='<div class="state-card"><div class="sc-icon">📊</div><h3>No investment data</h3><p>Data will appear after a snapshot with baseline is published.</p></div>'; return; }
-  results.sort((a,b) => a.inv100 - b.inv100);
+  results.sort((a,b) => b.inv100 - a.inv100);
   const mktF = document.getElementById('bcMktF')?.value || '';
   const cntF = parseInt(document.getElementById('bcCntF')?.value || '999') || 999;
   let filtered = mktF ? results.filter(r=>r.market===mktF) : results;
-  filtered = filtered.slice(-Math.min(cntF, filtered.length));
+  filtered = filtered.slice(0, Math.min(cntF, filtered.length));
   const investment = parseFloat(document.getElementById('investmentAmount')?.value || 100);
   const maxVal = Math.max(...filtered.map(r=>(r.inv100/100)*investment), investment*2);
   const MAXPX = 520;
