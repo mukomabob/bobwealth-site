@@ -140,12 +140,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);display:flex
 .sect-v{background:var(--gold-p);color:var(--gold-l);border-color:rgba(201,151,58,.2)}
 
 /* LIQUIDITY SCORE */
-.qscore{display:inline-block;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);min-width:28px;text-align:right}
-.qscore.qs-high{color:var(--gain)}
-.qscore.qs-mid {color:var(--gl)}
-.qscore.qs-low {color:var(--gold)}
-.qscore.qs-zero{color:var(--red)}
-.liq-score-bar{display:inline-block;height:4px;border-radius:2px;vertical-align:middle;margin-left:4px}
+.qscore{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;white-space:nowrap;letter-spacing:.04em}
+.qs-high{background:rgba(74,184,112,.12);color:var(--gain);border:1px solid rgba(74,184,112,.25)}
+.qs-mid {background:rgba(201,151,58,.1);color:var(--gold-l);border:1px solid rgba(201,151,58,.2)}
+.qs-zero{background:rgba(224,82,82,.1);color:var(--red);border:1px solid rgba(224,82,82,.2)}
 
 /* TABLES */
 .tw{overflow-x:auto}
@@ -686,33 +684,49 @@ const pC  = v => v>0?'up':v<0?'dn':'nc';
 
 // ─── LIQUIDITY SCORE ─────────────────────────────────────────────────────────
 function calcLiquidity(r) {
-  // Turnover ratio: value traded ÷ market cap (proxy; ZSE uses ZiG values)
+  // Turnover ratio: value traded ÷ market cap
   const mktCap = r.mktCapIBR || 0;
   const turnover = (mktCap > 0 && r.val > 0)
     ? Math.min(r.val / mktCap, 1)
     : 0;
 
-  // Volume activity: binary — did it trade at all?
+  // Volume activity: binary
   const activity = (r.vol > 0 && !r.suspended) ? 1 : 0;
 
-  // Weighted composite: turnover 75%, activity 25%
+  // Raw composite: turnover 75%, activity 25%
   const raw = (turnover * 75) + (activity * 25);
-  const score = Math.round(Math.min(100, raw));
 
   // Days to liquidate estimate
   const avgDailyVal = r.val > 0 ? r.val : 0;
-  const positionSize = 100;
   const dtl = avgDailyVal > 0
-    ? Math.max(1, Math.round(positionSize / (avgDailyVal * 0.1)))
+    ? Math.max(1, Math.round(100 / (avgDailyVal * 0.1)))
     : null;
 
-  return { score, dtl };
+  return { raw, dtl, tier: r._liqTier || 'Illiquid' };
 }
 
-const Q_SCORE_CELL = liq => {
-  const cls = liq.score >= 70 ? 'qs-high' : liq.score >= 40 ? 'qs-mid' : liq.score > 0 ? 'qs-low' : 'qs-zero';
-  return `<span class="qscore ${cls}" title="Liquidity Score: ${liq.score}/100">${liq.score}</span>`;
-};
+// Call once after PS is loaded — ranks all counters and stamps _liqTier
+function assignLiquidityTiers(rows) {
+  // Sort by raw score descending
+  const scores = rows.map(r => {
+    const mktCap = r.mktCapIBR || 0;
+    const turnover = (mktCap > 0 && r.val > 0) ? Math.min(r.val / mktCap, 1) : 0;
+    const activity = (r.vol > 0 && !r.suspended) ? 1 : 0;
+    return (turnover * 75) + (activity * 25);
+  });
+  const sorted = [...scores].sort((a, b) => b - a);
+  const n = sorted.length;
+  rows.forEach((r, i) => {
+    const rank = sorted.indexOf(scores[i]); // rank 0 = best
+    const pct = rank / n; // 0 = top, 1 = bottom
+    r._liqTier = pct < 0.33 ? 'Liquid' : pct < 0.67 ? 'Fairly Liquid' : 'Illiquid';
+  });
+}
+
+const TIER_CSS = { 'Liquid': 'qs-high', 'Fairly Liquid': 'qs-mid', 'Illiquid': 'qs-zero' };
+
+const Q_SCORE_CELL = liq =>
+  `<span class="qscore ${TIER_CSS[liq.tier] || 'qs-zero'}" title="Liquidity Tier: ${liq.tier}">${liq.tier}</span>`;
 
 const LIQ_DTL = dtl =>
   dtl != null ? (dtl === 1 ? '&lt;1d' : `~${dtl}d`) : '<span class="nc">—</span>';
@@ -896,6 +910,7 @@ function handleCurrentSheet(file) {
       const ws = wb.Sheets[wb.SheetNames[0]];
       const { rows, date } = parseSheet(XLSX.utils.sheet_to_json(ws, {header:1,defval:null}), file.name);
       window.PS = rows;
+      assignLiquidityTiers(window.PS);
       const zse = rows.filter(r => r.market==='ZSE').length;
       const vfex = rows.filter(r => r.market==='VFEX').length;
       document.getElementById('sbDate').textContent = date;
@@ -1038,6 +1053,7 @@ async function loadData() {
 
 function ingestSnapshot(data) {
   window.PS = data.counters || [];
+  assignLiquidityTiers(window.PS);
   const priceDate  = data.priceDate  || '';
   const baseDate   = data.baseDate   || '';
   const generated  = data.generated ? new Date(data.generated) : null;
@@ -1240,8 +1256,8 @@ function renderScreener() {
   else if(so==='vol_d')   D.sort((a,b)=>b.vol-a.vol);
   else if(so==='ytd_d')   D.sort((a,b)=>b.ytd-a.ytd);
   else if(so==='ytd_a')   D.sort((a,b)=>a.ytd-b.ytd);
-  else if(so==='liq_d')   D.sort((a,b)=>calcLiquidity(b).score-calcLiquidity(a).score);
-  else if(so==='liq_a')   D.sort((a,b)=>calcLiquidity(a).score-calcLiquidity(b).score);
+  else if(so==='liq_d')   D.sort((a,b)=>calcLiquidity(b).raw-calcLiquidity(a).raw);
+  else if(so==='liq_a')   D.sort((a,b)=>calcLiquidity(a).raw-calcLiquidity(b).raw);
   else if(so==='az')      D.sort((a,b)=>a.counter.localeCompare(b.counter));
 
   document.getElementById('tblScreener').innerHTML=D.map((r,i)=>{
@@ -1276,78 +1292,76 @@ function renderLiquidity() {
   }
 
   const D = filterBy(window.MKT_L).map(r => ({ ...r, _liq: calcLiquidity(r) }));
-  const sorted = [...D].sort((a,b) => b._liq.score - a._liq.score);
+
+  // Sort by raw score descending
+  const sorted = [...D].sort((a,b) => b._liq.raw - a._liq.raw);
 
   // KPI values
-  const mostLiquid   = sorted.length ? sorted[0] : null;
-  const marketQScore = D.length ? Math.round(D.reduce((s,r) => s + r._liq.score, 0) / D.length) : 0;
-  const activeCnt    = D.filter(r => r._liq.score > 0 && r.vol > 0).length;
-  const dtlValues    = D.map(r => r._liq.dtl).filter(v => v != null).sort((a,b) => a - b);
-  const medianDtl    = dtlValues.length ? dtlValues[Math.floor(dtlValues.length / 2)] : null;
+  const mostLiquid = sorted.length ? sorted[0] : null;
+  const liquidCnt      = D.filter(r => r._liqTier === 'Liquid').length;
+  const fairlyLiqCnt   = D.filter(r => r._liqTier === 'Fairly Liquid').length;
+  const illiquidCnt    = D.filter(r => r._liqTier === 'Illiquid').length;
+  const activeCnt      = D.filter(r => r.vol > 0 && !r.suspended).length;
+  const dtlValues      = D.map(r => r._liq.dtl).filter(v => v != null).sort((a,b) => a - b);
+  const medianDtl      = dtlValues.length ? dtlValues[Math.floor(dtlValues.length / 2)] : null;
 
   // Top 10 for chart
   const top10 = sorted.slice(0, 10);
 
   document.getElementById('liquidityContent').innerHTML = `
-    <div style="background:linear-gradient(135deg,var(--gd),var(--gm));border-radius:6px;padding:14px 20px;margin-bottom:16px;border:1px solid rgba(184,135,42,.2)">
-      <div style="font-family:var(--serif);font-size:13px;font-weight:700;color:var(--white);margin-bottom:4px">Liquidity Score — Quality of Exit Analysis</div>
-      <div style="font-size:10px;font-family:var(--mono);color:rgba(255,255,255,.6);line-height:1.7;max-width:740px">
-        Liquidity Score is Bob Wealth Holdings' proprietary liquidity metric. It measures the quality of exit available to investors by assessing trading activity, value traded and market capitalisation. Scores range from 0–100, with higher scores indicating stronger liquidity and more efficient execution.
+    <div style="background:linear-gradient(135deg,#0f1f16,#1a3326);border-radius:6px;padding:14px 20px;margin-bottom:16px;border:1px solid rgba(201,151,58,.2)">
+      <div style="font-family:var(--serif);font-size:13px;font-weight:700;color:var(--gold-l);margin-bottom:4px">Liquidity Score — Quality of Exit Analysis</div>
+      <div style="font-size:10px;font-family:var(--mono);color:var(--ts);line-height:1.7;max-width:740px">
+        Bob Wealth Holdings' proprietary liquidity ranking. Counters are classified as <strong style="color:var(--gain)">Liquid</strong>, <strong style="color:var(--gold-l)">Fairly Liquid</strong>, or <strong style="color:var(--red)">Illiquid</strong> based on their relative trading activity and value-to-market-cap ratio — ranked against all other counters in the same dataset.
       </div>
     </div>
     <div class="kpi-row k4">
       <div class="kc" style="--kca:var(--gold)">
         <div class="kc-lbl">Most Liquid Counter</div>
         <div class="kc-val" style="font-size:15px;color:var(--gold-l)">${mostLiquid ? mostLiquid.counter : '—'}</div>
-        <div class="kc-sub">${mostLiquid ? 'Liquidity Score ' + mostLiquid._liq.score : 'no data'}</div>
+        <div class="kc-sub">${mostLiquid ? mostLiquid._liqTier : 'no data'}</div>
       </div>
-      <div class="kc" style="--kca:var(--gl)">
-        <div class="kc-lbl">Market Liquidity Score</div>
-        <div class="kc-val" style="color:${marketQScore>=50?'var(--gain)':marketQScore>=25?'var(--gm)':'var(--red)'}">${marketQScore}</div>
-        <div class="kc-sub">market average / 100</div>
+      <div class="kc" style="--kca:var(--gain)">
+        <div class="kc-lbl">Liquid</div>
+        <div class="kc-val" style="color:var(--gain)">${liquidCnt}</div>
+        <div class="kc-sub">top third</div>
       </div>
       <div class="kc" style="--kca:var(--gd)">
         <div class="kc-lbl">Median Days Out</div>
-        <div class="kc-val">${medianDtl != null ? (medianDtl === 1 ? '<1' : '~' + medianDtl) : '—'}</div>
+        <div class="kc-val">${medianDtl != null ? (medianDtl === 1 ? '&lt;1' : '~' + medianDtl) : '—'}</div>
         <div class="kc-sub">trading days to exit</div>
       </div>
-      <div class="kc" style="--kca:var(--gain)">
-        <div class="kc-lbl">Active Counters</div>
-        <div class="kc-val" style="color:var(--gain)">${activeCnt}</div>
-        <div class="kc-sub">volume > 0 today</div>
+      <div class="kc" style="--kca:var(--red)">
+        <div class="kc-lbl">Illiquid</div>
+        <div class="kc-val" style="color:var(--red)">${illiquidCnt}</div>
+        <div class="kc-sub">bottom third</div>
       </div>
     </div>
     <div class="row c21">
       <div class="mc">
-        <div class="mc-title">Top 10 Liquidity Scores <span class="hint">highest quality of exit</span></div>
+        <div class="mc-title">Top 10 by Exit Quality <span class="hint">highest liquidity first</span></div>
         <div class="ch" style="height:260px"><canvas id="cLiqTop10"></canvas></div>
       </div>
       <div class="mc">
-        <div class="mc-title">Score Distribution</div>
+        <div class="mc-title">Tier Distribution</div>
         <div class="ch" style="height:260px"><canvas id="cLiqDist"></canvas></div>
       </div>
     </div>
     <div class="row c1">
       <div class="mc">
-        <div class="mc-title">Full Liquidity Score Ranking <span class="hint">all counters · best to worst exit quality</span></div>
+        <div class="mc-title">Full Liquidity Ranking <span class="hint">all counters · best to worst exit quality</span></div>
         <div class="tw">
           <table>
             <thead>
               <tr>
-                <th>Rank</th>
-                <th>Counter</th>
-                <th>Market</th>
-                <th>Sector</th>
-                <th>Mkt Cap (USD)</th>
-                <th>Value Traded</th>
-                <th>Score</th>
-                <th>Days Out †</th>
+                <th>Rank</th><th>Counter</th><th>Market</th><th>Sector</th>
+                <th>Mkt Cap (USD)</th><th>Value Traded</th><th>Liquidity</th><th>Days Out †</th>
               </tr>
             </thead>
             <tbody>
               ${sorted.map((r,i) => `
                 <tr>
-                  <td class="nc" style="font-weight:600;color:${i<3?'var(--gold)':'var(--ts)'}">${i+1}</td>
+                  <td class="nc" style="font-weight:600;color:${i<3?'var(--gold-l)':'var(--ts)'}">${i+1}</td>
                   <td class="tf hi">${r.counter}</td>
                   <td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td>
                   <td><span class="sect">${r.sector}</span></td>
@@ -1360,24 +1374,22 @@ function renderLiquidity() {
           </table>
         </div>
         <div style="margin-top:8px;font-size:9px;font-family:var(--mono);color:var(--ts);line-height:1.8">
-          Liquidity Score = weighted composite: trading activity 25% · value-to-market-cap ratio 75% · max 100. Bob Wealth Holdings proprietary metric.<br>
-          † Days Out: ZSE = directional estimate only (ZiG/USD conversion not applied). VFEX = USD native. Click counter name to add to Watchlist.
+          Tiers are percentile-ranked within the dataset: top 33% = Liquid · middle 33% = Fairly Liquid · bottom 33% = Illiquid. Bob Wealth Holdings proprietary metric.<br>
+          † Days Out: ZSE = directional estimate only (ZiG/USD conversion not applied). VFEX = USD native.
         </div>
       </div>
     </div>`;
 
-  // Chart: top 10 horizontal bar — colour by score intensity
-  const barColors = top10.map(r => {
-    const s = r._liq.score;
-    return s >= 70 ? '#1D6B3A' : s >= 40 ? '#3D7A56' : s > 0 ? '#B8872A' : '#C0392B';
-  });
+
+  // Chart: top 10 horizontal bar — colour by tier
+  const tierColor = r => r._liqTier === 'Liquid' ? '#4AB870' : r._liqTier === 'Fairly Liquid' ? '#C9973A' : '#E05252';
   mk('cLiqTop10', {
     type: 'bar',
     data: {
       labels: top10.map(r => r.counter),
       datasets: [{
-        data: top10.map(r => r._liq.score),
-        backgroundColor: barColors,
+        data: top10.map(r => r._liq.raw),
+        backgroundColor: top10.map(tierColor),
         borderRadius: 4,
       }]
     },
@@ -1387,32 +1399,23 @@ function renderLiquidity() {
       maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
-        tooltip: { ...TT, callbacks: { label: c => ' Liquidity Score: ' + c.raw + ' / 100' } }
+        tooltip: { ...TT, callbacks: { label: c => ' ' + top10[c.dataIndex]._liqTier } }
       },
       scales: {
-        x: { ...scX(), max: 100, ticks: { ...scX().ticks, callback: v => v } },
-        y: { grid: { display: false }, ticks: { color: '#1A1A1A', font: { family: 'DM Mono,monospace', size: 10 } } }
+        x: { display: false, grid: { display: false } },
+        y: { grid: { display: false }, ticks: { color: '#E8EDE9', font: { family: 'DM Mono,monospace', size: 10 } } }
       }
     }
   });
 
-  // Chart: score distribution — bucket into bands 0-19, 20-39, 40-59, 60-79, 80-100
-  const bands = ['0–19','20–39','40–59','60–79','80–100'];
-  const bandCounts = [
-    D.filter(r => r._liq.score <= 19).length,
-    D.filter(r => r._liq.score >= 20 && r._liq.score <= 39).length,
-    D.filter(r => r._liq.score >= 40 && r._liq.score <= 59).length,
-    D.filter(r => r._liq.score >= 60 && r._liq.score <= 79).length,
-    D.filter(r => r._liq.score >= 80).length,
-  ];
+  // Chart: tier distribution — simple 3-bar
   mk('cLiqDist', {
     type: 'bar',
     data: {
-      labels: bands,
+      labels: ['Liquid', 'Fairly Liquid', 'Illiquid'],
       datasets: [{
-        label: 'Counters',
-        data: bandCounts,
-        backgroundColor: ['#C0392B','#B8872A','#3D7A56','#2D5A40','#1D6B3A'],
+        data: [liquidCnt, fairlyLiqCnt, illiquidCnt],
+        backgroundColor: ['#4AB870', '#C9973A', '#E05252'],
         borderRadius: 4,
       }]
     },
@@ -1424,7 +1427,7 @@ function renderLiquidity() {
         tooltip: { ...TT, callbacks: { label: c => ' ' + c.raw + ' counters' } }
       },
       scales: {
-        x: { ...scX(), ticks: { ...scX().ticks } },
+        x: { ...scX() },
         y: { ...scY(v => v), ticks: { ...scY(v=>v).ticks, stepSize: 1 } }
       }
     }
@@ -1568,19 +1571,19 @@ function exportReport() {
       const h1=['Counter','ISIN','Market','Sector','Shares','Mkt Cap USD','Open','Close','USD@IBR','Change','% Change','Volume','Value (ZiG)','YTD G/L %','Div Yield %','Liquidity Score','Days to Exit'];
       const r1=window.PS.map(r=>{
         const liq=calcLiquidity(r);
-        return [r.counter.trim(),r.isin,r.market,r.sector,r.shares,+r.mktCapIBR.toFixed(2),r.open,r.close,r.usdIBR,r.chg,+r.chgPct.toFixed(4),r.vol,+r.val.toFixed(2),+(r.ytd*100).toFixed(2),+(r.divYield*100).toFixed(4),liq.score,liq.dtl||''];
+        return [r.counter.trim(),r.isin,r.market,r.sector,r.shares,+r.mktCapIBR.toFixed(2),r.open,r.close,r.usdIBR,r.chg,+r.chgPct.toFixed(4),r.vol,+r.val.toFixed(2),+(r.ytd*100).toFixed(2),+(r.divYield*100).toFixed(4),r._liqTier||'Illiquid',liq.dtl||''];
       });
       XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([h1,...r1]), 'PRICE DATA');
       if (Object.keys(window.BASE).length) {
-        const h2=['Counter','Market','Sector','Base Price (USD)','Current Price (USD)','$100 Value','Gain/Loss ($)','% Change','YTD G/L %','Liquidity Score','Days to Exit'];
-        const r2=window.PS.map(r=>{const iv=getInvValue(r);const b=window.BASE[r.counter.trim().toUpperCase()];const liq=calcLiquidity(r);return iv!=null?[r.counter.trim(),r.market,r.sector,b?+b.price.toFixed(6):null,+r.usdPrice.toFixed(6),+iv.toFixed(4),+(iv-100).toFixed(4),+(iv-100).toFixed(4),+(r.ytd*100).toFixed(2),liq.score,liq.dtl||'']:null;}).filter(Boolean).sort((a,b)=>b[5]-a[5]);
+        const h2=['Counter','Market','Sector','Base Price (USD)','Current Price (USD)','$100 Value','Gain/Loss ($)','% Change','YTD G/L %','Liquidity','Days to Exit'];
+        const r2=window.PS.map(r=>{const iv=getInvValue(r);const b=window.BASE[r.counter.trim().toUpperCase()];const liq=calcLiquidity(r);return iv!=null?[r.counter.trim(),r.market,r.sector,b?+b.price.toFixed(6):null,+r.usdPrice.toFixed(6),+iv.toFixed(4),+(iv-100).toFixed(4),+(iv-100).toFixed(4),+(r.ytd*100).toFixed(2),r._liqTier||'Illiquid',liq.dtl||'']:null;}).filter(Boolean).sort((a,b)=>b[5]-a[5]);
         XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([h2,...r2]), '$100 TRACKER');
       }
       // Liquidity Score Rankings sheet
-      const h3=['Rank','Counter','Market','Sector','Mkt Cap USD','Value Traded','Liquidity Score','Days to Exit'];
-      const r3=[...window.PS].sort((a,b)=>calcLiquidity(b).score-calcLiquidity(a).score).map((r,i)=>{
+      const h3=['Rank','Counter','Market','Sector','Mkt Cap USD','Value Traded','Liquidity','Days to Exit'];
+      const r3=[...window.PS].sort((a,b)=>calcLiquidity(b).raw-calcLiquidity(a).raw).map((r,i)=>{
         const liq=calcLiquidity(r);
-        return [i+1,r.counter.trim(),r.market,r.sector,+r.mktCapIBR.toFixed(2),+r.val.toFixed(2),liq.score,liq.dtl||''];
+        return [i+1,r.counter.trim(),r.market,r.sector,+r.mktCapIBR.toFixed(2),+r.val.toFixed(2),r._liqTier||'Illiquid',liq.dtl||''];
       });
       XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([h3,...r3]), 'LIQUIDITY SCORE RANKINGS');
       XLSX.writeFile(wb, `BobWealth_Markets_${date.replace(/-/g,'')}.xlsx`);
