@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Contact — Bob Wealth Holdings</title>
+<link rel="icon" type="image/png" href="images/bob_logo.png">
+<link rel="apple-touch-icon" href="images/bob_logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0E1110;
+  --surface:#161A17;
+  --surface-2:#1C2119;
+  --surface-3:#222720;
+  --border:#2A332A;
+  --bl:#242B23;
+  --gd:#1A3A2A;
+  --gm:#2D5A40;
+  --gl:#4A9464;
+  --gp:rgba(74,148,100,.12);
+  --gold:#C9973A;
+  --gold-l:#E0B455;
+  --gold-p:rgba(201,151,58,.1);
+  --white:#FFFFFF;
+  --text:#E8EDE9;
+  --tm:#9BA89C;
+  --ts:#5A6B5C;
+  --red:#E05252;
+  --gain:#4AB870;
+  --font:'DM Sans',sans-serif;
+  --mono:'DM Mono',monospace;
+  --serif:'Playfair Display',serif;
+}
+
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.6}
+
+/* ─── HEADER ─────────────────────────────────────────────────────────────── */
+.site-header{
+  background:#0A0E0B;border-bottom:2px solid var(--gold);
+  padding:0 40px;display:flex;align-items:center;justify-content:space-between;
+  height:62px;position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 24px rgba(0,0,0,.5);
+}
+.hd-brand{display:flex;align-items:center;gap:13px;text-decoration:none}
+.hd-logo{height:36px;width:36px;object-fit:contain}
+.hd-logo-fb{width:36px;height:36px;border-radius:4px;background:var(--gold);display:none;align-items:center;justify-content:center;font-family:var(--serif);font-size:17px;font-weight:700;color:#0A0E0B;flex-shrink:0}
+.hd-name{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--white);letter-spacing:.2px;line-height:1.1}
+.hd-name span{display:block;font-family:var(--mono);font-size:9px;font-weight:400;color:var(--gold-l);letter-spacing:.15em;text-transform:uppercase;margin-top:2px}
+.site-nav{display:flex;align-items:center;gap:3px}
+.site-nav a{color:rgba(255,255,255,.5);font-size:12px;font-weight:500;text-decoration:none;padding:6px 13px;border-radius:3px;transition:all .15s;letter-spacing:.02em}
+.site-nav a:hover{color:var(--white);background:rgba(255,255,255,.06)}
+.site-nav a.active{color:var(--white);background:rgba(201,151,58,.18);border:1px solid rgba(201,151,58,.35)}
+
+/* ─── HERO ───────────────────────────────────────────────────────────────── */
+.hero{
+  min-height:40vh;display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;background:#0A0E0B;
+}
+.hero-bg{
+  position:absolute;inset:0;background:#0A0E0B;
+}
+.hero-content{
+  position:relative;z-index:1;text-align:center;
+  padding:60px 24px 48px;max-width:560px;
+}
+.hero-eyebrow{
+  font-family:var(--mono);font-size:9px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--gold-l);margin-bottom:14px;
+}
+.hero h1{
+  font-family:var(--serif);font-size:clamp(30px,5vw,48px);font-weight:700;
+  color:var(--white);line-height:1.1;margin-bottom:14px;
+}
+.hero-sub{font-size:14px;color:var(--tm);line-height:1.75;max-width:400px;margin:0 auto}
+
+/* ─── SHARED ─────────────────────────────────────────────────────────────── */
+.gold-rule{width:48px;height:2px;background:var(--gold);margin:0 auto 24px;border-radius:2px}
+
+/* ─── CONTACT LAYOUT ─────────────────────────────────────────────────────── */
+.contact-section{
+  padding:72px 40px 100px;
+}
+.contact-inner{
+  max-width:960px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1.6fr;gap:40px;align-items:start;
+}
+
+/* ─── CONTACT INFO ───────────────────────────────────────────────────────── */
+.contact-info{display:flex;flex-direction:column;gap:16px}
+.info-eyebrow{
+  font-family:var(--mono);font-size:9px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ts);margin-bottom:6px;
+}
+.info-title{
+  font-family:var(--serif);font-size:26px;font-weight:700;
+  color:var(--white);line-height:1.2;margin-bottom:8px;
+}
+.info-body{font-size:14px;color:var(--tm);line-height:1.8;margin-bottom:8px}
+
+.contact-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:6px;padding:18px 20px;
+  display:flex;align-items:flex-start;gap:14px;
+}
+.contact-card-icon{
+  font-size:18px;flex-shrink:0;margin-top:2px;
+}
+.contact-card-body{}
+.contact-card-label{
+  font-family:var(--mono);font-size:9px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ts);margin-bottom:4px;
+}
+.contact-card-value{
+  font-size:13px;color:var(--text);font-weight:500;
+}
+.contact-card-value a{
+  color:var(--gold-l);text-decoration:none;transition:color .14s;
+}
+.contact-card-value a:hover{color:var(--white)}
+
+/* ─── FORM ───────────────────────────────────────────────────────────────── */
+.contact-form-wrap{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;padding:36px 32px;
+}
+.form-title{
+  font-family:var(--serif);font-size:20px;font-weight:700;
+  color:var(--white);margin-bottom:24px;
+}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.form-group:last-of-type{margin-bottom:0}
+.form-label{
+  font-family:var(--mono);font-size:9px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ts);
+}
+.form-input,.form-select,.form-textarea{
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:4px;padding:10px 14px;
+  color:var(--text);font-family:var(--font);font-size:13px;
+  outline:none;transition:border-color .14s;width:100%;
+}
+.form-input:focus,.form-select:focus,.form-textarea:focus{
+  border-color:var(--gl);
+}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--ts)}
+.form-select{cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235A6B5C' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+  padding-right:32px;
+}
+.form-select option{background:var(--surface-2);color:var(--text)}
+.form-textarea{resize:vertical;min-height:120px;line-height:1.6}
+.form-submit{
+  width:100%;margin-top:20px;
+  background:var(--gold);color:#0A0E0B;border:none;
+  font-family:var(--font);font-size:13px;font-weight:700;
+  padding:13px 24px;border-radius:4px;cursor:pointer;
+  letter-spacing:.04em;transition:background .14s;
+}
+.form-submit:hover{background:var(--gold-l)}
+.form-note{
+  font-family:var(--mono);font-size:9px;color:var(--ts);
+  margin-top:12px;text-align:center;line-height:1.6;
+}
+
+/* ─── SUCCESS STATE ──────────────────────────────────────────────────────── */
+.form-success{
+  display:none;text-align:center;padding:40px 20px;
+}
+.form-success .success-icon{font-size:40px;margin-bottom:16px}
+.form-success h3{
+  font-family:var(--serif);font-size:20px;font-weight:700;
+  color:var(--gain);margin-bottom:10px;
+}
+.form-success p{font-size:13px;color:var(--tm);line-height:1.7}
+
+/* ─── FOOTER ─────────────────────────────────────────────────────────────── */
+.site-footer{
+  background:#0A0E0B;border-top:1px solid var(--border);
+  padding:28px 40px;display:flex;align-items:center;
+  justify-content:space-between;flex-wrap:wrap;gap:12px;
+}
+.footer-brand{font-family:var(--mono);font-size:10px;color:var(--ts);letter-spacing:.06em}
+.footer-links{display:flex;gap:20px}
+.footer-links a{
+  font-family:var(--mono);font-size:10px;color:var(--ts);
+  text-decoration:none;letter-spacing:.04em;transition:color .14s;
+}
+.footer-links a:hover{color:var(--tm)}
+
+/* ─── MOBILE ─────────────────────────────────────────────────────────────── */
+@media(max-width:768px){
+  .site-header{padding:0 18px;height:54px}
+  .hd-name span{display:none}
+  .site-nav a{padding:5px 9px;font-size:11px}
+  .contact-section{padding:48px 20px 72px}
+  .contact-inner{grid-template-columns:1fr;gap:28px}
+  .form-row{grid-template-columns:1fr}
+  .contact-form-wrap{padding:24px 20px}
+  .site-footer{flex-direction:column;align-items:flex-start;gap:16px;padding:24px 20px}
+}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <a href="index.html" class="hd-brand">
+    <img src="images/bob_logo.png" class="hd-logo" alt="Bob Wealth"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="hd-logo-fb">B</div>
+    <div class="hd-name">Bob Wealth Holdings<span>Wealth · Purpose · Impact</span></div>
+  </a>
+  <nav class="site-nav">
+    <a href="index.html">Home</a>
+    <a href="markets">Markets</a>
+    <a href="impact">Impact</a>
+    <a href="contact" class="active">Contact</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Bob Wealth Holdings</div>
+    <h1>Get in Touch</h1>
+    <p class="hero-sub">Questions, partnerships, or market enquiries — we'd love to hear from you.</p>
+  </div>
+</section>
+
+<!-- CONTACT BODY -->
+<section class="contact-section">
+  <div class="contact-inner">
+
+    <!-- LEFT — Info -->
+    <div class="contact-info">
+      <div>
+        <div class="info-eyebrow">Contact</div>
+        <h2 class="info-title">Let's Start a Conversation</h2>
+        <p class="info-body">
+          Whether you have questions about Zimbabwe's markets, want to explore a partnership, 
+          or are simply curious about what we do — reach out and we'll get back to you.
+        </p>
+      </div>
+
+      <div class="contact-card">
+        <div class="contact-card-icon">✉</div>
+        <div class="contact-card-body">
+          <div class="contact-card-label">Email</div>
+          <div class="contact-card-value">
+            <a href="mailto:admin@bobwealth.org">admin@bobwealth.org</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-card">
+        <div class="contact-card-icon">🌐</div>
+        <div class="contact-card-body">
+          <div class="contact-card-label">Markets Dashboard</div>
+          <div class="contact-card-value">
+            <a href="markets.html">bobwealth.org/markets</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-card">
+        <div class="contact-card-icon">📍</div>
+        <div class="contact-card-body">
+          <div class="contact-card-label">Based In</div>
+          <div class="contact-card-value">Harare, Zimbabwe</div>
+        </div>
+      </div>
+
+      <div style="background:linear-gradient(135deg,#0f1f16,#1a3326);border:1px solid rgba(201,151,58,.18);border-radius:6px;padding:18px 20px;margin-top:4px">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ts);margin-bottom:8px">Response Time</div>
+        <div style="font-size:13px;color:var(--tm);line-height:1.7">
+          We typically respond within <strong style="color:var(--gold-l)">24–48 hours</strong> on business days.
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT — Form -->
+    <div class="contact-form-wrap">
+      <div class="form-title">Send a Message</div>
+
+      <form id="contactForm" action="https://formspree.io/f/mgvygpop" method="POST">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="firstName">First Name</label>
+            <input class="form-input" type="text" id="firstName" name="firstName" placeholder="Tinashe" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="lastName">Last Name</label>
+            <input class="form-input" type="text" id="lastName" name="lastName" placeholder="Moyo" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <input class="form-input" type="email" id="email" name="email" placeholder="you@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="subject">Subject</label>
+          <select class="form-select" id="subject" name="subject" required>
+            <option value="" disabled selected>Select a topic…</option>
+            <option value="Markets Enquiry">Markets Enquiry</option>
+            <option value="Partnership">Partnership Opportunity</option>
+            <option value="Investment">Investment Discussion</option>
+            <option value="Media">Media &amp; Press</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="message">Message</label>
+          <textarea class="form-textarea" id="message" name="message" placeholder="Tell us what's on your mind…" required></textarea>
+        </div>
+
+        <!-- Hidden field to route to admin@bobwealth.org -->
+        <input type="hidden" name="_replyto" value="admin@bobwealth.org">
+        <input type="hidden" name="_subject" id="hiddenSubject" value="New message from bobwealth.org">
+
+        <button type="submit" class="form-submit">Send Message →</button>
+        <p class="form-note">Your message is sent directly to admin@bobwealth.org</p>
+
+      </form>
+
+      <div class="form-success" id="formSuccess">
+        <div class="success-icon">✓</div>
+        <h3>Message Sent</h3>
+        <p>Thanks for reaching out. We'll be in touch within 24–48 hours.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-brand">© <span id="year"></span> Bob Wealth Holdings · All rights reserved</div>
+  <nav class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="markets">Markets</a>
+    <a href="impact">Impact</a>
+    <a href="contact">Contact</a>
+  </nav>
+</footer>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// Update hidden subject field with the selected topic
+document.getElementById('subject').addEventListener('change', function() {
+  document.getElementById('hiddenSubject').value = 'Bob Wealth Enquiry: ' + this.value;
+});
+
+// Show success state after Formspree submission
+const form = document.getElementById('contactForm');
+form.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const data = new FormData(form);
+  try {
+    const res = await fetch(form.action, {
+      method: 'POST',
+      body: data,
+      headers: { 'Accept': 'application/json' }
+    });
+    if (res.ok) {
+      form.style.display = 'none';
+      document.getElementById('formSuccess').style.display = 'block';
+    } else {
+      // Fallback — submit normally
+      form.submit();
+    }
+  } catch(err) {
+    form.submit();
+  }
+});
+</script>
+
+</body>
+</html>
