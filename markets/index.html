@@ -450,7 +450,7 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
         <div class="mc">
           <div class="mc-title">All Counters <span class="hint">click name to add to watchlist</span>
             <span style="float:right;display:flex;gap:6px;align-items:center">
-              <input type="text" id="scrSearch" placeholder="Search…" oninput="renderScreener()" style="background:var(--white);border:1.5px solid var(--border);border-radius:4px;padding:4px 8px;color:var(--text);font-family:var(--mono);font-size:10px;outline:none;width:140px">
+              <input type="text" id="scrSearch" placeholder="Search…" oninput="debouncedRenderScreener()" style="background:var(--white);border:1.5px solid var(--border);border-radius:4px;padding:4px 8px;color:var(--text);font-family:var(--mono);font-size:10px;outline:none;width:140px">
               <select id="scrSect" onchange="renderScreener()" style="background:var(--white);border:1.5px solid var(--border);border-radius:4px;padding:4px 8px;color:var(--text);font-family:var(--mono);font-size:10px;outline:none"><option value="">All Sectors</option></select>
               <select id="scrSort" onchange="renderScreener()" style="background:var(--white);border:1.5px solid var(--border);border-radius:4px;padding:4px 8px;color:var(--text);font-family:var(--mono);font-size:10px;outline:none">
                 <option value="mktcap_d">Mkt Cap ↓</option>
@@ -715,17 +715,15 @@ const pC  = v => v>0?'up':v<0?'dn':'nc';
 
 // ─── LIQUIDITY SCORE ─────────────────────────────────────────────────────────
 function calcLiquidity(r) {
-  // Turnover ratio: value traded ÷ market cap
-  const mktCap = r.mktCapIBR || 0;
-  const turnover = (mktCap > 0 && r.val > 0)
-    ? Math.min(r.val / mktCap, 1)
-    : 0;
-
-  // Volume activity: binary
-  const activity = (r.vol > 0 && !r.suspended) ? 1 : 0;
-
-  // Raw composite: turnover 75%, activity 25%
-  const raw = (turnover * 75) + (activity * 25);
+  // Uses the raw score cached by assignLiquidityTiers (avoids recomputing on every call).
+  // Falls back to a fresh calc only if tiers haven't been assigned yet (e.g. stray row).
+  let raw = r._liqRaw;
+  if (raw == null) {
+    const mktCap = r.mktCapIBR || 0;
+    const turnover = (mktCap > 0 && r.val > 0) ? Math.min(r.val / mktCap, 1) : 0;
+    const activity = (r.vol > 0 && !r.suspended) ? 1 : 0;
+    raw = (turnover * 75) + (activity * 25);
+  }
 
   // Days to liquidate estimate
   const avgDailyVal = r.val > 0 ? r.val : 0;
@@ -736,21 +734,23 @@ function calcLiquidity(r) {
   return { raw, dtl, tier: r._liqTier || 'Illiquid' };
 }
 
-// Call once after PS is loaded — ranks all counters and stamps _liqTier
+// Call once after PS is loaded — ranks all counters and stamps _liqTier + _liqRaw
 function assignLiquidityTiers(rows) {
-  // Sort by raw score descending
   const scores = rows.map(r => {
     const mktCap = r.mktCapIBR || 0;
     const turnover = (mktCap > 0 && r.val > 0) ? Math.min(r.val / mktCap, 1) : 0;
     const activity = (r.vol > 0 && !r.suspended) ? 1 : 0;
     return (turnover * 75) + (activity * 25);
   });
-  const sorted = [...scores].sort((a, b) => b - a);
-  const n = sorted.length;
-  rows.forEach((r, i) => {
-    const rank = sorted.indexOf(scores[i]); // rank 0 = best
+  const n = rows.length;
+  // Sort indices by score descending once — avoids O(n^2) indexOf lookups per row,
+  // and correctly handles rows that share an identical score (indexOf would always
+  // return the first match's rank for every tied row).
+  const idxByRank = rows.map((_, i) => i).sort((a, b) => scores[b] - scores[a]);
+  idxByRank.forEach((origIdx, rank) => {
     const pct = rank / n; // 0 = top, 1 = bottom
-    r._liqTier = pct < 0.33 ? 'Liquid' : pct < 0.67 ? 'Fairly Liquid' : 'Illiquid';
+    rows[origIdx]._liqRaw = scores[origIdx];
+    rows[origIdx]._liqTier = pct < 0.33 ? 'Liquid' : pct < 0.67 ? 'Fairly Liquid' : 'Illiquid';
   });
 }
 
@@ -1321,7 +1321,22 @@ function setMktMovers(m,el){ window.MKT_M=m; hlBtn(el); renderMovers(); }
 function setMktLiq(m,el)   { window.MKT_L=m; hlBtn(el); renderLiquidity(); }
 function hlBtn(el) { el.parentNode.querySelectorAll('.mkt-btn').forEach(b=>b.classList.remove('on')); el.classList.add('on'); }
 
-function mk(id,cfg) { if(CH[id]){CH[id].destroy();delete CH[id];} const cv=document.getElementById(id); if(!cv)return; CH[id]=new Chart(cv,cfg); return CH[id]; }
+function mk(id,cfg) {
+  const cv=document.getElementById(id); if(!cv) return;
+  // If a chart of the same type already lives here, update its data in place instead of
+  // destroying/recreating — avoids visible flicker on frequent re-renders (e.g. typing
+  // in the investment amount field re-triggers this several times a second).
+  if (CH[id] && CH[id].config.type === cfg.type) {
+    const ch = CH[id];
+    ch.data = cfg.data;
+    if (cfg.options) ch.options = cfg.options;
+    ch.update();
+    return ch;
+  }
+  if (CH[id]) { CH[id].destroy(); delete CH[id]; }
+  CH[id]=new Chart(cv,cfg);
+  return CH[id];
+}
 const scX = () => ({grid:{display:false},ticks:{color:'#5A6B5C',font:{family:'DM Mono,monospace',size:10},maxRotation:30}});
 const scY = cb => ({grid:{color:'rgba(42,51,42,.8)'},ticks:{color:'#5A6B5C',font:{family:'DM Mono,monospace',size:10},callback:cb}});
 
@@ -1365,6 +1380,12 @@ function renderMovers() {
   const row=(r,i,cls,sign)=>`<tr><td class="nc">${i+1}</td><td class="tf hi">${r.counter}</td><td><span class="sect">${r.sector}</span></td><td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td><td>${r.open!=null?fP2(r.open):'—'}</td><td class="hi">${fP2(r.close)}</td><td class="${cls}">${sign}${fP2(r.chg)}</td><td class="${cls}">${cls==='up'?'▲ +':'▼ '}${Math.abs(r.chgPct).toFixed(2)}%</td><td class="${pC(r.ytd)}">${(r.ytd*100).toFixed(1)}%</td></tr>`;
   document.getElementById('tblGainers').innerHTML=gainers.length?gainers.map((r,i)=>row(r,i,'up','+')).join(''):'<tr><td colspan="9" style="color:var(--ts);text-align:center;padding:24px">No gainers.</td></tr>';
   document.getElementById('tblLosers').innerHTML=losers.length?losers.map((r,i)=>row(r,i,'dn','')).join(''):'<tr><td colspan="9" style="color:var(--ts);text-align:center;padding:24px">No losers.</td></tr>';
+}
+
+let _scrDebounceTimer = null;
+function debouncedRenderScreener() {
+  clearTimeout(_scrDebounceTimer);
+  _scrDebounceTimer = setTimeout(renderScreener, 150);
 }
 
 function renderScreener() {
