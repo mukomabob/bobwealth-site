@@ -35,6 +35,7 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MARKET_DATA_PATH = os.path.join(REPO_ROOT, "market-data.json")
 BASELINE_PATH = os.path.join(REPO_ROOT, "Price Sheet 06.01.26.xlsx")
 BASELINE_FNAME = "Price_Sheet_06_01_26.xlsx"  # underscored on purpose — see sheet_date()
+SHEETS_DIR = os.path.join(REPO_ROOT, "data", "fbc-sheets")  # archive for the predictions pipeline
 
 FBC_SENDER = "FBCSECURITIESRESEARCH@fbc.co.zw"
 HARARE = ZoneInfo("Africa/Harare")
@@ -229,6 +230,14 @@ def main():
 
     date_match = re.search(r"\d{2}\.\d{2}\.\d{2}", fname)
     parse_fname = f"{date_match.group(0)}.xlsx" if date_match else fname
+
+    # Archive the raw sheet for the predictions pipeline (generate_predictions.py
+    # reads every file here to rebuild the full training history). Written
+    # unconditionally so a re-poll of the same day's email just overwrites it
+    # with identical bytes — no-op for git.
+    os.makedirs(SHEETS_DIR, exist_ok=True)
+    with open(os.path.join(SHEETS_DIR, parse_fname), "wb") as f:
+        f.write(blob)
 
     # idempotency: skip if we've already published today's date
     if os.path.exists(MARKET_DATA_PATH):
