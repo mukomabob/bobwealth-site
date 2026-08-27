@@ -1,0 +1,52 @@
+name: Publish daily FBC price sheet
+
+on:
+  schedule:
+    # Hourly, 06:00–15:00 Harare time (UTC+2 -> 04:00-13:00 UTC), weekdays only.
+    # FBC's send time varies day to day, so we poll rather than assume one slot;
+    # the script is a no-op if today's email hasn't arrived yet or was already published.
+    - cron: '0 4-13 * * 1-5'
+  workflow_dispatch: {}   # lets you trigger a run manually from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install openpyxl
+
+      - name: Fetch + parse + write market-data.json
+        id: publish
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: python scripts/publish_fbc_prices.py
+
+      - name: Commit and push if market-data.json changed
+        run: |
+          if git diff --quiet -- market-data.json; then
+            echo "No changes to market-data.json — skipping commit."
+            exit 0
+          fi
+          git config user.name "fbc-price-bot"
+          git config user.email "actions@users.noreply.github.com"
+          PRICE_DATE=$(python -c "import json;print(json.load(open('market-data.json'))['priceDate'])")
+          git add market-data.json
+          git commit -m "market-data: ${PRICE_DATE}"
+          git push
+
+      - name: Purge jsDelivr CDN cache
+        if: success()
+        run: |
+          curl -s "https://purge.jsdelivr.net/gh/${{ github.repository }}@${{ github.ref_name }}/market-data.json" || true
