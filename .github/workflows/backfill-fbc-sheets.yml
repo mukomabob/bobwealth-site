@@ -1,0 +1,44 @@
+name: Backfill FBC price-sheet history from Gmail
+
+# Manual only, on purpose -- this pulls FULL history out of Gmail so
+# generate_predictions.py has every trading day to learn from, not just
+# whichever days were manually saved to Drive. It's not part of the daily
+# schedule; run it once from the Actions tab, and again any time you
+# suspect a gap (already-archived dates are left untouched, so re-running
+# is always safe and only fills in what's missing).
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Pull every historical FBC sheet from Gmail
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: python scripts/backfill_fbc_sheets.py
+
+      - name: Commit and push if anything new was archived
+        run: |
+          git add data/fbc-sheets
+          if git diff --cached --quiet; then
+            echo "Nothing new to archive — skipping commit."
+            exit 0
+          fi
+          git config user.name "fbc-price-bot"
+          git config user.email "actions@users.noreply.github.com"
+          COUNT=$(git diff --cached --name-only | wc -l | tr -d ' ')
+          git commit -m "backfill: archive ${COUNT} historical FBC sheet(s) from Gmail"
+          git push
