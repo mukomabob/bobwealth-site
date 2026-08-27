@@ -1,4 +1,4 @@
-name: Publish daily FBC price sheet
+name: Publish daily FBC prices + ML predictions
 
 on:
   schedule:
@@ -24,29 +24,33 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        run: pip install openpyxl
+        run: pip install openpyxl pandas scikit-learn
 
-      - name: Fetch + parse + write market-data.json
+      - name: Fetch + parse + archive today's sheet, write market-data.json
         id: publish
         env:
           GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: python scripts/publish_fbc_prices.py
 
-      - name: Commit and push if market-data.json changed
+      - name: Retrain + write predictions.json from the accumulated sheet history
+        run: python scripts/generate_predictions.py
+
+      - name: Commit and push if anything changed
         run: |
-          if git diff --quiet -- market-data.json; then
-            echo "No changes to market-data.json — skipping commit."
+          git add market-data.json predictions.json data/fbc-sheets
+          if git diff --cached --quiet; then
+            echo "Nothing changed — skipping commit."
             exit 0
           fi
           git config user.name "fbc-price-bot"
           git config user.email "actions@users.noreply.github.com"
           PRICE_DATE=$(python -c "import json;print(json.load(open('market-data.json'))['priceDate'])")
-          git add market-data.json
-          git commit -m "market-data: ${PRICE_DATE}"
+          git commit -m "market-data + predictions: ${PRICE_DATE}"
           git push
 
       - name: Purge jsDelivr CDN cache
         if: success()
         run: |
           curl -s "https://purge.jsdelivr.net/gh/${{ github.repository }}@${{ github.ref_name }}/market-data.json" || true
+          curl -s "https://purge.jsdelivr.net/gh/${{ github.repository }}@${{ github.ref_name }}/predictions.json" || true
