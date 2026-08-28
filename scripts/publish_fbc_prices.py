@@ -24,7 +24,7 @@ import math
 import os
 import re
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from email.header import decode_header
 from io import BytesIO
 from zoneinfo import ZoneInfo
@@ -184,10 +184,23 @@ def decode_str(s):
     return "".join(out)
 
 
-def fetch_todays_attachment():
-    """Returns (filename, bytes) for today's FBC price-sheet attachment, or (None, None)."""
-    today_harare = datetime.now(HARARE).date()
-    imap_date = today_harare.strftime("%d-%b-%Y")  # IMAP SINCE wants e.g. 27-Aug-2026
+def fetch_latest_attachment():
+    """Returns (filename, bytes) for the most recent FBC price-sheet attachment
+    found in the last few days, or (None, None).
+
+    Deliberately does NOT restrict the IMAP search to "today" only: FBC's send
+    time has drifted later and later (observed as late as ~14:52 UTC / 16:52
+    Harare in practice, well past a same-day polling window that stops
+    earlier), so a same-day-only search can permanently miss a day's sheet
+    the moment it arrives after the last scheduled tick -- the next day's
+    "since today" search would then no longer include it. Searching back a
+    few days and picking the NEWEST matching attachment is safe because the
+    actual price date is read from the attachment's own filename (not the
+    email's arrival date) and main() already skips re-publishing a date
+    that's already in market-data.json.
+    """
+    since_date = (datetime.now(HARARE) - timedelta(days=5)).date()
+    imap_date = since_date.strftime("%d-%b-%Y")  # IMAP SINCE wants e.g. 22-Aug-2026
 
     addr = os.environ["GMAIL_ADDRESS"]
     app_pw = os.environ["GMAIL_APP_PASSWORD"]
@@ -223,9 +236,9 @@ def fetch_todays_attachment():
 
 # ─── main ────────────────────────────────────────────────────────────────────
 def main():
-    fname, blob = fetch_todays_attachment()
+    fname, blob = fetch_latest_attachment()
     if not blob:
-        print("No FBC price-sheet email found yet today — nothing to do.")
+        print("No FBC price-sheet email found in the last 5 days — nothing to do.")
         return 0
 
     date_match = re.search(r"\d{2}\.\d{2}\.\d{2}", fname)
