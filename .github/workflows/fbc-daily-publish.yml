@@ -1,16 +1,16 @@
-name: Publish daily FBC prices + ML predictions
+name: Publish daily FBC prices + ML predictions (v2)
 
 on:
   schedule:
-    # Hourly, 06:00–22:00 Harare time (UTC+2 -> 04:00-20:00 UTC), weekdays only.
-    # FBC's actual send time has been drifting later (observed as late as
-    # ~16:52 Harare in practice), so this window runs well past that with
-    # margin. The script itself searches the last several days (not just
-    # "today"), so a still-later send just gets picked up on the next tick
-    # rather than being silently missed until the following day.
+    # Hourly, 06:00-22:00 Harare time (UTC+2 -> 04:00-20:00 UTC), weekdays only.
+    # Recreated under a new filename on 2026-08-31 after the original
+    # fbc-daily-publish.yml's schedule trigger stopped firing (fired once on
+    # 2026-08-27, then went silent through ~12+ elapsed windows) despite a
+    # valid, unmodified cron and no Actions/billing restriction -- a known
+    # GitHub Actions scheduler quirk where a workflow can silently fail to
+    # re-arm. Recreating under a fresh path forces a clean registration.
     - cron: '0 4-20 * * 1-5'
   workflow_dispatch: {}   # lets you trigger a run manually from the Actions tab
-    # re-armed 2026-08-31 -- trivial edit to force GitHub to re-register the cron schedule after it silently stopped firing
 
 permissions:
   contents: write
@@ -44,7 +44,7 @@ jobs:
         run: |
           git add market-data.json predictions.json data/fbc-sheets
           if git diff --cached --quiet; then
-            echo "Nothing changed — skipping commit."
+            echo "Nothing changed -- skipping commit."
             exit 0
           fi
           git config user.name "fbc-price-bot"
