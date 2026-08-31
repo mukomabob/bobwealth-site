@@ -10,6 +10,7 @@ on:
     # rather than being silently missed until the following day.
     - cron: '0 4-20 * * 1-5'
   workflow_dispatch: {}   # lets you trigger a run manually from the Actions tab
+    # re-armed 2026-08-31 -- trivial edit to force GitHub to re-register the cron schedule after it silently stopped firing
 
 permissions:
   contents: write
