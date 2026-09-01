@@ -1,4 +1,4 @@
-name: Publish daily FBC prices + ML predictions (v2)
+name: Publish daily FBC prices + ML predictions
 
 on:
   schedule:
