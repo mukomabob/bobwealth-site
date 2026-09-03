@@ -81,6 +81,18 @@ ROWS_TO_DROP = {
     "No liability is accepted by FBC Securities (Private) Limited for any errors in this report.",
 }
 
+# The sheet ends with a "Top Gainers/Losers" leaderboard block that packs four
+# unrelated mini-tables side by side per row (name, price, blank, %change,
+# repeated) -- a completely different layout from the rest of the sheet. Its
+# first cell is just a normal-looking company name (whoever tops the
+# leaderboard that day), so there's no way to recognize those rows as junk
+# individually -- ROWS_TO_DROP above only ever caught the section's own
+# header row, and FBC's stray trailing tabs/whitespace on that header
+# ("ZSE Top Gainers\t\t") even made that match unreliable. Once this header
+# is seen, there's nothing usable left in the file, so each sheet is cut
+# there entirely rather than filtered row-by-row.
+HARD_STOP_RE = re.compile(r"ZSE TOP|VFEX TOP|THIS PRICE SHEET", re.IGNORECASE)
+
 VFEX_COUNTERS = {
     "BINDURA", "PADENGA", "CALEDONIA", "SEEDCO INTL",
     "AFRICAN SUN", "AXIA", "INNSCOR", "NATFOODS",
@@ -131,6 +143,16 @@ def load_sheets(sheets_dir):
             df.dropna(how="all", inplace=True)
             df.reset_index(drop=True, inplace=True)
             df.columns = df.columns.astype(str).str.replace("\n", " ", regex=False).str.strip()
+
+            # Cut the sheet before the "Top Gainers/Losers" leaderboard block --
+            # see HARD_STOP_RE above. df's index is a plain 0..N-1 range after
+            # reset_index(), so the first matching position also works as an
+            # iloc cutoff.
+            hard_stop_rows = df.index[
+                df["COUNTER"].astype(str).str.contains(HARD_STOP_RE, na=False)
+            ]
+            if len(hard_stop_rows):
+                df = df.iloc[: hard_stop_rows[0]]
 
             date_match = re.search(r"(\d{2}[._]\d{2}[._]\d{2})\.xlsx", file_name)
             if date_match:
@@ -424,3 +446,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
