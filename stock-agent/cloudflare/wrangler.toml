@@ -11,7 +11,7 @@ compatibility_date = "2026-09-03"
 [[d1_databases]]
 binding = "DB"
 database_name = "fbc-history"
-database_id = "REPLACE_WITH_YOUR_DATABASE_ID"
+database_id = "2ea92d8b-8711-4d6e-89a2-878326f8da4d"
 
 # Workers AI -- runs the text-to-SQL and SQL-to-answer steps. No separate
 # API key needed; this binding is enough.
