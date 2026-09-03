@@ -40,11 +40,25 @@ SHEETS_DIR = os.path.join(REPO_ROOT, "data", "fbc-sheets")  # archive for the pr
 FBC_SENDER = "FBCSECURITIESRESEARCH@fbc.co.zw"
 HARARE = ZoneInfo("Africa/Harare")
 
-EXCLUDED_SECTORS = {"Fixed Term  Bond", "Riet", "Reit", "Derivative"}
+EXCLUDED_SECTORS = {"Fixed Term  Bond", "Derivative"}
+
+# Rows whose first cell just introduces a sub-section (e.g. "VFEX REITS (USD$)")
+# -- skip that one row, but the real counter rows right after it use the same
+# column layout as the main sheet, so keep reading normally.
 EXCLUDED_ROW_RE = re.compile(
-    r"VFEX BONDS|VFEX REITS|VFEX ETF|ZSE ETF|ZSE REIT|ZSE TOP|THIS PRICE SHEET",
+    r"VFEX BONDS|VFEX REITS|VFEX ETF|ZSE ETF|ZSE REIT",
     re.IGNORECASE,
 )
+
+# Rows that mark the start of the "Top Gainers/Losers" leaderboard block (and
+# the trailing disclaimer after it). That block packs four unrelated
+# mini-tables side by side per row (name, price, blank, %change, repeated),
+# so it can't be read with the normal single-counter column layout -- and
+# because its first cell is just a normal-looking company name (whoever is
+# topping the leaderboard that day), earlier code had no way to tell those
+# rows apart from real ones. Once we see this, there's nothing usable left
+# in the file, so stop reading entirely instead of skipping row-by-row.
+HARD_STOP_RE = re.compile(r"ZSE TOP|VFEX TOP|THIS PRICE SHEET", re.IGNORECASE)
 
 
 # ─── numeric helpers (mirror JS parseFloat(...)||0 / ||null quirks) ──────────
@@ -106,6 +120,8 @@ def parse_sheet(raw, fname):
         first = str(r[0]).strip()
         if not first:
             continue
+        if HARD_STOP_RE.search(first):
+            break
         if "VFEX PRICE SHEET" in first.upper():
             mkt = "VFEX"
             continue
@@ -175,7 +191,7 @@ def load_baseline():
     return base, date
 
 
-# ─── Gmail (IMAP) ────────────────────────────────────────────────────────────
+# ─── Gmail (IMAP) ───────────────────────────────────────────────────────────────
 def decode_str(s):
     parts = decode_header(s or "")
     out = []
@@ -317,3 +333,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
