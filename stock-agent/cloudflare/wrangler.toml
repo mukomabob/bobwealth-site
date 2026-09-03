@@ -1,0 +1,19 @@
+# Cloudflare Worker config for the FBC stock-trend chat agent.
+# See ../DEPLOY.md for the full step-by-step setup.
+
+name = "fbc-stock-agent"
+main = "worker.js"
+compatibility_date = "2026-09-03"
+
+# D1 (hosted SQLite) -- holds the `prices` table built from the 111 FBC
+# sheets. Create with `npx wrangler d1 create fbc-history`, then paste the
+# database_id it prints below (database_name must match too).
+[[d1_databases]]
+binding = "DB"
+database_name = "fbc-history"
+database_id = "REPLACE_WITH_YOUR_DATABASE_ID"
+
+# Workers AI -- runs the text-to-SQL and SQL-to-answer steps. No separate
+# API key needed; this binding is enough.
+[ai]
+binding = "AI"

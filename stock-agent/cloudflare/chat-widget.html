@@ -1,0 +1,156 @@
+<!--
+  FBC stock-trend chat widget -- drop-in fragment.
+
+  Matches bobwealth-site's existing design tokens (--bg, --surface, --gold,
+  etc. from index.html/markets.html) so it doesn't need its own separate
+  <style> system. Paste this <section> wherever it should appear (e.g. into
+  markets.html as a new tab, or as a new section on index.html) -- the
+  variables it references are already defined in :root on both pages.
+
+  Before using: replace WORKER_URL below with your deployed Worker's URL
+  (see ../DEPLOY.md), e.g. "https://fbc-stock-agent.<your-subdomain>.workers.dev"
+-->
+<section class="section stock-chat" id="stock-chat">
+  <div class="section-inner stock-chat-inner">
+    <div class="section-eyebrow">Ask the Data</div>
+    <h2 class="section-title">Stock Trend Assistant</h2>
+    <p class="section-body">
+      Ask a question about ZSE/VFEX price history, trends, or sector
+      performance. Answers are computed from the actual archived price
+      sheets -- not guessed.
+    </p>
+
+    <form class="sc-form" id="sc-form">
+      <input
+        type="text"
+        class="nl-input sc-input"
+        id="sc-question"
+        placeholder="e.g. How has Pfuma REIT trended over the last month?"
+        autocomplete="off"
+        required
+      />
+      <button type="submit" class="nl-btn sc-btn" id="sc-btn">Ask</button>
+    </form>
+
+    <div class="sc-examples">
+      <span>Try:</span>
+      <button type="button" class="sc-chip">Top 5 gainers today</button>
+      <button type="button" class="sc-chip">Most volatile sector</button>
+      <button type="button" class="sc-chip">Best performer this year</button>
+    </div>
+
+    <div class="sc-answer" id="sc-answer" hidden>
+      <div class="sc-answer-text" id="sc-answer-text"></div>
+      <button type="button" class="sc-details-toggle" id="sc-details-toggle" hidden>
+        Show the query this was grounded in
+      </button>
+      <pre class="sc-details" id="sc-details" hidden></pre>
+    </div>
+  </div>
+</section>
+
+<style>
+  .stock-chat{ background:var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+  .stock-chat-inner{ max-width:720px; margin:0 auto; text-align:center; }
+  .sc-form{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:28px; }
+  .sc-input{ flex:1; min-width:260px; }
+  .sc-examples{
+    margin-top:14px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center;
+    align-items:center; font-family:var(--mono); font-size:10px; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--ts);
+  }
+  .sc-chip{
+    background:transparent; border:1px solid var(--border); color:var(--tm);
+    font-family:var(--font); font-size:12px; padding:6px 12px; border-radius:20px;
+    cursor:pointer; transition:all .15s; text-transform:none; letter-spacing:normal;
+  }
+  .sc-chip:hover{ border-color:var(--gl); color:var(--white); }
+  .sc-answer{
+    margin-top:28px; text-align:left; background:var(--surface-2);
+    border:1px solid var(--border); border-radius:6px; padding:20px 24px;
+  }
+  .sc-answer-text{ font-size:14px; line-height:1.75; color:var(--text); }
+  .sc-answer-text.sc-loading{ color:var(--ts); font-style:italic; }
+  .sc-answer-text.sc-error{ color:var(--red); }
+  .sc-details-toggle{
+    margin-top:12px; background:none; border:none; color:var(--gold-l);
+    font-family:var(--font); font-size:12px; cursor:pointer; padding:0;
+    text-decoration:underline; text-underline-offset:3px;
+  }
+  .sc-details{
+    margin-top:10px; background:var(--bg); border:1px solid var(--border);
+    border-radius:4px; padding:12px 14px; font-family:var(--mono); font-size:11px;
+    color:var(--tm); overflow-x:auto; white-space:pre-wrap; word-break:break-word;
+  }
+</style>
+
+<script>
+(function () {
+  const WORKER_URL = "REPLACE_WITH_YOUR_WORKER_URL"; // e.g. https://fbc-stock-agent.<subdomain>.workers.dev
+
+  const form = document.getElementById("sc-form");
+  const input = document.getElementById("sc-question");
+  const btn = document.getElementById("sc-btn");
+  const answerBox = document.getElementById("sc-answer");
+  const answerText = document.getElementById("sc-answer-text");
+  const detailsToggle = document.getElementById("sc-details-toggle");
+  const details = document.getElementById("sc-details");
+
+  async function ask(question) {
+    answerBox.hidden = false;
+    answerText.className = "sc-answer-text sc-loading";
+    answerText.textContent = "Thinking…";
+    detailsToggle.hidden = true;
+    details.hidden = true;
+    btn.disabled = true;
+
+    try {
+      const res = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        answerText.className = "sc-answer-text sc-error";
+        answerText.textContent = "Something went wrong answering that -- try rephrasing the question.";
+        return;
+      }
+
+      answerText.className = "sc-answer-text";
+      answerText.textContent = data.answer || "No answer returned.";
+
+      if (data.sql) {
+        detailsToggle.hidden = false;
+        details.textContent = "SQL:\n" + data.sql + "\n\nRows returned: " + (data.rows ? data.rows.length : 0);
+      }
+    } catch (err) {
+      answerText.className = "sc-answer-text sc-error";
+      answerText.textContent = "Couldn't reach the assistant -- please try again in a moment.";
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const q = input.value.trim();
+    if (q) ask(q);
+  });
+
+  document.querySelectorAll(".sc-chip").forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      input.value = chip.textContent;
+      ask(chip.textContent);
+    });
+  });
+
+  detailsToggle.addEventListener("click", function () {
+    details.hidden = !details.hidden;
+    detailsToggle.textContent = details.hidden
+      ? "Show the query this was grounded in"
+      : "Hide query details";
+  });
+})();
+</script>
