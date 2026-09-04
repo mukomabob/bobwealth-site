@@ -1,5 +1,7 @@
 # FBC stock-trend agent — structured data prototype
 
+Live at: https://fbc-stock-agent.robertzata23.workers.dev/ (deployed via Cloudflare Workers Builds from this folder).
+
 Answers natural-language questions about ZSE/VFEX trends by querying a clean
 SQL table built from all 111 archived FBC price sheets, instead of doing
 vector-embedding retrieval over the sheets as text.
