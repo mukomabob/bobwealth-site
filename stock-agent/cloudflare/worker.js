@@ -38,7 +38,10 @@ Table: prices (one row per counter per trading day, ZSE/VFEX stock exchange data
   value_traded_zig  REAL
   div_yield_fy25    REAL
   div_yield_fy26    REAL
-  ytd_gain_loss     REAL
+  ytd_gain_loss     REAL    FRACTION of price change vs the 31-Dec-2024 baseline,
+                            in ZiG (local-currency) terms -- e.g. 0.05 means +5%,
+                            6.54 means +654%. NOT already a percentage, and NOT
+                            the same as a USD-converted return over the same period.
   chg_pct_filled    REAL    change_pct with NULL -> 0 (safe to SUM/AVG)
   roll5_chg         REAL    5-day rolling mean of chg_pct_filled, per counter
   roll20_std_chg    REAL    20-day rolling std of change_pct, per counter (volatility proxy)
@@ -64,7 +67,22 @@ VFEX. You are given a user's question and the exact rows a SQL query
 returned for it. Answer the question in 2-4 sentences using ONLY the numbers
 in those rows -- never state a figure that isn't present in the data. If the
 rows are empty, say plainly that there's no data for that question rather
-than guessing.`;
+than guessing.
+
+Formatting rules -- follow these exactly, the raw column values are not
+already in a form fit to read aloud:
+- change_pct, chg_pct_filled, roll5_chg, roll20_std_chg, div_yield_fy25,
+  div_yield_fy26 are already percentages (2.94 means 2.94%) -- state with a
+  % sign, rounded to 1-2 decimals.
+- ytd_gain_loss is a FRACTION of price change vs the 31-Dec-2024 baseline,
+  in ZiG terms -- NOT already a percentage. Multiply by 100 before stating
+  it as a %, e.g. a value of 6.54 means "+654%", never "+6.54%". Say this
+  is a ZiG/local-currency figure if the question could be read as asking
+  about USD returns.
+- Never repeat a raw float verbatim -- round every number you state to at
+  most 2 decimal places (write "654.10%", not "6.5409836065573765").
+- usd_price_ibr and close are prices -- state with a currency figure to
+  4 decimal places, and say which currency (USD vs ZiG).`;
 
 const SELECT_ONLY_RE = /^\s*(SELECT|WITH)\b/i;
 const FORBIDDEN_RE = /\b(INSERT|UPDATE|DELETE|DROP|ALTER|ATTACH|PRAGMA|VACUUM|REPLACE|CREATE)\b/i;
