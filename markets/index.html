@@ -533,6 +533,7 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 
         <div class="sc-answer" id="sc-answer" hidden>
           <div class="sc-answer-text" id="sc-answer-text"></div>
+          <div class="sc-chart" id="sc-chart" hidden></div>
           <button type="button" class="sc-details-toggle" id="sc-details-toggle" hidden>
             Show the query this was grounded in
           </button>
@@ -582,24 +583,289 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
         border-radius:4px; padding:12px 14px; font-family:var(--mono); font-size:11px;
         color:var(--tm); overflow-x:auto; white-space:pre-wrap; word-break:break-word;
       }
+
+      /* Ask the Data -- inline chart (line for a single-counter trend over
+         dates, horizontal bars for a multi-counter leaderboard). Single
+         series each, so no legend box -- the caption above names the metric. */
+      #page-stockchat .sc-chart{ margin-top:18px; }
+      #page-stockchat .sc-chart[hidden]{ display:none; }
+      #page-stockchat .sc-chart-caption{
+        font-family:var(--mono); font-size:10px; letter-spacing:.06em; text-transform:uppercase;
+        color:var(--ts); margin-bottom:8px;
+      }
+      #page-stockchat .sc-chart-wrap{ position:relative; }
+      #page-stockchat .sc-chart-wrap svg{ display:block; overflow:visible; }
+      #page-stockchat .sc-chart-wrap svg text{ font-family:var(--mono); }
+      #page-stockchat .sc-chart-tip{
+        position:absolute; top:0; transform:translate(-50%,-115%);
+        background:var(--bg); border:1px solid var(--border); border-radius:4px;
+        padding:4px 8px; font-family:var(--mono); font-size:11px; color:var(--text);
+        white-space:nowrap; pointer-events:none;
+      }
+      #page-stockchat .sc-bar-list{ display:flex; flex-direction:column; gap:6px; }
+      #page-stockchat .sc-bar-row{
+        display:grid; grid-template-columns:112px 1fr 68px; align-items:center; gap:10px;
+      }
+      #page-stockchat .sc-bar-label{
+        font-size:12px; color:var(--tm); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      }
+      #page-stockchat .sc-bar-track{
+        background:var(--bg); border-radius:3px; height:16px; position:relative; overflow:hidden;
+      }
+      #page-stockchat .sc-bar-fill{
+        position:absolute; left:0; top:0; bottom:0; border-radius:3px; min-width:3px;
+      }
+      #page-stockchat .sc-bar-pos{ background:var(--gain); }
+      #page-stockchat .sc-bar-neg{ background:var(--red); }
+      #page-stockchat .sc-bar-value{
+        font-family:var(--mono); font-size:11px; text-align:right; font-weight:600;
+      }
+      #page-stockchat .sc-bar-pos-text{ color:var(--gain); }
+      #page-stockchat .sc-bar-neg-text{ color:var(--red); }
     </style>
 
     <script>
     (function () {
       const WORKER_URL = "https://fbc-stock-agent.robertzata23.workers.dev/";
+      const SVGNS = "http://www.w3.org/2000/svg";
 
       const form = document.getElementById("sc-form");
       const input = document.getElementById("sc-question");
       const btn = document.getElementById("sc-btn");
       const answerBox = document.getElementById("sc-answer");
       const answerText = document.getElementById("sc-answer-text");
+      const chartBox = document.getElementById("sc-chart");
       const detailsToggle = document.getElementById("sc-details-toggle");
       const details = document.getElementById("sc-details");
+
+      // ---- figure rendering -------------------------------------------------
+      // The Worker returns the actual SQL result rows alongside the prose
+      // answer. When those rows plot cleanly -- one counter's metric across
+      // dates, or one metric across several counters -- draw a small inline
+      // chart instead of leaving the numbers as text only.
+
+      const METRIC_PRIORITY = [
+        /ytd_gain|gain_loss/i,
+        /change_pct|chg_pct|chg\b/i,
+        /usd_price|price/i,
+        /^close$/i,
+        /volume/i,
+        /value_traded/i,
+        /std|volatil/i,
+        /yield/i,
+      ];
+
+      function pickFields(rows) {
+        const keys = Object.keys(rows[0]);
+        const dateKey = keys.find(function (k) { return /^date$/i.test(k); }) ||
+          keys.find(function (k) { return /date/i.test(k); });
+        const counterKey = keys.find(function (k) { return /^counter$/i.test(k); }) ||
+          keys.find(function (k) { return /counter|name/i.test(k); });
+        const numericKeys = keys.filter(function (k) {
+          return k !== dateKey && rows.some(function (r) { return typeof r[k] === "number"; });
+        });
+        if (!numericKeys.length) return null;
+        let valueKey = null;
+        for (let i = 0; i < METRIC_PRIORITY.length; i++) {
+          valueKey = numericKeys.find(function (k) { return METRIC_PRIORITY[i].test(k); });
+          if (valueKey) break;
+        }
+        if (!valueKey) valueKey = numericKeys[0];
+        return { dateKey: dateKey, counterKey: counterKey, valueKey: valueKey };
+      }
+
+      function decideChart(rows) {
+        if (!rows || rows.length < 2) return null;
+        const fields = pickFields(rows);
+        if (!fields || !fields.valueKey) return null;
+        const dateKey = fields.dateKey, counterKey = fields.counterKey, valueKey = fields.valueKey;
+
+        if (dateKey) {
+          const counters = counterKey ? new Set(rows.map(function (r) { return r[counterKey]; })) : new Set([1]);
+          if (counters.size <= 1) {
+            const pts = rows
+              .filter(function (r) { return typeof r[valueKey] === "number"; })
+              .map(function (r) { return { label: String(r[dateKey]), value: r[valueKey] }; })
+              .sort(function (a, b) { return a.label < b.label ? -1 : a.label > b.label ? 1 : 0; });
+            if (pts.length >= 2) return { type: "line", valueKey: valueKey, points: pts };
+          }
+        }
+
+        if (counterKey) {
+          const pts = rows
+            .filter(function (r) { return typeof r[valueKey] === "number"; })
+            .map(function (r) { return { label: String(r[counterKey]), value: r[valueKey] }; })
+            .slice(0, 12);
+          if (pts.length >= 2) return { type: "bar", valueKey: valueKey, points: pts };
+        }
+
+        return null;
+      }
+
+      function formatMetricValue(key, v) {
+        if (v === null || v === undefined || Number.isNaN(v)) return "—";
+        const k = key.toLowerCase();
+        if (/pct|gain|loss|chg|change|yield|std/.test(k)) {
+          return (v > 0 ? "+" : "") + v.toFixed(2) + "%";
+        }
+        if (/price|usd/.test(k)) {
+          return "$" + v.toFixed(4).replace(/0+$/, "").replace(/\.$/, "");
+        }
+        if (/mkt_cap|value_traded/.test(k)) {
+          return "$" + Math.round(v).toLocaleString();
+        }
+        if (/volume|shares/.test(k)) {
+          return Math.round(v).toLocaleString();
+        }
+        return String(Math.round(v * 100) / 100);
+      }
+
+      function svgEl(tag, attrs) {
+        const el = document.createElementNS(SVGNS, tag);
+        for (const k in attrs) el.setAttribute(k, attrs[k]);
+        return el;
+      }
+
+      function renderLineChart(container, chart) {
+        const W = 600, H = 170, padL = 8, padR = 8, padT = 14, padB = 22;
+        const pts = chart.points;
+        const values = pts.map(function (p) { return p.value; });
+        const minV = Math.min.apply(null, values);
+        const maxV = Math.max.apply(null, values);
+        const span = (maxV - minV) || 1;
+        const x = function (i) { return padL + (i / (pts.length - 1)) * (W - padL - padR); };
+        const y = function (v) { return padT + (1 - (v - minV) / span) * (H - padT - padB); };
+
+        const svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, width: "100%", height: "170", role: "img", "aria-label": "Trend chart" });
+
+        const gTop = svgEl("text", { x: padL, y: 10, fill: "var(--tm)", "font-size": "9" });
+        gTop.textContent = formatMetricValue(chart.valueKey, maxV);
+        const gBot = svgEl("text", { x: padL, y: H - 6, fill: "var(--tm)", "font-size": "9" });
+        gBot.textContent = formatMetricValue(chart.valueKey, minV);
+        svg.appendChild(gTop);
+        svg.appendChild(gBot);
+
+        let areaD = "M " + x(0) + " " + (H - padB) + " ";
+        pts.forEach(function (p, i) { areaD += "L " + x(i) + " " + y(p.value) + " "; });
+        areaD += "L " + x(pts.length - 1) + " " + (H - padB) + " Z";
+        svg.appendChild(svgEl("path", { d: areaD, fill: "var(--gold)", opacity: "0.12", stroke: "none" }));
+
+        let lineD = "";
+        pts.forEach(function (p, i) { lineD += (i === 0 ? "M " : "L ") + x(i) + " " + y(p.value) + " "; });
+        svg.appendChild(svgEl("path", { d: lineD, fill: "none", stroke: "var(--gold-l)", "stroke-width": "2", "stroke-linecap": "round", "stroke-linejoin": "round" }));
+
+        const last = pts[pts.length - 1];
+        svg.appendChild(svgEl("circle", { cx: x(pts.length - 1), cy: y(last.value), r: "3.5", fill: "var(--gold-l)" }));
+
+        const crosshair = svgEl("line", { x1: 0, x2: 0, y1: padT, y2: H - padB, stroke: "var(--border)", "stroke-width": "1", visibility: "hidden" });
+        const hoverDot = svgEl("circle", { r: "4", fill: "var(--white)", stroke: "var(--gold)", "stroke-width": "2", visibility: "hidden" });
+        svg.appendChild(crosshair);
+        svg.appendChild(hoverDot);
+
+        const hit = svgEl("rect", { x: padL, y: 0, width: W - padL - padR, height: H, fill: "transparent" });
+        svg.appendChild(hit);
+
+        const tip = document.createElement("div");
+        tip.className = "sc-chart-tip";
+        tip.hidden = true;
+
+        const wrap = document.createElement("div");
+        wrap.className = "sc-chart-wrap";
+        wrap.appendChild(svg);
+        wrap.appendChild(tip);
+
+        hit.addEventListener("mousemove", function (e) {
+          const rect = svg.getBoundingClientRect();
+          const relX = ((e.clientX - rect.left) / rect.width) * W;
+          let idx = Math.round(((relX - padL) / (W - padL - padR)) * (pts.length - 1));
+          idx = Math.max(0, Math.min(pts.length - 1, idx));
+          const p = pts[idx];
+          crosshair.setAttribute("x1", x(idx));
+          crosshair.setAttribute("x2", x(idx));
+          crosshair.setAttribute("visibility", "visible");
+          hoverDot.setAttribute("cx", x(idx));
+          hoverDot.setAttribute("cy", y(p.value));
+          hoverDot.setAttribute("visibility", "visible");
+          tip.hidden = false;
+          tip.textContent = p.label + " · " + formatMetricValue(chart.valueKey, p.value);
+          tip.style.left = Math.min(Math.max((x(idx) / W) * 100, 10), 90) + "%";
+        });
+        hit.addEventListener("mouseleave", function () {
+          crosshair.setAttribute("visibility", "hidden");
+          hoverDot.setAttribute("visibility", "hidden");
+          tip.hidden = true;
+        });
+
+        container.innerHTML = "";
+        const caption = document.createElement("div");
+        caption.className = "sc-chart-caption";
+        caption.textContent = chart.valueKey.replace(/_/g, " ");
+        container.appendChild(caption);
+        container.appendChild(wrap);
+      }
+
+      function renderBarChart(container, chart) {
+        const pts = chart.points;
+        const maxAbs = Math.max.apply(null, pts.map(function (p) { return Math.abs(p.value); }).concat([1e-9]));
+
+        container.innerHTML = "";
+        const caption = document.createElement("div");
+        caption.className = "sc-chart-caption";
+        caption.textContent = chart.valueKey.replace(/_/g, " ");
+        container.appendChild(caption);
+
+        const list = document.createElement("div");
+        list.className = "sc-bar-list";
+
+        pts.forEach(function (p) {
+          const row = document.createElement("div");
+          row.className = "sc-bar-row";
+
+          const label = document.createElement("div");
+          label.className = "sc-bar-label";
+          label.textContent = p.label;
+          label.title = p.label;
+
+          const track = document.createElement("div");
+          track.className = "sc-bar-track";
+          const fill = document.createElement("div");
+          fill.className = "sc-bar-fill " + (p.value >= 0 ? "sc-bar-pos" : "sc-bar-neg");
+          fill.style.width = Math.max(4, (Math.abs(p.value) / maxAbs) * 100) + "%";
+          track.appendChild(fill);
+
+          const val = document.createElement("div");
+          val.className = "sc-bar-value " + (p.value >= 0 ? "sc-bar-pos-text" : "sc-bar-neg-text");
+          val.textContent = formatMetricValue(chart.valueKey, p.value);
+
+          row.appendChild(label);
+          row.appendChild(track);
+          row.appendChild(val);
+          list.appendChild(row);
+        });
+
+        container.appendChild(list);
+      }
+
+      function renderChart(rows) {
+        const chart = decideChart(rows || []);
+        if (!chart) {
+          chartBox.hidden = true;
+          chartBox.innerHTML = "";
+          return;
+        }
+        chartBox.hidden = false;
+        if (chart.type === "line") renderLineChart(chartBox, chart);
+        else renderBarChart(chartBox, chart);
+      }
+
+      // ---- ask / answer flow -------------------------------------------------
 
       async function ask(question) {
         answerBox.hidden = false;
         answerText.className = "sc-answer-text sc-loading";
         answerText.textContent = "Thinking…";
+        chartBox.hidden = true;
+        chartBox.innerHTML = "";
         detailsToggle.hidden = true;
         details.hidden = true;
         btn.disabled = true;
@@ -620,6 +886,8 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 
           answerText.className = "sc-answer-text";
           answerText.textContent = data.answer || "No answer returned.";
+
+          renderChart(data.rows);
 
           if (data.sql) {
             detailsToggle.hidden = false;
