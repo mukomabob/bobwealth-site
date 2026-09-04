@@ -705,6 +705,11 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
       function formatMetricValue(key, v) {
         if (v === null || v === undefined || Number.isNaN(v)) return "—";
         const k = key.toLowerCase();
+        if (/ytd_gain|gain_loss/.test(k)) {
+          // FRACTION of price change vs the 31-Dec-2024 baseline (ZiG terms) --
+          // not already a percentage, unlike change_pct etc below. 6.54 means +654%.
+          return (v > 0 ? "+" : "") + (v * 100).toFixed(2) + "%";
+        }
         if (/pct|gain|loss|chg|change|yield|std/.test(k)) {
           return (v > 0 ? "+" : "") + v.toFixed(2) + "%";
         }
