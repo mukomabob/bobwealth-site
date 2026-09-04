@@ -217,6 +217,27 @@ def engineer_derived_fields(df):
     """A handful of fields that make trend questions cheap to answer without
     the agent having to hand-roll window functions every time."""
     df = df.sort_values(["counter", "date"]).reset_index(drop=True)
+
+    # When a row has no closing price (the counter didn't trade that day /
+    # was suspended), the source sheet's own "Price % p" and "YTD Gain/Loss"
+    # cells are still populated -- but with meaningless placeholder/error
+    # values (observed: flat -100%, -1, or +100) rather than being blank.
+    # Left in place, these get picked up by MAX()/MIN() trend queries (e.g.
+    # "best performer this year") as if they were real price moves. Null
+    # them out here so only rows backed by an actual close price can ever
+    # look like a real gain or loss.
+    no_price = df["close"].isna()
+    n_scrubbed = int(no_price.sum())
+    if n_scrubbed:
+        log(f"Scrubbing change_pct/ytd_gain_loss on {n_scrubbed} row(s) with no close price "
+            f"(counters: {sorted(df.loc[no_price, 'counter'].unique())})")
+    # Use float NaN (not pd.NA) so change_pct/ytd_gain_loss stay numeric
+    # dtype -- pd.NA would upcast the column to object and break the
+    # rolling().std() call below.
+    df["change_pct"] = df["change_pct"].astype(float)
+    df["ytd_gain_loss"] = df["ytd_gain_loss"].astype(float)
+    df.loc[no_price, ["change_pct", "ytd_gain_loss"]] = float("nan")
+
     grp = df.groupby("counter")
 
     df["chg_pct_filled"] = df["change_pct"].fillna(0)
