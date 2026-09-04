@@ -403,6 +403,7 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
     <div class="ni" onclick="nav('barchart',this)"><span class="ni-ic">▬</span>Investment Simulator</div>
     <div class="ni" onclick="nav('liquidity',this)"><span class="ni-ic">◉</span>Liquidity Score Rankings</div>
     <div class="ni" onclick="nav('modelpicks',this)"><span class="ni-ic">🤖</span>Model Picks</div>
+    <div class="ni" onclick="nav('stockchat',this)"><span class="ni-ic">💬</span>Ask the Data</div>
     <div style="margin-top:auto;padding-top:10px;border-top:1px solid var(--border)">
       <div class="ni-admin" id="adminNavItem" onclick="enterAdmin()"><span class="ni-ic">🔒</span>Admin</div>
     </div>
@@ -508,6 +509,151 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
     <div class="vp" id="page-modelpicks"><div id="modelPicksContent">
       <div class="state-card"><div class="spinner"></div><h3>Loading model predictions…</h3></div>
     </div></div>
+
+    <!-- STOCK CHAT -->
+    <div class="vp" id="page-stockchat">
+      <div class="mc" style="max-width:720px;margin:20px auto 0;text-align:center">
+        <div class="mc-title" style="text-align:center;border-bottom:none;margin-bottom:2px">Ask the Data</div>
+        <h2 style="font-family:var(--font);font-size:20px;font-weight:700;margin:2px 0 10px;color:var(--text)">Stock Trend Assistant</h2>
+        <p style="font-size:12px;color:var(--tm);line-height:1.6;margin:0 0 20px">
+          Ask a question about ZSE/VFEX price history, trends, or sector performance. Answers are computed from the actual archived price sheets — not guessed.
+        </p>
+
+        <form class="sc-form" id="sc-form">
+          <input type="text" class="sc-input" id="sc-question" placeholder="e.g. How has Pfuma REIT trended over the last month?" autocomplete="off" required />
+          <button type="submit" class="sc-btn" id="sc-btn">Ask</button>
+        </form>
+
+        <div class="sc-examples">
+          <span>Try:</span>
+          <button type="button" class="sc-chip">Top 5 gainers today</button>
+          <button type="button" class="sc-chip">Most volatile sector</button>
+          <button type="button" class="sc-chip">Best performer this year</button>
+        </div>
+
+        <div class="sc-answer" id="sc-answer" hidden>
+          <div class="sc-answer-text" id="sc-answer-text"></div>
+          <button type="button" class="sc-details-toggle" id="sc-details-toggle" hidden>
+            Show the query this was grounded in
+          </button>
+          <pre class="sc-details" id="sc-details" hidden></pre>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      #page-stockchat .sc-form{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+      #page-stockchat .sc-input{
+        flex:1; min-width:240px; background:var(--surface-2); border:1px solid var(--border);
+        border-radius:4px; padding:9px 12px; color:var(--text); font-family:var(--font); font-size:13px; outline:none;
+      }
+      #page-stockchat .sc-input:focus{ border-color:var(--gold); }
+      #page-stockchat .sc-btn{
+        background:var(--gold); border:none; color:#161A17; font-family:var(--font); font-weight:600;
+        font-size:13px; padding:9px 20px; border-radius:4px; cursor:pointer;
+      }
+      #page-stockchat .sc-btn:hover{ background:var(--gold-l); }
+      #page-stockchat .sc-btn:disabled{ opacity:.6; cursor:default; }
+      #page-stockchat .sc-examples{
+        margin-top:14px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center;
+        align-items:center; font-family:var(--mono); font-size:10px; letter-spacing:.06em;
+        text-transform:uppercase; color:var(--ts);
+      }
+      #page-stockchat .sc-chip{
+        background:transparent; border:1px solid var(--border); color:var(--tm);
+        font-family:var(--font); font-size:12px; padding:6px 12px; border-radius:20px;
+        cursor:pointer; transition:all .15s; text-transform:none; letter-spacing:normal;
+      }
+      #page-stockchat .sc-chip:hover{ border-color:var(--gl); color:var(--white); }
+      #page-stockchat .sc-answer{
+        margin-top:24px; text-align:left; background:var(--surface-2);
+        border:1px solid var(--border); border-radius:6px; padding:18px 20px;
+      }
+      #page-stockchat .sc-answer-text{ font-size:13px; line-height:1.75; color:var(--text); }
+      #page-stockchat .sc-answer-text.sc-loading{ color:var(--ts); font-style:italic; }
+      #page-stockchat .sc-answer-text.sc-error{ color:var(--red); }
+      #page-stockchat .sc-details-toggle{
+        margin-top:12px; background:none; border:none; color:var(--gold-l);
+        font-family:var(--font); font-size:12px; cursor:pointer; padding:0;
+        text-decoration:underline; text-underline-offset:3px;
+      }
+      #page-stockchat .sc-details{
+        margin-top:10px; background:var(--bg); border:1px solid var(--border);
+        border-radius:4px; padding:12px 14px; font-family:var(--mono); font-size:11px;
+        color:var(--tm); overflow-x:auto; white-space:pre-wrap; word-break:break-word;
+      }
+    </style>
+
+    <script>
+    (function () {
+      const WORKER_URL = "https://fbc-stock-agent.robertzata23.workers.dev/";
+
+      const form = document.getElementById("sc-form");
+      const input = document.getElementById("sc-question");
+      const btn = document.getElementById("sc-btn");
+      const answerBox = document.getElementById("sc-answer");
+      const answerText = document.getElementById("sc-answer-text");
+      const detailsToggle = document.getElementById("sc-details-toggle");
+      const details = document.getElementById("sc-details");
+
+      async function ask(question) {
+        answerBox.hidden = false;
+        answerText.className = "sc-answer-text sc-loading";
+        answerText.textContent = "Thinking…";
+        detailsToggle.hidden = true;
+        details.hidden = true;
+        btn.disabled = true;
+
+        try {
+          const res = await fetch(WORKER_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ question }),
+          });
+          const data = await res.json();
+
+          if (!res.ok || data.error) {
+            answerText.className = "sc-answer-text sc-error";
+            answerText.textContent = "Something went wrong answering that — try rephrasing the question.";
+            return;
+          }
+
+          answerText.className = "sc-answer-text";
+          answerText.textContent = data.answer || "No answer returned.";
+
+          if (data.sql) {
+            detailsToggle.hidden = false;
+            details.textContent = "SQL:\n" + data.sql + "\n\nRows returned: " + (data.rows ? data.rows.length : 0);
+          }
+        } catch (err) {
+          answerText.className = "sc-answer-text sc-error";
+          answerText.textContent = "Couldn't reach the assistant — please try again in a moment.";
+        } finally {
+          btn.disabled = false;
+        }
+      }
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const q = input.value.trim();
+        if (q) ask(q);
+      });
+
+      document.querySelectorAll("#page-stockchat .sc-chip").forEach(function (chip) {
+        chip.addEventListener("click", function () {
+          input.value = chip.textContent;
+          ask(chip.textContent);
+        });
+      });
+
+      detailsToggle.addEventListener("click", function () {
+        details.hidden = !details.hidden;
+        detailsToggle.textContent = details.hidden
+          ? "Show the query this was grounded in"
+          : "Hide query details";
+      });
+    })();
+    </script>
 
     <!-- ADMIN -->
     <div class="vp" id="page-admin">
@@ -1254,7 +1400,7 @@ function nav(id, el) {
   const mnEl = document.getElementById('mn-'+id);
   document.querySelectorAll('.mob-nav-item').forEach(b=>b.classList.remove('on'));
   if (mnEl) mnEl.classList.add('on');
-  const T = {overview:'Market Overview',movers:'Daily Movers',liquidity:'Liquidity Score Rankings',barchart:'Investment Simulator',modelpicks:'Model Picks'};
+  const T = {overview:'Market Overview',movers:'Daily Movers',liquidity:'Liquidity Score Rankings',barchart:'Investment Simulator',modelpicks:'Model Picks',stockchat:'Stock Trend Assistant'};
   document.getElementById('tbTitle').textContent = T[id] || id;
   document.getElementById('tbSub').textContent = 'Zimbabwe Stock Exchange · ZSE + VFEX';
   document.getElementById('topbar').classList.remove('admin-mode');
@@ -1833,7 +1979,7 @@ function mobNav(id, el) {
   const sideItem = Array.from(document.querySelectorAll('.ni')).find(n => n.getAttribute('onclick')?.includes("'"+id+"'"));
   if (sideItem) { document.querySelectorAll('.ni,.ni-admin').forEach(n=>n.classList.remove('on')); sideItem.classList.add('on'); }
   showPage(id);
-  const T = {overview:'Market Overview',movers:'Daily Movers',liquidity:'Liquidity Score Rankings',barchart:'Investment Simulator',modelpicks:'Model Picks'};
+  const T = {overview:'Market Overview',movers:'Daily Movers',liquidity:'Liquidity Score Rankings',barchart:'Investment Simulator',modelpicks:'Model Picks',stockchat:'Stock Trend Assistant'};
   document.getElementById('tbTitle').textContent = T[id] || id;
   document.getElementById('tbSub').textContent = 'Zimbabwe Stock Exchange · ZSE + VFEX';
   document.getElementById('topbar').classList.remove('admin-mode');
