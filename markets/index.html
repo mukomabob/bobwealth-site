@@ -475,6 +475,7 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
         <button type="button" class="sim-ask-chip">Top 5 gainers this year</button>
         <button type="button" class="sim-ask-chip">Which REITs are up the most?</button>
         <button type="button" class="sim-ask-chip">Most traded counters this month</button>
+        <button type="button" class="sim-ask-chip">What's on today's watchlist?</button>
       </div>
       <div class="sim-ask-answer" id="simAskAnswer" hidden>
         <div class="sim-ask-text" id="simAskText"></div>
@@ -1251,6 +1252,9 @@ function setAskFilter(filter) {
 // Only the newest question may touch the chart: an answer to an earlier one
 // that arrives late must not re-filter it after a newer answer has landed.
 let _askSeq = 0;
+// The last few answered turns, sent with each question so follow-ups like
+// "and Delta?" make sense. Clear starts a fresh conversation.
+let _askHistory = [];
 
 async function askSimulator(question) {
   const seq = ++_askSeq;
@@ -1270,7 +1274,7 @@ async function askSimulator(question) {
     const res = await fetch(ASK_WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question }),
+      body: JSON.stringify({ question, history: _askHistory }),
     });
     const data = await res.json().catch(() => ({}));
     if (seq !== _askSeq) return;
@@ -1283,6 +1287,7 @@ async function askSimulator(question) {
     }
     text.className = 'sim-ask-text';
     text.textContent = data.answer || 'No answer returned.';
+    if (data.answer) _askHistory = [..._askHistory, { question, answer: data.answer, sql: data.sql || '' }].slice(-3);
     setAskFilter(askFilterFromRows(data.rows));
     if (data.sql) {
       sqlToggle.hidden = false;
@@ -1313,6 +1318,7 @@ document.getElementById('simAskClear').addEventListener('click', () => {
   document.getElementById('simAskAnswer').hidden = true;
   document.getElementById('simAskSql').hidden = true;
   document.getElementById('simAskClear').hidden = true;
+  _askHistory = [];
   setAskFilter(null);
   document.getElementById('simAskInput').focus();
 });
