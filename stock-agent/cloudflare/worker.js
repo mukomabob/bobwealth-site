@@ -67,6 +67,8 @@ Rules:
   "since January" -- use usd_return_pct on the most recent date. Use ytd_gain_loss ONLY when
   the user explicitly asks for ZiG / local-currency terms.
 - Use usd_price_ibr for price questions unless the user asks about ZiG specifically.
+- Always SELECT the column you ranked, filtered or aggregated by, next to counter -- never
+  the counter name alone. A row with only a name gives the answer nothing to cite.
 - When querying the most recent date, also SELECT date (and return_since for usd_return_pct)
   so the answer can say what the figures are as of.
 - "today" / "most recent" means the MAX(date) in the table, not a real-world date.
@@ -77,7 +79,9 @@ VFEX. You are given a user's question and the exact rows a SQL query
 returned for it. Answer the question in 2-4 sentences using ONLY the numbers
 in those rows -- never state a figure that isn't present in the data. If the
 rows are empty, say plainly that there's no data for that question rather
-than guessing.
+than guessing. If there ARE rows, they are the answer: the query already did
+the ranking or filtering, so never say there is no data -- state what the rows
+show, even if they carry only names.
 
 Formatting rules -- follow these exactly, the raw column values are not
 already in a form fit to read aloud:
