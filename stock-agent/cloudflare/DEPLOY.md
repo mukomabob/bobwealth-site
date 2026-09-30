@@ -130,3 +130,14 @@ refresh; until then, re-run step 3 by hand whenever you want D1 updated.
 
 If you outgrow the free tier, Cloudflare's dashboard shows exactly what's
 being used before anything charges — nothing here auto-upgrades you.
+
+## Access controls
+
+`wrangler.toml` locks the Worker down in two ways, both applied on the next
+`npx wrangler deploy`:
+
+- **`ALLOWED_ORIGINS`** — only pages on these sites can call the Worker from a
+  browser; everything else gets `403`. To test from your own machine, add e.g.
+  `http://localhost:8000` to the list temporarily.
+- **`RATE_LIMITER`** — 10 questions per minute per visitor IP; extra requests
+  get `429`. Change `limit` / `period` in `wrangler.toml` to tune it.

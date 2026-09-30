@@ -13,7 +13,7 @@ FilePurposesuperuser.htmlPrivate dashboard with upload, import, and publish tool
 
 How the superuser page works
 
-Baseline auto-loads on page open — fetches Price Sheet 06.01.26.xlsx from the repo via jsDelivr CDN, with allorigins proxy as fallback. No action needed.
+Baseline auto-loads on page open — fetches Price Sheet 06.01.26.xlsx from the repo via jsDelivr CDN, with the GitHub raw URL as fallback. No action needed.
 Import a price sheet — click ↑ Import Sheet and select the day's FBC Securities .xlsx file. All dashboard views populate instantly (Overview, Movers, Trading Activity, Sectors, Screener, $100 Tracker, Investment Chart).
 Publish — click ⬆ Publish Snapshot to download market-data.json. This file contains all counter data plus the pre-calculated $100 investment values for every counter.
 Upload to GitHub — drag market-data.json into the repo root via github.com. The public page updates automatically within minutes (jsDelivr CDN cache).
@@ -21,10 +21,9 @@ Upload to GitHub — drag market-data.json into the repo root via github.com. Th
 
 How the public markets page works
 
-On load, markets.html fetches market-data.json from the repo using a three-URL cascade:
+On load, markets.html fetches market-data.json from the repo using a two-URL cascade:
 
 jsDelivr CDN — fast, CORS-friendly mirror of the GitHub repo
-allorigins proxy — public CORS proxy, fallback if jsDelivr fails
 GitHub raw URL — direct fallback
 
 

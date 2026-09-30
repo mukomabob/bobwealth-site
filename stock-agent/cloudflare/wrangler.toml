@@ -17,3 +17,15 @@ database_id = "2ea92d8b-8711-4d6e-89a2-878326f8da4d"
 # API key needed; this binding is enough.
 [ai]
 binding = "AI"
+
+# Sites allowed to call this Worker from a browser (comma-separated).
+[vars]
+ALLOWED_ORIGINS = "https://bobwealth.org,https://www.bobwealth.org"
+
+# Per-IP rate limit: 10 questions per 60 seconds. Stops anyone scripting the
+# endpoint from burning through the daily Workers AI allowance.
+[[unsafe.bindings]]
+name = "RATE_LIMITER"
+type = "ratelimit"
+namespace_id = "1001"
+simple = { limit = 10, period = 60 }
