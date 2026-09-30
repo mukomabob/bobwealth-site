@@ -21,7 +21,9 @@
       "ytd": 0.9189053896212249,
       "suspended": false,
       "usdPrice": 0.6424293886306758,
-      "inv100": 190.75144445677253
+      "inv100": 190.75144445677253,
+      "basePrice": 0.33678874121252644,
+      "baseSince": null
     },
     {
       "counter": "Ariston",
@@ -41,7 +43,9 @@
       "ytd": 1.150632911392405,
       "suspended": false,
       "usdPrice": 0.0025309855797878682,
-      "inv100": 83.96025484417066
+      "inv100": 83.96025484417066,
+      "basePrice": 0.0030145044038817543,
+      "baseSince": null
     },
     {
       "counter": "ART",
@@ -61,7 +65,9 @@
       "ytd": 1.6016153846153847,
       "suspended": false,
       "usdPrice": 0.007557427601001073,
-      "inv100": 632.8403994600086
+      "inv100": 632.8403994600086,
+      "basePrice": 0.001194207513845464,
+      "baseSince": null
     },
     {
       "counter": "BAT",
@@ -81,7 +87,9 @@
       "ytd": 0.4889968268964171,
       "suspended": false,
       "usdPrice": 5.400131092837564,
-      "inv100": 155.2531689045141
+      "inv100": 155.2531689045141,
+      "basePrice": 3.478274312171255,
+      "baseSince": null
     },
     {
       "counter": "Cafca Limited",
@@ -101,7 +109,9 @@
       "ytd": 0.9852941176470589,
       "suspended": false,
       "usdPrice": 1.0055416517697533,
-      "inv100": 191.31095356894994
+      "inv100": 191.31095356894994,
+      "basePrice": 0.525605896061434,
+      "baseSince": null
     },
     {
       "counter": "CBZ",
@@ -121,7 +131,9 @@
       "ytd": 2.2172869565217392,
       "suspended": false,
       "usdPrice": 1.3779197950184723,
-      "inv100": 264.1002733638776
+      "inv100": 264.1002733638776,
+      "basePrice": 0.5217411468256882,
+      "baseSince": null
     },
     {
       "counter": "CFI",
@@ -141,7 +153,9 @@
       "ytd": 0.4712430426716141,
       "suspended": false,
       "usdPrice": 0.2953313073531164,
-      "inv100": 141.77491734009558
+      "inv100": 141.77491734009558,
+      "basePrice": 0.20830998380670068,
+      "baseSince": null
     },
     {
       "counter": "Dairibord",
@@ -161,7 +175,9 @@
       "ytd": 1.8947368421052633,
       "suspended": false,
       "usdPrice": 0.20483255869383865,
-      "inv100": 328.17473516700966
+      "inv100": 328.17473516700966,
+      "basePrice": 0.06241570015729529,
+      "baseSince": null
     },
     {
       "counter": "Delta",
@@ -181,7 +197,9 @@
       "ytd": 0.4608413801765072,
       "suspended": false,
       "usdPrice": 1.1262774103205817,
-      "inv100": 118.99242316249716
+      "inv100": 118.99242316249716,
+      "basePrice": 0.9465118705772776,
+      "baseSince": null
     },
     {
       "counter": "Econet",
@@ -201,7 +219,9 @@
       "ytd": 0,
       "suspended": true,
       "usdPrice": null,
-      "inv100": null
+      "inv100": null,
+      "basePrice": 0.26052769286064875,
+      "baseSince": null
     },
     {
       "counter": "Fbc",
@@ -221,7 +241,9 @@
       "ytd": 0.08098795180722895,
       "suspended": false,
       "usdPrice": 0.5012178226671433,
-      "inv100": 104.16836176490014
+      "inv100": 104.16836176490014,
+      "basePrice": 0.4811612798503569,
+      "baseSince": null
     },
     {
       "counter": "Fidelity",
@@ -241,7 +263,9 @@
       "ytd": 1.6571428571428575,
       "suspended": false,
       "usdPrice": 0.03463532356095817,
-      "inv100": 256.0530096021248
+      "inv100": 256.0530096021248,
+      "basePrice": 0.013526622325110434,
+      "baseSince": null
     },
     {
       "counter": "FML",
@@ -261,7 +285,9 @@
       "ytd": -0.01408421052631581,
       "suspended": false,
       "usdPrice": 0.10464560243117627,
-      "inv100": 95.00682450338395
+      "inv100": 95.00682450338395,
+      "basePrice": 0.1101453532187564,
+      "baseSince": null
     },
     {
       "counter": "FMP",
@@ -281,7 +307,9 @@
       "ytd": -1.0,
       "suspended": true,
       "usdPrice": null,
-      "inv100": null
+      "inv100": null,
+      "basePrice": 0.034172344627418846,
+      "baseSince": null
     },
     {
       "counter": "General Beltings",
@@ -301,7 +329,9 @@
       "ytd": -0.09880999999999995,
       "suspended": false,
       "usdPrice": 0.0033562373376236445,
-      "inv100": 86.84230548727804
+      "inv100": 86.84230548727804,
+      "basePrice": 0.003864749235745839,
+      "baseSince": null
     },
     {
       "counter": "Hippo",
@@ -321,7 +351,9 @@
       "ytd": 0.11406055700457096,
       "suspended": false,
       "usdPrice": 0.33892340007150523,
-      "inv100": 106.9464522501243
+      "inv100": 106.9464522501243,
+      "basePrice": 0.3169094373311587,
+      "baseSince": null
     },
     {
       "counter": "Mash Holdings",
@@ -341,7 +373,9 @@
       "ytd": 0.029358920539730216,
       "suspended": false,
       "usdPrice": 0.06392474079370755,
-      "inv100": 116.69580044892787
+      "inv100": 116.69580044892787,
+      "basePrice": 0.054778955667461514,
+      "baseSince": null
     },
     {
       "counter": "Masimba",
@@ -361,7 +395,9 @@
       "ytd": 0.38927479855515434,
       "suspended": false,
       "usdPrice": 0.09310570849719939,
-      "inv100": 133.8761265237113
+      "inv100": 133.8761265237113,
+      "basePrice": 0.06954616249724636,
+      "baseSince": null
     },
     {
       "counter": "Meikles",
@@ -381,7 +417,9 @@
       "ytd": -0.20269458891623682,
       "suspended": false,
       "usdPrice": 0.09312280270527946,
-      "inv100": 76.98221110922799
+      "inv100": 76.98221110922799,
+      "basePrice": 0.12096665107884474,
+      "baseSince": null
     },
     {
       "counter": "Nampak",
@@ -401,7 +439,9 @@
       "ytd": 0.47260749999999985,
       "suspended": false,
       "usdPrice": 0.04387461268025265,
-      "inv100": 141.90640195503366
+      "inv100": 141.90640195503366,
+      "basePrice": 0.03091799388596671,
+      "baseSince": null
     },
     {
       "counter": "Nmbz",
@@ -421,7 +461,9 @@
       "ytd": 0.16504854368932032,
       "suspended": false,
       "usdPrice": 0.22345370039327853,
-      "inv100": 112.26877965642801
+      "inv100": 112.26877965642801,
+      "basePrice": 0.1990345856409107,
+      "baseSince": null
     },
     {
       "counter": "Ok Zim",
@@ -441,7 +483,9 @@
       "ytd": 0.0,
       "suspended": true,
       "usdPrice": null,
-      "inv100": null
+      "inv100": null,
+      "basePrice": 0.005024174006469591,
+      "baseSince": null
     },
     {
       "counter": "Proplastics",
@@ -461,7 +505,9 @@
       "ytd": 0.022142857142857242,
       "suspended": false,
       "usdPrice": 0.05329370754379693,
-      "inv100": 98.4978109517851
+      "inv100": 98.4978109517851,
+      "basePrice": 0.054106489300441735,
+      "baseSince": null
     },
     {
       "counter": "Riozim",
@@ -481,7 +527,9 @@
       "ytd": 0.3846153846153846,
       "suspended": false,
       "usdPrice": 0.03351805505899178,
-      "inv100": 60.227522419854616
+      "inv100": 60.227522419854616,
+      "basePrice": 0.05565238899474007,
+      "baseSince": null
     },
     {
       "counter": "RTG",
@@ -501,7 +549,9 @@
       "ytd": -0.14087291666666668,
       "suspended": false,
       "usdPrice": 0.04607403021094029,
-      "inv100": 183.40937297000906
+      "inv100": 183.40937297000906,
+      "basePrice": 0.02512087003234795,
+      "baseSince": null
     },
     {
       "counter": "Seedco Ltd",
@@ -521,7 +571,9 @@
       "ytd": 0.0024020800832034173,
       "suspended": false,
       "usdPrice": 0.1346042634966035,
-      "inv100": 88.2945658069253
+      "inv100": 88.2945658069253,
+      "basePrice": 0.15244909159069214,
+      "baseSince": null
     },
     {
       "counter": "Starafrica",
@@ -541,7 +593,9 @@
       "ytd": 1.5816334661354583,
       "suspended": false,
       "usdPrice": 0.002413262721964009,
-      "inv100": 219.09800562998788
+      "inv100": 219.09800562998788,
+      "basePrice": 0.001101453532187564,
+      "baseSince": null
     },
     {
       "counter": "Tanganda",
@@ -561,7 +615,9 @@
       "ytd": 4.659836065573771,
       "suspended": false,
       "usdPrice": 0.12857898343463237,
-      "inv100": 554.0551726418323
+      "inv100": 554.0551726418323,
+      "basePrice": 0.02320689162083718,
+      "baseSince": null
     },
     {
       "counter": "Tn Cybertech Investments Holdings Limited",
@@ -581,7 +637,9 @@
       "ytd": 5.2920121542977805,
       "suspended": false,
       "usdPrice": 0.027299785484447624,
-      "inv100": 588.6493495262781
+      "inv100": 588.6493495262781,
+      "basePrice": 0.004637699082895006,
+      "baseSince": null
     },
     {
       "counter": "Turnall",
@@ -601,7 +659,9 @@
       "ytd": 0.405,
       "suspended": false,
       "usdPrice": 0.005232540817542606,
-      "inv100": 135.39147039983314
+      "inv100": 135.39147039983314,
+      "basePrice": 0.003864749235745839,
+      "baseSince": null
     },
     {
       "counter": "Unifreight",
@@ -621,7 +681,9 @@
       "ytd": 0.14597550591953667,
       "suspended": false,
       "usdPrice": 0.07448456679775951,
-      "inv100": 110.13032671059129
+      "inv100": 110.13032671059129,
+      "basePrice": 0.06763311162555218,
+      "baseSince": null
     },
     {
       "counter": "Willdale",
@@ -641,7 +703,9 @@
       "ytd": 1.1016666666666666,
       "suspended": false,
       "usdPrice": 0.002348125968299368,
-      "inv100": 202.5250820571644
+      "inv100": 202.5250820571644,
+      "basePrice": 0.0011594247707237516,
+      "baseSince": null
     },
     {
       "counter": "Zb",
@@ -661,7 +725,9 @@
       "ytd": 0.5973684444444443,
       "suspended": false,
       "usdPrice": 0.26770341735192466,
-      "inv100": 153.92887008087368
+      "inv100": 153.92887008087368,
+      "basePrice": 0.17391371560856272,
+      "baseSince": null
     },
     {
       "counter": "Zeco",
@@ -681,7 +747,9 @@
       "ytd": 0.0,
       "suspended": false,
       "usdPrice": 6.703611011798356e-07,
-      "inv100": 96.36403587176737
+      "inv100": 96.36403587176737,
+      "basePrice": 6.956548624342509e-07,
+      "baseSince": null
     },
     {
       "counter": "Zimpapers",
@@ -701,7 +769,9 @@
       "ytd": 0.028571428571428692,
       "suspended": false,
       "usdPrice": 0.0026814444047193425,
-      "inv100": 99.11729403953217
+      "inv100": 99.11729403953217,
+      "basePrice": 0.002705324465022087,
+      "baseSince": null
     },
     {
       "counter": "Zimre",
@@ -721,7 +791,9 @@
       "ytd": -0.23375137513751376,
       "suspended": false,
       "usdPrice": 0.0285339947562865,
-      "inv100": 73.83880997294105
+      "inv100": 73.83880997294105,
+      "basePrice": 0.03864362760822264,
+      "baseSince": null
     },
     {
       "counter": "ZSE Holdings",
@@ -741,7 +813,9 @@
       "ytd": 2.0485828898759326,
       "suspended": false,
       "usdPrice": 0.16466675604814685,
-      "inv100": 327.74891123616885
+      "inv100": 327.74891123616885,
+      "basePrice": 0.0502417400646959,
+      "baseSince": null
     },
     {
       "counter": "Axia",
@@ -761,7 +835,9 @@
       "ytd": 0.5989999999999998,
       "suspended": false,
       "usdPrice": 0.1599,
-      "inv100": 161.02719033232626
+      "inv100": 161.02719033232626,
+      "basePrice": 0.0993,
+      "baseSince": null
     },
     {
       "counter": "Caledonia",
@@ -781,7 +857,9 @@
       "ytd": 0.0025062656641603454,
       "suspended": false,
       "usdPrice": 40.0,
-      "inv100": 100.25062656641603
+      "inv100": 100.25062656641603,
+      "basePrice": 39.9,
+      "baseSince": null
     },
     {
       "counter": "Econet InfraCo",
@@ -801,7 +879,9 @@
       "ytd": -0.3057575757575758,
       "suspended": false,
       "usdPrice": 0.2291,
-      "inv100": null
+      "inv100": 76.11295681063123,
+      "basePrice": 0.301,
+      "baseSince": "2026-03-31"
     },
     {
       "counter": "Edgars",
@@ -821,7 +901,9 @@
       "ytd": 0.0,
       "suspended": false,
       "usdPrice": 0.0,
-      "inv100": null
+      "inv100": null,
+      "basePrice": 0.023,
+      "baseSince": null
     },
     {
       "counter": "First Capital Bank Limited",
@@ -841,7 +923,9 @@
       "ytd": 0.719512195121951,
       "suspended": false,
       "usdPrice": 0.1551,
-      "inv100": 168.40390879478826
+      "inv100": 168.40390879478826,
+      "basePrice": 0.0921,
+      "baseSince": null
     },
     {
       "counter": "Innscor Africa Limited",
@@ -861,7 +945,9 @@
       "ytd": 0.5949869451697127,
       "suspended": false,
       "usdPrice": 1.5272,
-      "inv100": 136.4668036815298
+      "inv100": 136.4668036815298,
+      "basePrice": 1.1191,
+      "baseSince": null
     },
     {
       "counter": "Invictus Energy ZDR",
@@ -881,7 +967,9 @@
       "ytd": -0.06269592476489039,
       "suspended": false,
       "usdPrice": 0.1495,
-      "inv100": 93.73040752351096
+      "inv100": 93.73040752351096,
+      "basePrice": 0.1595,
+      "baseSince": null
     },
     {
       "counter": "Kavango Resources Plc",
@@ -901,7 +989,9 @@
       "ytd": 0.1607142857142858,
       "suspended": false,
       "usdPrice": 0.0195,
-      "inv100": 112.71676300578035
+      "inv100": 112.71676300578035,
+      "basePrice": 0.0173,
+      "baseSince": null
     },
     {
       "counter": "Old Mutual Limited",
@@ -921,7 +1011,9 @@
       "ytd": 0.1510809773570425,
       "suspended": false,
       "usdPrice": 0.8998,
-      "inv100": null
+      "inv100": 115.10809773570425,
+      "basePrice": 0.7817,
+      "baseSince": "2026-08-12"
     },
     {
       "counter": "Padenga",
@@ -941,7 +1033,9 @@
       "ytd": 1.52,
       "suspended": false,
       "usdPrice": 1.4994,
-      "inv100": 269.72477064220186
+      "inv100": 269.72477064220186,
+      "basePrice": 0.5559,
+      "baseSince": null
     },
     {
       "counter": "Seedco Int",
@@ -961,7 +1055,9 @@
       "ytd": 0.9911504424778761,
       "suspended": false,
       "usdPrice": 0.45,
-      "inv100": 173.1435167372066
+      "inv100": 173.1435167372066,
+      "basePrice": 0.2599,
+      "baseSince": null
     },
     {
       "counter": "Simbisa",
@@ -981,7 +1077,9 @@
       "ytd": 0.4563106796116505,
       "suspended": false,
       "usdPrice": 0.72,
-      "inv100": 120.04001333777924
+      "inv100": 120.04001333777924,
+      "basePrice": 0.5998,
+      "baseSince": null
     },
     {
       "counter": "TSL",
@@ -1001,7 +1099,9 @@
       "ytd": -0.18882466281310217,
       "suspended": false,
       "usdPrice": 0.2105,
-      "inv100": 198.0605981818182
+      "inv100": 198.0605981818182,
+      "basePrice": 0.10628060398301056,
+      "baseSince": null
     },
     {
       "counter": "West Prop Holdings Limited",
@@ -1021,7 +1121,9 @@
       "ytd": 0.0,
       "suspended": false,
       "usdPrice": 10.0,
-      "inv100": 100.0
+      "inv100": 100.0,
+      "basePrice": 10.0,
+      "baseSince": null
     },
     {
       "counter": "Zimplow Holdings Limited",
@@ -1041,7 +1143,9 @@
       "ytd": 1.7906976744186047,
       "suspended": false,
       "usdPrice": 0.12,
-      "inv100": 279.06976744186045
+      "inv100": 279.06976744186045,
+      "basePrice": 0.043,
+      "baseSince": null
     },
     {
       "counter": "Eagle REIT",
@@ -1061,7 +1165,9 @@
       "ytd": 0.3750000000000002,
       "suspended": false,
       "usdPrice": 0.33,
-      "inv100": 114.58333333333334
+      "inv100": 114.58333333333334,
+      "basePrice": 0.288,
+      "baseSince": null
     },
     {
       "counter": "Pfuma REIT",
@@ -1081,7 +1187,9 @@
       "ytd": 0.607,
       "suspended": false,
       "usdPrice": 0.1607,
-      "inv100": null
+      "inv100": 160.7,
+      "basePrice": 0.1,
+      "baseSince": "2026-02-06"
     },
     {
       "counter": "Revitus",
@@ -1101,7 +1209,9 @@
       "ytd": 0.5384615384615383,
       "suspended": false,
       "usdPrice": 2.0,
-      "inv100": 136.986301369863
+      "inv100": 136.986301369863,
+      "basePrice": 1.46,
+      "baseSince": null
     },
     {
       "counter": "Tigere Reit",
@@ -1121,7 +1231,9 @@
       "ytd": -0.21098464117716342,
       "suspended": false,
       "usdPrice": 1.13892,
-      "inv100": 73.15113417913717
+      "inv100": 73.15113417913717,
+      "basePrice": 1.556941,
+      "baseSince": null
     }
   ]
 }

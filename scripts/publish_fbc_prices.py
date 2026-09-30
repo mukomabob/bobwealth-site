@@ -192,6 +192,59 @@ def load_baseline():
 
 
 # ─── Gmail (IMAP) ───────────────────────────────────────────────────────────────
+# ─── late listings: counters with no Jan-6 price ─────────────────────────────
+# A counter listed after the baseline is measured from its published listing
+# price when we know it (the price investors actually paid), and otherwise from
+# its first price in data/fbc-sheets/. The archive only starts on 16 Mar 2026,
+# so anything that listed before then needs an entry here. Checked against the
+# archive: Econet InfraCo (first trade 31 Mar) and Old Mutual Limited (first
+# trade 12 Aug, closed 78.17c) are already exact there and need no override.
+LISTING_PRICES = {
+    # 471.3m units placed at US$0.10, listed on VFEX 6 Feb 2026.
+    # https://www.newzimbabwe.com/pfuma-reit-lists-on-vfex-after-us25-million-private-placement/
+    "PFUMA REIT": {"price": 0.10, "since": "2026-02-06"},
+}
+
+ARCHIVE_DATE_RE = re.compile(r"^(\d{2})\.(\d{2})\.(\d{2})\.xlsx$", re.IGNORECASE)
+
+
+def archive_iso_date(fname):
+    m = ARCHIVE_DATE_RE.match(fname)
+    return f"20{m.group(3)}-{m.group(2)}-{m.group(1)}" if m else None
+
+
+def load_late_listing_baselines(known, before_iso):
+    """Earliest archived USD price for every counter the Jan-6 baseline lacks.
+
+    Only sheets dated strictly before `before_iso` count, so a counter that
+    first appears today starts tomorrow rather than showing a meaningless $100.
+    Returns {COUNTER_UPPER: {"price": float, "since": "YYYY-MM-DD"}}.
+    """
+    if not os.path.isdir(SHEETS_DIR):
+        return {}
+    dated = sorted(
+        (iso, name) for name in os.listdir(SHEETS_DIR)
+        if (iso := archive_iso_date(name)) and iso < before_iso
+    )
+    late = {k: dict(v) for k, v in LISTING_PRICES.items() if k not in known and v["since"] < before_iso}
+    for iso, name in dated:
+        try:
+            wb = load_workbook(os.path.join(SHEETS_DIR, name), read_only=True, data_only=True)
+            raw = [list(row) for row in wb.worksheets[0].iter_rows(values_only=True)]
+            wb.close()
+            rows, _ = parse_sheet(raw, name)
+        except Exception as e:  # one unreadable archive file must not block publishing
+            print(f"Skipping archived sheet {name}: {e}", file=sys.stderr)
+            continue
+        for r in rows:
+            key = r["counter"].strip().upper()
+            if key in known or key in late:
+                continue
+            if r["usdPrice"] and r["usdPrice"] > 0:
+                late[key] = {"price": r["usdPrice"], "since": iso}
+    return late
+
+
 def decode_str(s):
     parts = decode_header(s or "")
     out = []
@@ -284,11 +337,21 @@ def main():
         return 1
 
     base, base_date = load_baseline()
+    today_iso = archive_iso_date(parse_fname) or datetime.now(HARARE).strftime("%Y-%m-%d")
+    late = load_late_listing_baselines(set(base), today_iso)
+
+    def start_point(r):
+        key = r["counter"].strip().upper()
+        if key in base:
+            return base[key]["price"], None
+        if key in late:
+            return late[key]["price"], late[key]["since"]
+        return None, None
 
     def inv100(r):
-        b = base.get(r["counter"].strip().upper())
-        if b and b["price"] > 0 and r["usdPrice"] and r["usdPrice"] > 0:
-            return (r["usdPrice"] / b["price"]) * 100
+        price, _ = start_point(r)
+        if price and price > 0 and r["usdPrice"] and r["usdPrice"] > 0:
+            return (r["usdPrice"] / price) * 100
         return None
 
     now = datetime.now(timezone.utc)
@@ -318,6 +381,10 @@ def main():
                 "suspended": r["suspended"],
                 "usdPrice": r["usdPrice"],
                 "inv100": inv100(r),
+                "basePrice": start_point(r)[0],
+                # Set only for counters missing from the Jan-6 baseline: the
+                # date of the first archived price their $100 is measured from.
+                "baseSince": start_point(r)[1],
             }
             for r in rows
         ],

@@ -2082,9 +2082,19 @@ function getInvValue(r) {
   return (r.usdPrice / base.price) * 100;
 }
 
+// Counters listed after the Jan-6 baseline carry baseSince: the date of the first
+// archived price their $100 is measured from.
+const fmtSince = iso => new Date(iso + 'T00:00:00').toLocaleDateString('en-GB', {day:'numeric', month:'short'});
+const SINCE_TAG = r => r.baseSince
+  ? `<span title="Listed after the Jan baseline — measured from its first available price" style="font-size:8px;font-family:var(--mono);color:var(--gold-l);margin-left:4px">since ${fmtSince(r.baseSince)}</span>`
+  : '';
+
 function renderBarChart() {
   const el = document.getElementById('barchartContent');
   const results = window.PS.filter(r => getInvValue(r) != null).map(r => ({...r, inv100: getInvValue(r)}));
+  const excluded = window.PS.filter(r => getInvValue(r) == null)
+    .map(r => r.counter.trim() + (r.suspended ? ' (suspended)' : ' (no price today)'));
+  const lateCount = results.filter(r => r.baseSince).length;
   if (!results.length) { el.innerHTML='<div class="state-card"><div class="sc-icon">📊</div><h3>No investment data</h3><p>Data will appear after a snapshot with baseline is published.</p></div>'; return; }
   results.sort((a,b) => b.inv100 - a.inv100);
   const mktF = document.getElementById('bcMktF')?.value || '';
@@ -2104,7 +2114,7 @@ function renderBarChart() {
   const rows = filtered.map(r => {
     const v=(r.inv100/100)*investment, cls=r.inv100>100?'iv-up':r.inv100<100?'iv-dn':'iv-nc';
     const liq=calcLiquidity(r);
-    return `<div class="bc-row"><div class="bc-label" title="${r.counter}">${r.counter}${r.suspended?' *':''}</div><div class="bc-bar-wrap"><div class="bc-bar" style="width:${scale(v)}px;background:${barColor(v)}"></div><span class="bc-val ${cls}">$${v.toFixed(2)}</span><span class="bc-sect">${r.sector}</span>${r.market==='VFEX'?'<span style="font-size:8px;font-family:var(--mono);color:var(--ts);margin-left:3px">(VFEX)</span>':''}<span style="margin-left:6px">${Q_SCORE_CELL(liq)}</span></div></div>`;
+    return `<div class="bc-row"><div class="bc-label" title="${r.counter}">${r.counter}${r.suspended?' *':''}</div><div class="bc-bar-wrap"><div class="bc-bar" style="width:${scale(v)}px;background:${barColor(v)}"></div><span class="bc-val ${cls}">$${v.toFixed(2)}</span><span class="bc-sect">${r.sector}</span>${SINCE_TAG(r)}${r.market==='VFEX'?'<span style="font-size:8px;font-family:var(--mono);color:var(--ts);margin-left:3px">(VFEX)</span>':''}<span style="margin-left:6px">${Q_SCORE_CELL(liq)}</span></div></div>`;
   }).join('');
 
   // $100 table (merged in)
@@ -2112,10 +2122,10 @@ function renderBarChart() {
   const irow = r => {
     const pct=r.inv100-100, bc=r.inv100>100?'#1D6B3A':r.inv100<100?'#C0392B':'#7A7A7A';
     const cls=r.inv100>100?'iv-up':r.inv100<100?'iv-dn':'iv-nc';
-    const basePx=(window.BASE[r.counter.trim().toUpperCase()]||{}).price||0;
+    const basePx=(window.BASE[r.counter.trim().toUpperCase()]||{}).price||r.basePrice||0;
     const liq=calcLiquidity(r);
     return `<tr>
-      <td class="tf hi">${r.counter}</td>
+      <td class="tf hi">${r.counter}${SINCE_TAG(r)}</td>
       <td><span class="sect${r.market==='VFEX'?' sect-v':''}">${r.market}</span></td>
       <td><span class="sect">${r.sector}</span></td>
       <td class="nc" style="font-size:10px">${basePx?'$'+basePx.toFixed(5):'—'}</td>
@@ -2141,7 +2151,9 @@ function renderBarChart() {
         </div>
         <div style="font-size:14px;font-weight:600;color:var(--text);font-family:var(--font)">If you invested US$<span id="dynamicLabelAmount">${investment.toLocaleString()}</span> in each counter at the beginning of the year,</div>
         <div style="font-size:14px;font-weight:600;color:var(--text);font-family:var(--font);margin-top:2px">on <strong>${priceDate}</strong> it would be worth;</div>
-        <div style="margin-top:8px;display:flex;gap:20px;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--ts)"><span>${results.length} counters tracked</span><span>${filtered.length} shown</span></div>
+        <div style="margin-top:8px;display:flex;gap:20px;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--ts)"><span>${results.length} of ${window.PS.length} counters tracked</span><span>${filtered.length} shown</span></div>
+        ${lateCount ? `<div style="margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--ts)">${lateCount} listed after ${window.BASE_DATE||'Jan 6 2026'} — measured from their first available price (marked <span style="color:var(--gold-l)">since …</span>)</div>` : ''}
+        ${excluded.length ? `<div style="margin-top:4px;font-family:var(--mono);font-size:10px;color:var(--ts)">Not tracked: ${excluded.join(', ')}</div>` : ''}
       </div>
       <div class="bchart-controls" style="margin-bottom:16px">
         <label style="font-family:var(--mono);font-size:10px">Investment Amount ($)</label>
