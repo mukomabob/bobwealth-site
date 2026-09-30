@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
 <title>Markets — Bob Wealth Holdings</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -409,8 +410,8 @@ const BASELINE_RAW  = 'https://raw.githubusercontent.com/mukomabob/bobwealth-sit
 const BASELINE_URLS = [
   // jsDelivr CDN — mirrors GitHub, has permissive CORS headers
   'https://cdn.jsdelivr.net/gh/mukomabob/bobwealth-site@main/Price%20Sheet%2006.01.26.xlsx',
-  // allorigins proxy — wraps any URL with CORS headers
-  'https://api.allorigins.win/raw?url=' + encodeURIComponent(BASELINE_RAW),
+  // GitHub raw — direct fallback if jsDelivr is unavailable
+  BASELINE_RAW,
 ];
 const BASELINE_FNAME = 'Price_Sheet_06_01_26.xlsx';
 

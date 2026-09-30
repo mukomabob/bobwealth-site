@@ -87,11 +87,23 @@ already in a form fit to read aloud:
 const SELECT_ONLY_RE = /^\s*(SELECT|WITH)\b/i;
 const FORBIDDEN_RE = /\b(INSERT|UPDATE|DELETE|DROP|ALTER|ATTACH|PRAGMA|VACUUM|REPLACE|CREATE)\b/i;
 
+// Only these sites may call the Worker from a browser. Override with the
+// ALLOWED_ORIGINS var in wrangler.toml (comma-separated) without a code change.
+const DEFAULT_ALLOWED_ORIGINS = ["https://bobwealth.org", "https://www.bobwealth.org"];
+const MAX_QUESTION_CHARS = 500;
+
+function allowedOrigins(env) {
+  const raw = (env && env.ALLOWED_ORIGINS) || "";
+  const list = raw.split(",").map((o) => o.trim()).filter(Boolean);
+  return list.length ? list : DEFAULT_ALLOWED_ORIGINS;
+}
+
 function corsHeaders(origin) {
   return {
-    "Access-Control-Allow-Origin": origin || "*",
+    "Access-Control-Allow-Origin": origin,
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
+    Vary: "Origin",
   };
 }
 
@@ -131,12 +143,18 @@ async function handleAsk(request, env, origin) {
     });
   }
 
-  const question = (body.question || "").trim();
+  const question = String(body.question || "").trim();
   if (!question) {
     return new Response(JSON.stringify({ error: "Missing 'question'." }), {
       status: 400,
       headers: { "Content-Type": "application/json", ...corsHeaders(origin) },
     });
+  }
+  if (question.length > MAX_QUESTION_CHARS) {
+    return new Response(
+      JSON.stringify({ error: `Please keep questions under ${MAX_QUESTION_CHARS} characters.` }),
+      { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders(origin) } }
+    );
   }
 
   // Step 1: text -> SQL
@@ -170,7 +188,6 @@ async function handleAsk(request, env, origin) {
       JSON.stringify({
         answer: "That query didn't run cleanly against the database -- try asking a simpler or more specific version of the question.",
         sql,
-        error: String(e),
         rows: [],
       }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders(origin) } }
@@ -196,7 +213,13 @@ async function handleAsk(request, env, origin) {
 
 export default {
   async fetch(request, env) {
-    const origin = request.headers.get("Origin");
+    const origin = request.headers.get("Origin") || "";
+
+    // Browsers always send Origin on a cross-site POST, so a missing or
+    // unknown one is either another website or a script -- refuse both.
+    if (!allowedOrigins(env).includes(origin)) {
+      return new Response("Forbidden", { status: 403 });
+    }
 
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: corsHeaders(origin) });
@@ -207,10 +230,24 @@ export default {
         headers: corsHeaders(origin),
       });
     }
+    // Origin can be faked outside a browser, so also cap requests per client IP.
+    // The binding is optional: without it (e.g. local dev) this check is skipped.
+    if (env.RATE_LIMITER) {
+      const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+      const { success } = await env.RATE_LIMITER.limit({ key: ip });
+      if (!success) {
+        return new Response(
+          JSON.stringify({ error: "Too many questions in a short time -- please wait a minute and try again." }),
+          { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders(origin) } }
+        );
+      }
+    }
+
     try {
       return await handleAsk(request, env, origin);
     } catch (e) {
-      return new Response(JSON.stringify({ error: String(e) }), {
+      console.error("handleAsk failed:", e);
+      return new Response(JSON.stringify({ error: "Something went wrong answering that -- please try again." }), {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders(origin) },
       });
