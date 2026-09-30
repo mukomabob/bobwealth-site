@@ -187,6 +187,27 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 .iv-bar{display:inline-block;height:4px;border-radius:2px;min-width:3px;vertical-align:middle;margin-left:5px}
 .inv-note{font-size:10px;font-family:var(--mono);color:var(--ts);margin-top:8px;padding-top:8px;border-top:1px solid var(--bl);line-height:1.6}
 
+/* ASK THE DATA (above the simulator) */
+.sim-ask{max-width:1100px;margin:16px auto 0;padding:0 16px}
+.sim-ask-form{display:flex;gap:8px}
+.sim-ask-input{flex:1;min-width:0;background:var(--surface-2);border:1px solid var(--border);border-radius:4px;padding:9px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none}
+.sim-ask-input:focus{border-color:var(--gold)}
+.sim-ask-btn{background:var(--gold);border:none;color:#161A17;font-family:var(--font);font-weight:600;font-size:13px;padding:9px 20px;border-radius:4px;cursor:pointer}
+.sim-ask-btn:hover{background:var(--gold-l)}
+.sim-ask-btn:disabled{opacity:.6;cursor:default}
+.sim-ask-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.sim-ask-chip{background:transparent;border:1px solid var(--border);color:var(--tm);font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:12px;cursor:pointer}
+.sim-ask-chip:hover{border-color:var(--gl);color:var(--white)}
+.sim-ask-answer{margin-top:12px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:4px;padding:12px 14px}
+.sim-ask-text{font-size:13px;line-height:1.7;color:var(--text)}
+.sim-ask-text.loading{color:var(--ts);font-style:italic}
+.sim-ask-text.error{color:var(--red)}
+.sim-ask-filter{margin-top:8px;font-family:var(--mono);font-size:10px;color:var(--gold-l);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sim-ask-filter button{background:transparent;border:1px solid rgba(201,151,58,.4);color:var(--gold-l);font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:3px;cursor:pointer}
+.sim-ask-sql-toggle{margin-top:8px;background:none;border:none;color:var(--ts);font-family:var(--mono);font-size:10px;cursor:pointer;padding:0;text-decoration:underline}
+.sim-ask-sql{margin-top:6px;white-space:pre-wrap;font-family:var(--mono);font-size:10px;color:var(--tm);background:var(--surface-2);padding:8px;border-radius:4px}
+@media print{.sim-ask{display:none}}
+
 /* LOADING / ERROR */
 .state-card{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;color:var(--ts)}
 .state-card .sc-icon{font-size:40px;margin-bottom:14px;opacity:.4}
@@ -337,7 +358,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
     <div class="ni" onclick="nav('barchart',this)"><span class="ni-ic">▬</span>Investment Simulator</div>
     <div class="ni" onclick="nav('liquidity',this)"><span class="ni-ic">◉</span>Liquidity Score Rankings</div>
     <div class="ni" onclick="nav('modelpicks',this)"><span class="ni-ic">🤖</span>Model Picks</div>
-    <div class="ni" onclick="nav('stockchat',this)"><span class="ni-ic">💬</span>Ask the Data</div>
   </nav>
   <div class="sb-foot">
     <p>Data Source<br><span class="sfs">FBC Securities (Pvt) Ltd</span></p>
@@ -432,7 +452,25 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
     </div>
 
     <!-- BAR CHART (Investment Simulator + $100 Tracker merged) -->
-    <div class="vp" id="page-barchart"><div id="barchartContent">
+    <div class="vp" id="page-barchart">
+    <div class="sim-ask" id="simAsk">
+      <form class="sim-ask-form" id="simAskForm">
+        <input type="text" class="sim-ask-input" id="simAskInput" placeholder="Ask the data — e.g. Which REITs have gained most this year?" autocomplete="off" maxlength="500" required>
+        <button type="submit" class="sim-ask-btn" id="simAskBtn">Ask</button>
+      </form>
+      <div class="sim-ask-chips">
+        <button type="button" class="sim-ask-chip">Top 5 gainers this year</button>
+        <button type="button" class="sim-ask-chip">Which REITs are up the most?</button>
+        <button type="button" class="sim-ask-chip">Most traded counters this month</button>
+      </div>
+      <div class="sim-ask-answer" id="simAskAnswer" hidden>
+        <div class="sim-ask-text" id="simAskText"></div>
+        <div class="sim-ask-filter" id="simAskFilter" hidden></div>
+        <button type="button" class="sim-ask-sql-toggle" id="simAskSqlToggle" hidden>Show the query</button>
+        <pre class="sim-ask-sql" id="simAskSql" hidden></pre>
+      </div>
+    </div>
+    <div id="barchartContent">
       <div class="state-card"><div class="spinner"></div><h3>Preparing chart…</h3></div>
     </div></div>
 
@@ -440,424 +478,6 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
     <div class="vp" id="page-modelpicks"><div id="modelPicksContent">
       <div class="state-card"><div class="spinner"></div><h3>Loading model predictions…</h3></div>
     </div></div>
-
-    <!-- STOCK CHAT -->
-    <div class="vp" id="page-stockchat">
-      <div class="mc" style="max-width:720px;margin:20px auto 0;text-align:center">
-        <div class="mc-title" style="text-align:center;border-bottom:none;margin-bottom:2px">Ask the Data</div>
-        <h2 style="font-family:var(--font);font-size:20px;font-weight:700;margin:2px 0 10px;color:var(--text)">Stock Trend Assistant</h2>
-        <p style="font-size:12px;color:var(--tm);line-height:1.6;margin:0 0 20px">
-          Ask a question about ZSE/VFEX price history, trends, or sector performance. Answers are computed from the actual archived price sheets — not guessed.
-        </p>
-
-        <form class="sc-form" id="sc-form">
-          <input type="text" class="sc-input" id="sc-question" placeholder="e.g. How has Pfuma REIT trended over the last month?" autocomplete="off" required />
-          <button type="submit" class="sc-btn" id="sc-btn">Ask</button>
-        </form>
-
-        <div class="sc-examples">
-          <span>Try:</span>
-          <button type="button" class="sc-chip">Top 5 gainers today</button>
-          <button type="button" class="sc-chip">Most volatile sector</button>
-          <button type="button" class="sc-chip">Best performer this year</button>
-        </div>
-
-        <div class="sc-answer" id="sc-answer" hidden>
-          <div class="sc-answer-text" id="sc-answer-text"></div>
-          <div class="sc-chart" id="sc-chart" hidden></div>
-          <button type="button" class="sc-details-toggle" id="sc-details-toggle" hidden>
-            Show the query this was grounded in
-          </button>
-          <pre class="sc-details" id="sc-details" hidden></pre>
-        </div>
-      </div>
-    </div>
-
-    <style>
-      #page-stockchat .sc-form{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
-      #page-stockchat .sc-input{
-        flex:1; min-width:240px; background:var(--surface-2); border:1px solid var(--border);
-        border-radius:4px; padding:9px 12px; color:var(--text); font-family:var(--font); font-size:13px; outline:none;
-      }
-      #page-stockchat .sc-input:focus{ border-color:var(--gold); }
-      #page-stockchat .sc-btn{
-        background:var(--gold); border:none; color:#161A17; font-family:var(--font); font-weight:600;
-        font-size:13px; padding:9px 20px; border-radius:4px; cursor:pointer;
-      }
-      #page-stockchat .sc-btn:hover{ background:var(--gold-l); }
-      #page-stockchat .sc-btn:disabled{ opacity:.6; cursor:default; }
-      #page-stockchat .sc-examples{
-        margin-top:14px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center;
-        align-items:center; font-family:var(--mono); font-size:10px; letter-spacing:.06em;
-        text-transform:uppercase; color:var(--ts);
-      }
-      #page-stockchat .sc-chip{
-        background:transparent; border:1px solid var(--border); color:var(--tm);
-        font-family:var(--font); font-size:12px; padding:6px 12px; border-radius:20px;
-        cursor:pointer; transition:all .15s; text-transform:none; letter-spacing:normal;
-      }
-      #page-stockchat .sc-chip:hover{ border-color:var(--gl); color:var(--white); }
-      #page-stockchat .sc-answer{
-        margin-top:24px; text-align:left; background:var(--surface-2);
-        border:1px solid var(--border); border-radius:6px; padding:18px 20px;
-      }
-      #page-stockchat .sc-answer-text{ font-size:13px; line-height:1.75; color:var(--text); }
-      #page-stockchat .sc-answer-text.sc-loading{ color:var(--ts); font-style:italic; }
-      #page-stockchat .sc-answer-text.sc-error{ color:var(--red); }
-      #page-stockchat .sc-details-toggle{
-        margin-top:12px; background:none; border:none; color:var(--gold-l);
-        font-family:var(--font); font-size:12px; cursor:pointer; padding:0;
-        text-decoration:underline; text-underline-offset:3px;
-      }
-      #page-stockchat .sc-details{
-        margin-top:10px; background:var(--bg); border:1px solid var(--border);
-        border-radius:4px; padding:12px 14px; font-family:var(--mono); font-size:11px;
-        color:var(--tm); overflow-x:auto; white-space:pre-wrap; word-break:break-word;
-      }
-
-      /* Ask the Data -- inline chart (line for a single-counter trend over
-         dates, horizontal bars for a multi-counter leaderboard). Single
-         series each, so no legend box -- the caption above names the metric. */
-      #page-stockchat .sc-chart{ margin-top:18px; }
-      #page-stockchat .sc-chart[hidden]{ display:none; }
-      #page-stockchat .sc-chart-caption{
-        font-family:var(--mono); font-size:10px; letter-spacing:.06em; text-transform:uppercase;
-        color:var(--ts); margin-bottom:8px;
-      }
-      #page-stockchat .sc-chart-wrap{ position:relative; }
-      #page-stockchat .sc-chart-wrap svg{ display:block; overflow:visible; }
-      #page-stockchat .sc-chart-wrap svg text{ font-family:var(--mono); }
-      #page-stockchat .sc-chart-tip{
-        position:absolute; top:0; transform:translate(-50%,-115%);
-        background:var(--bg); border:1px solid var(--border); border-radius:4px;
-        padding:4px 8px; font-family:var(--mono); font-size:11px; color:var(--text);
-        white-space:nowrap; pointer-events:none;
-      }
-      #page-stockchat .sc-bar-list{ display:flex; flex-direction:column; gap:6px; }
-      #page-stockchat .sc-bar-row{
-        display:grid; grid-template-columns:112px 1fr 68px; align-items:center; gap:10px;
-      }
-      #page-stockchat .sc-bar-label{
-        font-size:12px; color:var(--tm); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-      }
-      #page-stockchat .sc-bar-track{
-        background:var(--bg); border-radius:3px; height:16px; position:relative; overflow:hidden;
-      }
-      #page-stockchat .sc-bar-fill{
-        position:absolute; left:0; top:0; bottom:0; border-radius:3px; min-width:3px;
-      }
-      #page-stockchat .sc-bar-pos{ background:var(--gain); }
-      #page-stockchat .sc-bar-neg{ background:var(--red); }
-      #page-stockchat .sc-bar-value{
-        font-family:var(--mono); font-size:11px; text-align:right; font-weight:600;
-      }
-      #page-stockchat .sc-bar-pos-text{ color:var(--gain); }
-      #page-stockchat .sc-bar-neg-text{ color:var(--red); }
-    </style>
-
-    <script>
-    (function () {
-      const WORKER_URL = "https://fbc-stock-agent.robertzata23.workers.dev/";
-      const SVGNS = "http://www.w3.org/2000/svg";
-
-      const form = document.getElementById("sc-form");
-      const input = document.getElementById("sc-question");
-      const btn = document.getElementById("sc-btn");
-      const answerBox = document.getElementById("sc-answer");
-      const answerText = document.getElementById("sc-answer-text");
-      const chartBox = document.getElementById("sc-chart");
-      const detailsToggle = document.getElementById("sc-details-toggle");
-      const details = document.getElementById("sc-details");
-
-      // ---- figure rendering -------------------------------------------------
-      // The Worker returns the actual SQL result rows alongside the prose
-      // answer. When those rows plot cleanly -- one counter's metric across
-      // dates, or one metric across several counters -- draw a small inline
-      // chart instead of leaving the numbers as text only.
-
-      const METRIC_PRIORITY = [
-        /ytd_gain|gain_loss/i,
-        /change_pct|chg_pct|chg\b/i,
-        /usd_price|price/i,
-        /^close$/i,
-        /volume/i,
-        /value_traded/i,
-        /std|volatil/i,
-        /yield/i,
-      ];
-
-      function pickFields(rows) {
-        const keys = Object.keys(rows[0]);
-        const dateKey = keys.find(function (k) { return /^date$/i.test(k); }) ||
-          keys.find(function (k) { return /date/i.test(k); });
-        const counterKey = keys.find(function (k) { return /^counter$/i.test(k); }) ||
-          keys.find(function (k) { return /counter|name/i.test(k); });
-        const numericKeys = keys.filter(function (k) {
-          return k !== dateKey && rows.some(function (r) { return typeof r[k] === "number"; });
-        });
-        if (!numericKeys.length) return null;
-        let valueKey = null;
-        for (let i = 0; i < METRIC_PRIORITY.length; i++) {
-          valueKey = numericKeys.find(function (k) { return METRIC_PRIORITY[i].test(k); });
-          if (valueKey) break;
-        }
-        if (!valueKey) valueKey = numericKeys[0];
-        return { dateKey: dateKey, counterKey: counterKey, valueKey: valueKey };
-      }
-
-      function decideChart(rows) {
-        if (!rows || rows.length < 2) return null;
-        const fields = pickFields(rows);
-        if (!fields || !fields.valueKey) return null;
-        const dateKey = fields.dateKey, counterKey = fields.counterKey, valueKey = fields.valueKey;
-
-        if (dateKey) {
-          const counters = counterKey ? new Set(rows.map(function (r) { return r[counterKey]; })) : new Set([1]);
-          if (counters.size <= 1) {
-            const pts = rows
-              .filter(function (r) { return typeof r[valueKey] === "number"; })
-              .map(function (r) { return { label: String(r[dateKey]), value: r[valueKey] }; })
-              .sort(function (a, b) { return a.label < b.label ? -1 : a.label > b.label ? 1 : 0; });
-            if (pts.length >= 2) return { type: "line", valueKey: valueKey, points: pts };
-          }
-        }
-
-        if (counterKey) {
-          const pts = rows
-            .filter(function (r) { return typeof r[valueKey] === "number"; })
-            .map(function (r) { return { label: String(r[counterKey]), value: r[valueKey] }; })
-            .slice(0, 12);
-          if (pts.length >= 2) return { type: "bar", valueKey: valueKey, points: pts };
-        }
-
-        return null;
-      }
-
-      function formatMetricValue(key, v) {
-        if (v === null || v === undefined || Number.isNaN(v)) return "—";
-        const k = key.toLowerCase();
-        if (/ytd_gain|gain_loss/.test(k)) {
-          // FRACTION of price change vs the 31-Dec-2024 baseline (ZiG terms) --
-          // not already a percentage, unlike change_pct etc below. 6.54 means +654%.
-          return (v > 0 ? "+" : "") + (v * 100).toFixed(2) + "%";
-        }
-        if (/pct|gain|loss|chg|change|yield|std/.test(k)) {
-          return (v > 0 ? "+" : "") + v.toFixed(2) + "%";
-        }
-        if (/price|usd/.test(k)) {
-          return "$" + v.toFixed(4).replace(/0+$/, "").replace(/\.$/, "");
-        }
-        if (/mkt_cap|value_traded/.test(k)) {
-          return "$" + Math.round(v).toLocaleString();
-        }
-        if (/volume|shares/.test(k)) {
-          return Math.round(v).toLocaleString();
-        }
-        return String(Math.round(v * 100) / 100);
-      }
-
-      function svgEl(tag, attrs) {
-        const el = document.createElementNS(SVGNS, tag);
-        for (const k in attrs) el.setAttribute(k, attrs[k]);
-        return el;
-      }
-
-      function renderLineChart(container, chart) {
-        const W = 600, H = 170, padL = 8, padR = 8, padT = 14, padB = 22;
-        const pts = chart.points;
-        const values = pts.map(function (p) { return p.value; });
-        const minV = Math.min.apply(null, values);
-        const maxV = Math.max.apply(null, values);
-        const span = (maxV - minV) || 1;
-        const x = function (i) { return padL + (i / (pts.length - 1)) * (W - padL - padR); };
-        const y = function (v) { return padT + (1 - (v - minV) / span) * (H - padT - padB); };
-
-        const svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, width: "100%", height: "170", role: "img", "aria-label": "Trend chart" });
-
-        const gTop = svgEl("text", { x: padL, y: 10, fill: "var(--tm)", "font-size": "9" });
-        gTop.textContent = formatMetricValue(chart.valueKey, maxV);
-        const gBot = svgEl("text", { x: padL, y: H - 6, fill: "var(--tm)", "font-size": "9" });
-        gBot.textContent = formatMetricValue(chart.valueKey, minV);
-        svg.appendChild(gTop);
-        svg.appendChild(gBot);
-
-        let areaD = "M " + x(0) + " " + (H - padB) + " ";
-        pts.forEach(function (p, i) { areaD += "L " + x(i) + " " + y(p.value) + " "; });
-        areaD += "L " + x(pts.length - 1) + " " + (H - padB) + " Z";
-        svg.appendChild(svgEl("path", { d: areaD, fill: "var(--gold)", opacity: "0.12", stroke: "none" }));
-
-        let lineD = "";
-        pts.forEach(function (p, i) { lineD += (i === 0 ? "M " : "L ") + x(i) + " " + y(p.value) + " "; });
-        svg.appendChild(svgEl("path", { d: lineD, fill: "none", stroke: "var(--gold-l)", "stroke-width": "2", "stroke-linecap": "round", "stroke-linejoin": "round" }));
-
-        const last = pts[pts.length - 1];
-        svg.appendChild(svgEl("circle", { cx: x(pts.length - 1), cy: y(last.value), r: "3.5", fill: "var(--gold-l)" }));
-
-        const crosshair = svgEl("line", { x1: 0, x2: 0, y1: padT, y2: H - padB, stroke: "var(--border)", "stroke-width": "1", visibility: "hidden" });
-        const hoverDot = svgEl("circle", { r: "4", fill: "var(--white)", stroke: "var(--gold)", "stroke-width": "2", visibility: "hidden" });
-        svg.appendChild(crosshair);
-        svg.appendChild(hoverDot);
-
-        const hit = svgEl("rect", { x: padL, y: 0, width: W - padL - padR, height: H, fill: "transparent" });
-        svg.appendChild(hit);
-
-        const tip = document.createElement("div");
-        tip.className = "sc-chart-tip";
-        tip.hidden = true;
-
-        const wrap = document.createElement("div");
-        wrap.className = "sc-chart-wrap";
-        wrap.appendChild(svg);
-        wrap.appendChild(tip);
-
-        hit.addEventListener("mousemove", function (e) {
-          const rect = svg.getBoundingClientRect();
-          const relX = ((e.clientX - rect.left) / rect.width) * W;
-          let idx = Math.round(((relX - padL) / (W - padL - padR)) * (pts.length - 1));
-          idx = Math.max(0, Math.min(pts.length - 1, idx));
-          const p = pts[idx];
-          crosshair.setAttribute("x1", x(idx));
-          crosshair.setAttribute("x2", x(idx));
-          crosshair.setAttribute("visibility", "visible");
-          hoverDot.setAttribute("cx", x(idx));
-          hoverDot.setAttribute("cy", y(p.value));
-          hoverDot.setAttribute("visibility", "visible");
-          tip.hidden = false;
-          tip.textContent = p.label + " · " + formatMetricValue(chart.valueKey, p.value);
-          tip.style.left = Math.min(Math.max((x(idx) / W) * 100, 10), 90) + "%";
-        });
-        hit.addEventListener("mouseleave", function () {
-          crosshair.setAttribute("visibility", "hidden");
-          hoverDot.setAttribute("visibility", "hidden");
-          tip.hidden = true;
-        });
-
-        container.innerHTML = "";
-        const caption = document.createElement("div");
-        caption.className = "sc-chart-caption";
-        caption.textContent = chart.valueKey.replace(/_/g, " ");
-        container.appendChild(caption);
-        container.appendChild(wrap);
-      }
-
-      function renderBarChart(container, chart) {
-        const pts = chart.points;
-        const maxAbs = Math.max.apply(null, pts.map(function (p) { return Math.abs(p.value); }).concat([1e-9]));
-
-        container.innerHTML = "";
-        const caption = document.createElement("div");
-        caption.className = "sc-chart-caption";
-        caption.textContent = chart.valueKey.replace(/_/g, " ");
-        container.appendChild(caption);
-
-        const list = document.createElement("div");
-        list.className = "sc-bar-list";
-
-        pts.forEach(function (p) {
-          const row = document.createElement("div");
-          row.className = "sc-bar-row";
-
-          const label = document.createElement("div");
-          label.className = "sc-bar-label";
-          label.textContent = p.label;
-          label.title = p.label;
-
-          const track = document.createElement("div");
-          track.className = "sc-bar-track";
-          const fill = document.createElement("div");
-          fill.className = "sc-bar-fill " + (p.value >= 0 ? "sc-bar-pos" : "sc-bar-neg");
-          fill.style.width = Math.max(4, (Math.abs(p.value) / maxAbs) * 100) + "%";
-          track.appendChild(fill);
-
-          const val = document.createElement("div");
-          val.className = "sc-bar-value " + (p.value >= 0 ? "sc-bar-pos-text" : "sc-bar-neg-text");
-          val.textContent = formatMetricValue(chart.valueKey, p.value);
-
-          row.appendChild(label);
-          row.appendChild(track);
-          row.appendChild(val);
-          list.appendChild(row);
-        });
-
-        container.appendChild(list);
-      }
-
-      function renderChart(rows) {
-        const chart = decideChart(rows || []);
-        if (!chart) {
-          chartBox.hidden = true;
-          chartBox.innerHTML = "";
-          return;
-        }
-        chartBox.hidden = false;
-        if (chart.type === "line") renderLineChart(chartBox, chart);
-        else renderBarChart(chartBox, chart);
-      }
-
-      // ---- ask / answer flow -------------------------------------------------
-
-      async function ask(question) {
-        answerBox.hidden = false;
-        answerText.className = "sc-answer-text sc-loading";
-        answerText.textContent = "Thinking…";
-        chartBox.hidden = true;
-        chartBox.innerHTML = "";
-        detailsToggle.hidden = true;
-        details.hidden = true;
-        btn.disabled = true;
-
-        try {
-          const res = await fetch(WORKER_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ question }),
-          });
-          const data = await res.json();
-
-          if (!res.ok || data.error) {
-            answerText.className = "sc-answer-text sc-error";
-            answerText.textContent = "Something went wrong answering that — try rephrasing the question.";
-            return;
-          }
-
-          answerText.className = "sc-answer-text";
-          answerText.textContent = data.answer || "No answer returned.";
-
-          renderChart(data.rows);
-
-          if (data.sql) {
-            detailsToggle.hidden = false;
-            details.textContent = "SQL:\n" + data.sql + "\n\nRows returned: " + (data.rows ? data.rows.length : 0);
-          }
-        } catch (err) {
-          answerText.className = "sc-answer-text sc-error";
-          answerText.textContent = "Couldn't reach the assistant — please try again in a moment.";
-        } finally {
-          btn.disabled = false;
-        }
-      }
-
-      form.addEventListener("submit", function (e) {
-        e.preventDefault();
-        const q = input.value.trim();
-        if (q) ask(q);
-      });
-
-      document.querySelectorAll("#page-stockchat .sc-chip").forEach(function (chip) {
-        chip.addEventListener("click", function () {
-          input.value = chip.textContent;
-          ask(chip.textContent);
-        });
-      });
-
-      detailsToggle.addEventListener("click", function () {
-        details.hidden = !details.hidden;
-        detailsToggle.textContent = details.hidden
-          ? "Show the query this was grounded in"
-          : "Hide query details";
-      });
-    })();
-    </script>
 
   </div><!-- /content -->
 </div><!-- /ws -->
@@ -1113,7 +733,7 @@ function nav(id, el) {
   const mnEl = document.getElementById('mn-'+id);
   document.querySelectorAll('.mob-nav-item').forEach(b=>b.classList.remove('on'));
   if (mnEl) mnEl.classList.add('on');
-  const T = {overview:'Market Overview',movers:'Daily Movers',liquidity:'Liquidity Score Rankings',barchart:'Investment Simulator',modelpicks:'Model Picks',stockchat:'Stock Trend Assistant'};
+  const T = {overview:'Market Overview',movers:'Daily Movers',liquidity:'Liquidity Score Rankings',barchart:'Investment Simulator',modelpicks:'Model Picks'};
   document.getElementById('tbTitle').textContent = T[id] || id;
   document.getElementById('tbSub').textContent = 'Zimbabwe Stock Exchange · ZSE + VFEX';
   document.getElementById('tbRight').innerHTML = '';
@@ -1480,7 +1100,8 @@ const SINCE_TAG = r => r.baseSince
 
 function renderBarChart() {
   const el = document.getElementById('barchartContent');
-  const results = window.PS.filter(r => getInvValue(r) != null).map(r => ({...r, inv100: getInvValue(r)}));
+  const allResults = window.PS.filter(r => getInvValue(r) != null).map(r => ({...r, inv100: getInvValue(r)}));
+  const results = window.ASK_FILTER ? allResults.filter(window.ASK_FILTER.test) : allResults;
   const excluded = window.PS.filter(r => getInvValue(r) == null)
     .map(r => r.counter.trim() + (r.suspended ? ' (suspended)' : ' (no price today)'));
   const lateCount = results.filter(r => r.baseSince).length;
@@ -1540,7 +1161,7 @@ function renderBarChart() {
         </div>
         <div style="font-size:14px;font-weight:600;color:var(--text);font-family:var(--font)">If you invested US$<span id="dynamicLabelAmount">${investment.toLocaleString()}</span> in each counter at the beginning of the year,</div>
         <div style="font-size:14px;font-weight:600;color:var(--text);font-family:var(--font);margin-top:2px">on <strong>${priceDate}</strong> it would be worth;</div>
-        <div style="margin-top:8px;display:flex;gap:20px;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--ts)"><span>${results.length} of ${window.PS.length} counters tracked</span><span>${filtered.length} shown</span></div>
+        <div style="margin-top:8px;display:flex;gap:20px;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--ts)"><span>${allResults.length} of ${window.PS.length} counters tracked</span><span>${filtered.length} shown</span></div>
         ${lateCount ? `<div style="margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--ts)">${lateCount} listed after ${window.BASE_DATE||'Jan 6 2026'} — measured from their first available price (marked <span style="color:var(--gold-l)">since …</span>)</div>` : ''}
         ${excluded.length ? `<div style="margin-top:4px;font-family:var(--mono);font-size:10px;color:var(--ts)">Not tracked: ${excluded.join(', ')}</div>` : ''}
       </div>
@@ -1600,6 +1221,109 @@ function renderBarChart() {
 function setInvestment(amount) { const el=document.getElementById('investmentAmount'); if(el)el.value=amount; renderBarChart(); }
 function printChart() { const c=document.getElementById('bcControls'); if(c)c.style.display='none'; window.print(); setTimeout(()=>{if(c)c.style.display='flex';},500); }
 
+// ─── ASK THE DATA → SIMULATOR FILTER ─────────────────────────────────────────
+// The Worker answers from the archived price history and returns the rows it
+// queried. When those rows name counters (or, failing that, sectors) that the
+// simulator tracks, the chart narrows to them; otherwise it is left as it was.
+const ASK_WORKER_URL = 'https://fbc-stock-agent.robertzata23.workers.dev/';
+window.ASK_FILTER = null;
+
+function askFilterFromRows(rows) {
+  if (!rows || !rows.length) return null;
+  const norm = v => String(v == null ? '' : v).trim().toUpperCase();
+  const keys = Object.keys(rows[0]);
+  const counterKey = keys.find(k => /^counter$/i.test(k)) || keys.find(k => /counter/i.test(k));
+  const sectorKey = keys.find(k => /^sector$/i.test(k));
+  const tracked = window.PS.filter(r => getInvValue(r) != null);
+  if (counterKey) {
+    const names = new Set(rows.map(r => norm(r[counterKey])));
+    const hits = tracked.filter(r => names.has(norm(r.counter)));
+    if (hits.length) return { test: r => names.has(norm(r.counter)), label: hits.length + ' counter' + (hits.length === 1 ? '' : 's') };
+  }
+  if (sectorKey) {
+    const sectors = new Set(rows.map(r => norm(r[sectorKey])));
+    const hits = tracked.filter(r => sectors.has(norm(r.sector)));
+    if (hits.length) return { test: r => sectors.has(norm(r.sector)), label: [...sectors].length + ' sector' + (sectors.size === 1 ? '' : 's') + ' · ' + hits.length + ' counters' };
+  }
+  return null;
+}
+
+function setAskFilter(filter) {
+  window.ASK_FILTER = filter;
+  const mkt = document.getElementById('bcMktF');
+  if (filter && mkt) mkt.value = '';
+  const box = document.getElementById('simAskFilter');
+  if (filter) {
+    box.innerHTML = '';
+    const span = document.createElement('span');
+    span.textContent = 'Chart filtered to ' + filter.label + ' from this answer';
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.textContent = 'Show all';
+    btn.onclick = () => setAskFilter(null);
+    box.append(span, btn);
+    box.hidden = false;
+  } else {
+    box.hidden = true;
+  }
+  renderBarChart();
+}
+
+async function askSimulator(question) {
+  const answer = document.getElementById('simAskAnswer');
+  const text = document.getElementById('simAskText');
+  const btn = document.getElementById('simAskBtn');
+  const sqlToggle = document.getElementById('simAskSqlToggle');
+  const sql = document.getElementById('simAskSql');
+  answer.hidden = false;
+  text.className = 'sim-ask-text loading';
+  text.textContent = 'Thinking…';
+  sqlToggle.hidden = true; sql.hidden = true;
+  btn.disabled = true;
+  try {
+    const res = await fetch(ASK_WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data.error) {
+      text.className = 'sim-ask-text error';
+      text.textContent = res.status === 429
+        ? 'Too many questions in a short time — please wait a minute and try again.'
+        : 'Something went wrong answering that — try rephrasing the question.';
+      return;
+    }
+    text.className = 'sim-ask-text';
+    text.textContent = data.answer || 'No answer returned.';
+    setAskFilter(askFilterFromRows(data.rows));
+    if (data.sql) {
+      sqlToggle.hidden = false;
+      sqlToggle.textContent = 'Show the query';
+      sql.textContent = data.sql + '\n\nRows returned: ' + (data.rows ? data.rows.length : 0);
+    }
+  } catch (err) {
+    text.className = 'sim-ask-text error';
+    text.textContent = 'Couldn\'t reach the assistant — please try again in a moment.';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+document.getElementById('simAskForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const q = document.getElementById('simAskInput').value.trim();
+  if (q) askSimulator(q);
+});
+document.querySelectorAll('.sim-ask-chip').forEach(chip => chip.addEventListener('click', () => {
+  document.getElementById('simAskInput').value = chip.textContent;
+  askSimulator(chip.textContent);
+}));
+document.getElementById('simAskSqlToggle').addEventListener('click', () => {
+  const sql = document.getElementById('simAskSql');
+  sql.hidden = !sql.hidden;
+  document.getElementById('simAskSqlToggle').textContent = sql.hidden ? 'Show the query' : 'Hide the query';
+});
+
 // ─── BOOT ─────────────────────────────────────────────────────────────────────
 try { localStorage.removeItem('bw_gh_pat'); localStorage.removeItem('bw_admin_pin'); } catch (e) {}
 loadData();
@@ -1623,7 +1347,7 @@ function mobNav(id, el) {
   const sideItem = Array.from(document.querySelectorAll('.ni')).find(n => n.getAttribute('onclick')?.includes("'"+id+"'"));
   if (sideItem) { document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on')); sideItem.classList.add('on'); }
   showPage(id);
-  const T = {overview:'Market Overview',movers:'Daily Movers',liquidity:'Liquidity Score Rankings',barchart:'Investment Simulator',modelpicks:'Model Picks',stockchat:'Stock Trend Assistant'};
+  const T = {overview:'Market Overview',movers:'Daily Movers',liquidity:'Liquidity Score Rankings',barchart:'Investment Simulator',modelpicks:'Model Picks'};
   document.getElementById('tbTitle').textContent = T[id] || id;
   document.getElementById('tbSub').textContent = 'Zimbabwe Stock Exchange · ZSE + VFEX';
   document.getElementById('tbRight').innerHTML = '';
