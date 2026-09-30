@@ -188,7 +188,7 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 .inv-note{font-size:10px;font-family:var(--mono);color:var(--ts);margin-top:8px;padding-top:8px;border-top:1px solid var(--bl);line-height:1.6}
 
 /* ASK THE DATA (above the simulator) */
-.sim-ask{max-width:1100px;margin:16px auto 0;padding:0 16px}
+.sim-ask{margin:0 0 16px}
 .sim-ask-form{display:flex;gap:8px}
 .sim-ask-input{flex:1;min-width:0;background:var(--surface-2);border:1px solid var(--border);border-radius:4px;padding:9px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none}
 .sim-ask-input:focus{border-color:var(--gold)}
@@ -207,6 +207,12 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 .sim-ask-sql-toggle{margin-top:8px;background:none;border:none;color:var(--ts);font-family:var(--mono);font-size:10px;cursor:pointer;padding:0;text-decoration:underline}
 .sim-ask-sql{margin-top:6px;white-space:pre-wrap;font-family:var(--mono);font-size:10px;color:var(--tm);background:var(--surface-2);padding:8px;border-radius:4px}
 @media print{.sim-ask{display:none}}
+.bc-bar-wrap{min-width:0;overflow:hidden}
+.bc-untracked{margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--ts)}
+.bc-untracked summary{cursor:pointer;display:inline-block}
+.bc-untracked summary:hover{color:var(--tm)}
+.bc-untracked div{margin-top:4px;line-height:1.6}
+@media(max-width:768px){.bc-sect,.bc-liq,.bc-mkt{display:none}.sim-ask-btn{padding:9px 14px}}
 
 /* LOADING / ERROR */
 .state-card{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;color:var(--ts)}
@@ -683,6 +689,8 @@ function ingestSnapshot(data) {
   const bc = Array.from(document.querySelectorAll('.ni')).find(n=>n.getAttribute('onclick')?.includes('barchart'));
   if (bc) bc.classList.add('on');
   document.getElementById('tbTitle').textContent = 'Investment Simulator';
+  document.querySelectorAll('.mob-nav-item').forEach(b => b.classList.remove('on'));
+  document.getElementById('mn-barchart')?.classList.add('on');
   renderBarChart();
 
   if (!Object.keys(window.BASE).length) fetchBaselineSilent();
@@ -1100,10 +1108,12 @@ const SINCE_TAG = r => r.baseSince
 
 function renderBarChart() {
   const el = document.getElementById('barchartContent');
+  const askEl = document.getElementById('simAsk');
+  if (askEl && el.contains(askEl)) el.parentNode.insertBefore(askEl, el);
   const allResults = window.PS.filter(r => getInvValue(r) != null).map(r => ({...r, inv100: getInvValue(r)}));
   const results = window.ASK_FILTER ? allResults.filter(window.ASK_FILTER.test) : allResults;
   const excluded = window.PS.filter(r => getInvValue(r) == null)
-    .map(r => r.counter.trim() + (r.suspended ? ' (suspended)' : ' (no price today)'));
+    .map(r => r.counter.trim() + (r.suspended ? ' (suspended)' : r.usdPrice > 0 ? ' (no starting price)' : ' (no price today)'));
   const lateCount = results.filter(r => r.baseSince).length;
   if (!results.length) { el.innerHTML='<div class="state-card"><div class="sc-icon">📊</div><h3>No investment data</h3><p>Data will appear after a snapshot with baseline is published.</p></div>'; return; }
   results.sort((a,b) => b.inv100 - a.inv100);
@@ -1113,7 +1123,10 @@ function renderBarChart() {
   filtered = filtered.slice(0, Math.min(cntF, filtered.length));
   const investment = parseFloat(document.getElementById('investmentAmount')?.value || 100);
   const maxVal = Math.max(...filtered.map(r=>(r.inv100/100)*investment), investment*2);
-  const MAXPX = 520;
+  const narrow = window.innerWidth <= 768;
+  const avail = el.clientWidth || 900;
+  const reserved = narrow ? 90 + 20 + 75 : 200 + 56 + 300;  // label + card padding + value/tags
+  const MAXPX = Math.max(60, Math.min(520, avail - reserved));
   const scale = v => Math.max(4, Math.round((v/maxVal)*MAXPX));
   const barColor = v => { const p=(v/investment)*100; return p>=150?'#1A3A2A':p>=120?'#2D5A40':p>=100?'#3D7A56':p>=80?'#B8872A':'#C0392B'; };
   const priceDate = document.getElementById('sbDate')?.textContent || '';
@@ -1124,7 +1137,7 @@ function renderBarChart() {
   const rows = filtered.map(r => {
     const v=(r.inv100/100)*investment, cls=r.inv100>100?'iv-up':r.inv100<100?'iv-dn':'iv-nc';
     const liq=calcLiquidity(r);
-    return `<div class="bc-row"><div class="bc-label" title="${r.counter}">${r.counter}${r.suspended?' *':''}</div><div class="bc-bar-wrap"><div class="bc-bar" style="width:${scale(v)}px;background:${barColor(v)}"></div><span class="bc-val ${cls}">$${v.toFixed(2)}</span><span class="bc-sect">${r.sector}</span>${SINCE_TAG(r)}${r.market==='VFEX'?'<span style="font-size:8px;font-family:var(--mono);color:var(--ts);margin-left:3px">(VFEX)</span>':''}<span style="margin-left:6px">${Q_SCORE_CELL(liq)}</span></div></div>`;
+    return `<div class="bc-row"><div class="bc-label" title="${r.counter}">${r.counter}${r.suspended?' *':''}</div><div class="bc-bar-wrap"><div class="bc-bar" style="width:${scale(v)}px;background:${barColor(v)}"></div><span class="bc-val ${cls}">$${v.toFixed(2)}</span><span class="bc-sect">${r.sector}</span>${SINCE_TAG(r)}${r.market==='VFEX'?'<span class="bc-mkt" style="font-size:8px;font-family:var(--mono);color:var(--ts);margin-left:3px">(VFEX)</span>':''}<span class="bc-liq" style="margin-left:6px">${Q_SCORE_CELL(liq)}</span></div></div>`;
   }).join('');
 
   // $100 table (merged in)
@@ -1163,7 +1176,7 @@ function renderBarChart() {
         <div style="font-size:14px;font-weight:600;color:var(--text);font-family:var(--font);margin-top:2px">on <strong>${priceDate}</strong> it would be worth;</div>
         <div style="margin-top:8px;display:flex;gap:20px;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--ts)"><span>${allResults.length} of ${window.PS.length} counters tracked</span><span>${filtered.length} shown</span></div>
         ${lateCount ? `<div style="margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--ts)">${lateCount} listed after ${window.BASE_DATE||'Jan 6 2026'} — measured from their first available price (marked <span style="color:var(--gold-l)">since …</span>)</div>` : ''}
-        ${excluded.length ? `<div style="margin-top:4px;font-family:var(--mono);font-size:10px;color:var(--ts)">Not tracked: ${excluded.join(', ')}</div>` : ''}
+        ${excluded.length ? `<details class="bc-untracked"><summary>${excluded.length} not tracked ▾</summary><div>${excluded.join(' · ')}</div></details>` : ''}
       </div>
       <div class="bchart-controls" style="margin-bottom:16px">
         <label style="font-family:var(--mono);font-size:10px">Investment Amount ($)</label>
@@ -1178,6 +1191,7 @@ function renderBarChart() {
         <div class="kc" style="--kca:var(--gold)"><div class="kc-lbl">Best Performer</div><div class="kc-val" style="font-size:14px">${best?best.counter:'—'}</div></div>
         <div class="kc" style="--kca:var(--gain)"><div class="kc-lbl">Highest Value</div><div class="kc-val">$${bestVal.toFixed(2)}</div></div>
       </div>
+      <div id="simAskSlot"></div>
       <div class="bchart-controls" id="bcControls">
         <select id="bcMktF" onchange="renderBarChart()"><option value="">All Markets</option><option ${mktF==='ZSE'?'selected':''}>ZSE</option><option ${mktF==='VFEX'?'selected':''}>VFEX</option></select>
         <select id="bcCntF" onchange="renderBarChart()"><option value="999" ${cntF===999?'selected':''}>All counters</option><option value="20" ${cntF===20?'selected':''}>Top/bottom 20</option><option value="30" ${cntF===30?'selected':''}>Top/bottom 30</option><option value="50" ${cntF===50?'selected':''}>Top/bottom 50</option></select>
@@ -1216,10 +1230,24 @@ function renderBarChart() {
       <div class="tw"><table><thead><tr><th>Counter</th><th>Market</th><th>Sector</th><th>Base Price</th><th>Current Price</th><th>$100 Now Worth</th><th>Gain/Loss</th><th>% Change</th><th>YTD G/L</th><th>Liq Score</th><th>Days Out †</th></tr></thead><tbody>${allSorted.map(irow).join('')}</tbody></table></div>
       <div class="inv-note">Prices in USD. VFEX = native USD; ZSE = USD@IBR from sheet. ${results.length} of ${window.PS.length} counters have data.<br>† Days Out: ZSE = directional estimate only. VFEX = USD native.</div>
     </div>`;
+  const slot = document.getElementById('simAskSlot');
+  if (slot && askEl) slot.replaceWith(askEl);
 }
 
 function setInvestment(amount) { const el=document.getElementById('investmentAmount'); if(el)el.value=amount; renderBarChart(); }
 function printChart() { const c=document.getElementById('bcControls'); if(c)c.style.display='none'; window.print(); setTimeout(()=>{if(c)c.style.display='flex';},500); }
+
+// Width only: a phone keyboard opening changes the height, and a re-render then
+// would pull focus out of the question box mid-typing.
+let _bcResizeTimer = null, _bcLastWidth = window.innerWidth;
+window.addEventListener('resize', () => {
+  if (window.innerWidth === _bcLastWidth) return;
+  _bcLastWidth = window.innerWidth;
+  clearTimeout(_bcResizeTimer);
+  _bcResizeTimer = setTimeout(() => {
+    if (document.getElementById('page-barchart').classList.contains('on') && window.PS.length) renderBarChart();
+  }, 200);
+});
 
 // ─── ASK THE DATA → SIMULATOR FILTER ─────────────────────────────────────────
 // The Worker answers from the archived price history and returns the rows it
