@@ -1,0 +1,59 @@
+name: Deploy chatbot (Worker + D1 data)
+
+# Redeploys the stock-agent Worker and reloads its database whenever the
+# chatbot's code or schema changes on main, and on demand from the Actions tab
+# (use that once after adding the Cloudflare secrets). Day-to-day data refreshes
+# happen in fbc-daily-publish.yml.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'stock-agent/**'
+      - 'scripts/publish_fbc_prices.py'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - name: Skip when Cloudflare secrets are not configured
+        if: env.CLOUDFLARE_API_TOKEN == ''
+        run: echo "::notice::CLOUDFLARE_API_TOKEN is not set -- see stock-agent/cloudflare/DEPLOY.md. Skipping."
+
+      - uses: actions/checkout@v4
+        if: env.CLOUDFLARE_API_TOKEN != ''
+
+      - uses: actions/setup-python@v5
+        if: env.CLOUDFLARE_API_TOKEN != ''
+        with:
+          python-version: '3.12'
+
+      - name: Build the chatbot database from the sheet archive
+        if: env.CLOUDFLARE_API_TOKEN != ''
+        run: |
+          pip install openpyxl pandas
+          python stock-agent/build_dataset.py data/fbc-sheets stock-agent/fbc_history.db
+          python stock-agent/cloudflare/export_to_d1.py stock-agent/fbc_history.db stock-agent/cloudflare/d1_data.sql
+
+      - name: Load it into Cloudflare D1
+        if: env.CLOUDFLARE_API_TOKEN != ''
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: stock-agent/cloudflare
+          command: d1 execute fbc-history --remote --file=d1_data.sql --yes
+
+      - name: Deploy the Worker
+        if: env.CLOUDFLARE_API_TOKEN != ''
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: stock-agent/cloudflare
+          command: deploy

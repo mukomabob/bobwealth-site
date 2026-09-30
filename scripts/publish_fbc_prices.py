@@ -59,6 +59,7 @@ EXCLUDED_ROW_RE = re.compile(
 # rows apart from real ones. Once we see this, there's nothing usable left
 # in the file, so stop reading entirely instead of skipping row-by-row.
 HARD_STOP_RE = re.compile(r"ZSE TOP|VFEX TOP|THIS PRICE SHEET", re.IGNORECASE)
+ZSE_SECTION_RE = re.compile(r"ZSE (ETF|REIT)", re.IGNORECASE)
 
 
 # ─── numeric helpers (mirror JS parseFloat(...)||0 / ||null quirks) ──────────
@@ -124,6 +125,12 @@ def parse_sheet(raw, fname):
             break
         if "VFEX PRICE SHEET" in first.upper():
             mkt = "VFEX"
+            continue
+        # The ZiG-priced ZSE ETF/REIT sections come after the VFEX ones, so the
+        # market has to switch back here; otherwise their ZiG closes (e.g.
+        # Revitus at 2.00) are read as VFEX US-dollar prices.
+        if ZSE_SECTION_RE.match(first):
+            mkt = "ZSE"
             continue
         if EXCLUDED_ROW_RE.search(first):
             continue

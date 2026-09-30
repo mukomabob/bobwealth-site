@@ -1194,7 +1194,7 @@
     {
       "counter": "Revitus",
       "isin": "ZW0009030025",
-      "market": "VFEX",
+      "market": "ZSE",
       "sector": "Reit",
       "shares": 368326244.0,
       "mktCapIBR": 27434620.72458587,
@@ -1208,15 +1208,15 @@
       "divYield": 0.0,
       "ytd": 0.5384615384615383,
       "suspended": false,
-      "usdPrice": 2.0,
-      "inv100": 136.986301369863,
-      "basePrice": 1.46,
+      "usdPrice": 0.07448456679775951,
+      "inv100": 132.00552859146217,
+      "basePrice": 0.056425338841889244,
       "baseSince": null
     },
     {
       "counter": "Tigere Reit",
       "isin": "ZW0009030017",
-      "market": "VFEX",
+      "market": "ZSE",
       "sector": "Reit",
       "shares": 1841105000.0,
       "mktCapIBR": 78092275.45137647,
@@ -1230,9 +1230,9 @@
       "divYield": 0.05130141818564957,
       "ytd": -0.21098464117716342,
       "suspended": false,
-      "usdPrice": 1.13892,
-      "inv100": 73.15113417913717,
-      "basePrice": 1.556941,
+      "usdPrice": 0.042415981408652124,
+      "inv100": 70.49138518098842,
+      "basePrice": 0.060171865398513616,
       "baseSince": null
     }
   ]
