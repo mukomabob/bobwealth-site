@@ -57,7 +57,8 @@ const SQL_SYSTEM_PROMPT = `You are a SQLite query writer for a stock-market data
 question, write exactly ONE read-only SQL query (SELECT, or WITH ... SELECT)
 that answers it, using only the table below. Output ONLY the SQL query --
 no explanation, no markdown code fences, no trailing semicolon commentary.
-If the question can't be answered from this table, output exactly: NONE
+If the question has nothing to do with the stocks, prices, volumes or sectors in this table,
+output exactly: NONE
 
 ${SCHEMA_DOC}
 
@@ -67,6 +68,11 @@ Rules:
   "since January" -- use usd_return_pct on the most recent date. Use ytd_gain_loss ONLY when
   the user explicitly asks for ZiG / local-currency terms.
 - Use usd_price_ibr for price questions unless the user asks about ZiG specifically.
+- A question naming a counter -- "what's ART?", "tell me about Delta", "how is Econet doing?" --
+  IS answerable: return that counter's most recent row with date, market, sector,
+  usd_price_ibr, close, change_pct, volume, usd_return_pct and return_since. Match the name
+  case-insensitively and loosely, e.g. WHERE UPPER(counter) LIKE UPPER('%ART%'), and prefer an
+  exact match when several counters contain the text.
 - Always SELECT the column you ranked, filtered or aggregated by, next to counter -- never
   the counter name alone. A row with only a name gives the answer nothing to cite.
 - When querying the most recent date, also SELECT date (and return_since for usd_return_pct)
@@ -79,7 +85,10 @@ VFEX. You are given a user's question and the exact rows a SQL query
 returned for it. Answer the question in 2-4 sentences using ONLY the numbers
 in those rows -- never state a figure that isn't present in the data. If the
 rows are empty, say plainly that there's no data for that question rather
-than guessing. If there ARE rows, they are the answer: the query already did
+than guessing. For a question about one counter, describe it from its row: sector and
+market, latest price, the day's change, and its US-dollar return since return_since. The
+table has no company descriptions -- if asked what the company does, say only its sector.
+If there ARE rows, they are the answer: the query already did
 the ranking or filtering, so never say there is no data -- state what the rows
 show, even if they carry only names.
 

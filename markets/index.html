@@ -1248,7 +1248,12 @@ function setAskFilter(filter) {
   renderBarChart();
 }
 
+// Only the newest question may touch the chart: an answer to an earlier one
+// that arrives late must not re-filter it after a newer answer has landed.
+let _askSeq = 0;
+
 async function askSimulator(question) {
+  const seq = ++_askSeq;
   const answer = document.getElementById('simAskAnswer');
   const text = document.getElementById('simAskText');
   const btn = document.getElementById('simAskBtn');
@@ -1260,6 +1265,7 @@ async function askSimulator(question) {
   text.textContent = 'Thinking…';
   sqlToggle.hidden = true; sql.hidden = true;
   btn.disabled = true;
+  setAskFilter(null);  // a new question starts from the full chart
   try {
     const res = await fetch(ASK_WORKER_URL, {
       method: 'POST',
@@ -1267,6 +1273,7 @@ async function askSimulator(question) {
       body: JSON.stringify({ question }),
     });
     const data = await res.json().catch(() => ({}));
+    if (seq !== _askSeq) return;
     if (!res.ok || data.error) {
       text.className = 'sim-ask-text error';
       text.textContent = res.status === 429
@@ -1283,10 +1290,11 @@ async function askSimulator(question) {
       sql.textContent = data.sql + '\n\nRows returned: ' + (data.rows ? data.rows.length : 0);
     }
   } catch (err) {
+    if (seq !== _askSeq) return;
     text.className = 'sim-ask-text error';
     text.textContent = 'Couldn\'t reach the assistant — please try again in a moment.';
   } finally {
-    btn.disabled = false;
+    if (seq === _askSeq) btn.disabled = false;
   }
 }
 
