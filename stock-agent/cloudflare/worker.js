@@ -105,7 +105,7 @@ Rules:
   the user explicitly asks for ZiG / local-currency terms.
 - Use usd_price_ibr for price questions unless the user asks about ZiG specifically.
 - A question naming a counter -- "what's ART?", "tell me about Delta", "how is Econet doing?" --
-  IS answerable: return that counter's most recent row with date, market, sector,
+  with no past date or period IS answerable: return that counter's most recent row with date, market, sector,
   usd_price_ibr, close, change_pct, volume, usd_return_pct and return_since. Match the name
   case-insensitively and loosely, e.g. WHERE UPPER(counter) LIKE UPPER('%ART%'), and prefer an
   exact match when several counters contain the text.
@@ -114,6 +114,13 @@ Rules:
 - When querying the most recent date, also SELECT date (and return_since for usd_return_pct)
   so the answer can say what the figures are as of.
 - "today" / "most recent" means the MAX(date) in the table, not a real-world date.
+- Relative times -- "2 months ago", "last week", "a month back" -- count back from MAX(date),
+  and markets are shut some days, so take the last trading date on or before that point,
+  e.g. "Pfuma price 2 months ago":
+    SELECT date, counter, usd_price_ibr, close FROM prices
+    WHERE UPPER(counter) LIKE UPPER('%Pfuma%')
+      AND date <= (SELECT date(MAX(date), '-2 months') FROM prices)
+    ORDER BY date DESC LIMIT 1
 - Questions about the watchlist, picks, signals, what the model/AI thinks, "bullish", "risk"
   use the predictions table: the watchlist is WHERE watchlist_rank IS NOT NULL ORDER BY
   watchlist_rank. Select price_date, signal, risk_score and watchlist_rank; you may ORDER BY
@@ -145,7 +152,8 @@ already in a form fit to read aloud:
 - usd_return_pct is already a percentage in US dollars since return_since. State it as
   "+X% in US dollars since <return_since>", and you may add what $100 would now be worth
   (100 + usd_return_pct). This is the same measure as the site's Investment Simulator.
-- If the rows include a date, say the figures are "as of <date>".
+- If the rows include a date, say the figures are "as of <date>". If that date is not
+  exactly the one asked for, give the figure anyway and name the date it is from.
 - ytd_gain_loss is a FRACTION of price change vs the 31-Dec-2024 baseline,
   in ZiG terms -- NOT already a percentage. Multiply by 100 before stating
   it as a %, e.g. a value of 6.54 means "+654%", never "+6.54%". Say this
