@@ -10,9 +10,15 @@ sequence of statements rather than a live SQLite connection, so this writes
 batched multi-row INSERTs (a few hundred rows each) instead of one INSERT
 per row -- keeps the file small and the import fast for ~7k rows.
 
+It also loads predictions.json (the latest model run) into the `predictions`
+and `model_track_record` tables, so the chatbot can answer questions about
+the watchlist and its track record. Those tables are left empty if the file
+is missing.
+
 Usage:
-    python3 export_to_d1.py fbc_history.db d1_data.sql
+    python3 export_to_d1.py fbc_history.db d1_data.sql [predictions.json]
 """
+import json
 import os
 import sqlite3
 import sys
@@ -28,7 +34,23 @@ COLUMNS = [
     "usd_return_pct", "return_since",
 ]
 
-SCHEMA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "schema.sql")
+PREDICTION_COLUMNS = [
+    "price_date", "counter", "market", "sector", "close", "usd_price",
+    "today_chg_pct", "traded_today", "predicted_chg_pct", "risk_score",
+    "signal", "watchlist_rank",
+]
+
+TRACK_RECORD_COLUMNS = [
+    "price_date", "training_days", "days", "beat_market_days",
+    "beat_market_days_pct", "picks_avg_next_day_pct", "market_avg_next_day_pct",
+    "biggest_fallers_avg_next_day_pct", "picks_total", "picks_rose_next_day_pct",
+    "picks_flat_next_day_pct", "picks_fell_next_day_pct", "holdout_days",
+    "model_mae", "no_change_mae",
+]
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+SCHEMA_PATH = os.path.join(HERE, "schema.sql")
+DEFAULT_PREDICTIONS_PATH = os.path.join(HERE, "..", "..", "predictions.json")
 
 
 def sql_literal(v):
@@ -40,13 +62,51 @@ def sql_literal(v):
         if v != v or v in (float("inf"), float("-inf")):
             return "NULL"
         return repr(v)
+    if isinstance(v, bool):
+        return "1" if v else "0"
     if isinstance(v, int):
         return str(v)
     # text: escape single quotes the SQL way
     return "'" + str(v).replace("'", "''") + "'"
 
 
-def export(db_path, out_path):
+def insert_statements(table, columns, rows):
+    """Batched multi-row INSERTs for `rows` (mappings keyed by column name)."""
+    col_list = ", ".join(f'"{c}"' for c in columns)
+    statements = []
+    for i in range(0, len(rows), BATCH_SIZE):
+        value_tuples = [
+            "(" + ", ".join(sql_literal(row[c]) for c in columns) + ")"
+            for row in rows[i : i + BATCH_SIZE]
+        ]
+        statements.append(f"INSERT INTO {table} ({col_list}) VALUES\n  " + ",\n  ".join(value_tuples) + ";")
+    return statements
+
+
+def prediction_rows(predictions_path):
+    """(predictions rows, model_track_record rows) from predictions.json, or two
+    empty lists when the file is missing."""
+    if not os.path.exists(predictions_path):
+        print(f"No {predictions_path} -- leaving the predictions tables empty.")
+        return [], []
+    with open(predictions_path) as f:
+        snap = json.load(f)
+    price_date = snap.get("price_date")
+    ranks = {p["counter"]: i + 1 for i, p in enumerate(snap.get("watchlist") or [])}
+    preds = [
+        {**p, "price_date": price_date, "watchlist_rank": ranks.get(p["counter"])}
+        for p in snap.get("all_predictions") or []
+    ]
+    record = {
+        "price_date": price_date,
+        "training_days": snap.get("training_days"),
+        **(snap.get("track_record") or {}),
+        **(snap.get("accuracy") or {}),
+    }
+    return preds, [{c: record.get(c) for c in TRACK_RECORD_COLUMNS}]
+
+
+def export(db_path, out_path, predictions_path=DEFAULT_PREDICTIONS_PATH):
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     rows = conn.execute(f"SELECT {', '.join(COLUMNS)} FROM prices ORDER BY date, counter").fetchall()
@@ -55,7 +115,6 @@ def export(db_path, out_path):
     if not rows:
         raise ValueError(f"No rows found in {db_path} -- run build_dataset.py first.")
 
-    col_list = ", ".join(f'"{c}"' for c in COLUMNS)
     # The schema is recreated on every import rather than DELETE-ing rows, so a
     # column added to schema.sql reaches D1 with the next daily refresh instead
     # of failing the INSERTs against the old table.
@@ -67,21 +126,19 @@ def export(db_path, out_path):
         schema.strip(),
     ]
 
-    for i in range(0, len(rows), BATCH_SIZE):
-        batch = rows[i : i + BATCH_SIZE]
-        value_tuples = []
-        for row in batch:
-            values = ", ".join(sql_literal(row[c]) for c in COLUMNS)
-            value_tuples.append(f"({values})")
-        lines.append(f"INSERT INTO prices ({col_list}) VALUES\n  " + ",\n  ".join(value_tuples) + ";")
+    lines += insert_statements("prices", COLUMNS, rows)
+    preds, record = prediction_rows(predictions_path)
+    lines += insert_statements("predictions", PREDICTION_COLUMNS, preds)
+    lines += insert_statements("model_track_record", TRACK_RECORD_COLUMNS, record)
 
     with open(out_path, "w") as f:
         f.write("\n".join(lines) + "\n")
 
-    print(f"Wrote {out_path} -- {len(rows):,} rows in {(len(rows) + BATCH_SIZE - 1)//BATCH_SIZE} batched INSERTs.")
+    print(f"Wrote {out_path} -- {len(rows):,} price rows, {len(preds)} prediction rows.")
 
 
 if __name__ == "__main__":
     db_path = sys.argv[1] if len(sys.argv) > 1 else "../fbc_history.db"
     out_path = sys.argv[2] if len(sys.argv) > 2 else "d1_data.sql"
-    export(db_path, out_path)
+    predictions_path = sys.argv[3] if len(sys.argv) > 3 else DEFAULT_PREDICTIONS_PATH
+    export(db_path, out_path, predictions_path)

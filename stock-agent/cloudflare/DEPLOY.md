@@ -118,6 +118,11 @@ The export recreates the `prices` table on every import (it inlines
 `schema.sql`), so adding a column to the schema reaches D1 with the next
 refresh.
 
+The same import loads the repo's `predictions.json` into the `predictions`
+and `model_track_record` tables, so the chatbot can answer questions about
+the watchlist and its track record. The daily run exports after
+`generate_predictions.py`, so these match the Watchlist page.
+
 `usd_return_pct` / `return_since` are computed with
 `scripts/publish_fbc_prices.py`'s own baselines, so the chatbot's
 "best performer" is the same one the Investment Simulator shows.
@@ -126,7 +131,8 @@ refresh.
 
 - **Workers AI**: 10,000 Neurons/day free (resets 00:00 UTC), then ~$0.011
   per 1,000 Neurons on a paid Workers plan. Each chat question uses two
-  model calls (text→SQL, then SQL→answer) — a rough, non-guaranteed
+  model calls (text→SQL, then SQL→answer), three when the first query fails
+  and is retried — a rough, non-guaranteed
   estimate is a few hundred Neurons per question, so the free daily
   allowance likely covers casual use; watch actual usage in the dashboard.
 - **D1**: free tier covers far more than ~7,000 rows and the query volume
