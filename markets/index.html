@@ -188,13 +188,18 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 .inv-note{font-size:10px;font-family:var(--mono);color:var(--ts);margin-top:8px;padding-top:8px;border-top:1px solid var(--bl);line-height:1.6}
 
 /* ASK THE DATA (above the simulator) */
-.sim-ask{margin:0 0 16px}
+.sim-ask{margin:8px 0 28px;padding:16px 18px;background:var(--gold-p);border:1px solid rgba(201,151,58,.35);border-radius:6px}
+.sim-ask-title{display:flex;align-items:baseline;gap:8px;margin-bottom:10px;font-family:var(--serif);font-size:15px;font-weight:700;color:var(--gold-l)}
+.sim-ask-title span{font-family:var(--font);font-size:11px;font-weight:400;color:var(--tm)}
 .sim-ask-form{display:flex;gap:8px}
-.sim-ask-input{flex:1;min-width:0;background:var(--surface-2);border:1px solid var(--border);border-radius:4px;padding:9px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none}
+.sim-ask-input{flex:1;min-width:0;background:var(--surface-2);border:1px solid rgba(201,151,58,.45);border-radius:4px;padding:9px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none}
 .sim-ask-input:focus{border-color:var(--gold)}
 .sim-ask-btn{background:var(--gold);border:none;color:#161A17;font-family:var(--font);font-weight:600;font-size:13px;padding:9px 20px;border-radius:4px;cursor:pointer}
 .sim-ask-btn:hover{background:var(--gold-l)}
 .sim-ask-btn:disabled{opacity:.6;cursor:default}
+.sim-ask-clear{background:transparent;border:1px solid rgba(201,151,58,.45);color:var(--gold-l);font-family:var(--font);font-size:13px;padding:9px 14px;border-radius:4px;cursor:pointer;white-space:nowrap}
+.sim-ask-clear:hover{background:rgba(201,151,58,.12)}
+.sim-ask-clear[hidden]{display:none}
 .sim-ask-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .sim-ask-chip{background:transparent;border:1px solid var(--border);color:var(--tm);font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:12px;cursor:pointer}
 .sim-ask-chip:hover{border-color:var(--gl);color:var(--white)}
@@ -460,9 +465,11 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
     <!-- BAR CHART (Investment Simulator + $100 Tracker merged) -->
     <div class="vp" id="page-barchart">
     <div class="sim-ask" id="simAsk">
+      <div class="sim-ask-title">💬 Ask the data <span>Ask in your own words — the chart below narrows to the counters in the answer.</span></div>
       <form class="sim-ask-form" id="simAskForm">
         <input type="text" class="sim-ask-input" id="simAskInput" placeholder="Ask the data — e.g. Which REITs have gained most this year?" autocomplete="off" maxlength="500" required>
         <button type="submit" class="sim-ask-btn" id="simAskBtn">Ask</button>
+        <button type="button" class="sim-ask-clear" id="simAskClear" hidden title="Clear the question and show every counter again">✕ Clear</button>
       </form>
       <div class="sim-ask-chips">
         <button type="button" class="sim-ask-chip">Top 5 gainers this year</button>
@@ -1047,10 +1054,10 @@ function renderModelPicks() {
 
   const record = tr ? `
     <div class="kpi-row k4">
-      <div class="kc" style="--kca:var(--gain)"><div class="kc-lbl">Beat the market</div><div class="kc-val" style="color:var(--gain)">${tr.beat_market_days_pct}%</div><div class="kc-sub">of the last ${tr.days} trading days</div></div>
-      <div class="kc" style="--kca:var(--gold)"><div class="kc-lbl">Picks, next day</div><div class="kc-val" style="color:${tr.picks_avg_next_day_pct>=0?'var(--gain)':'var(--red)'}">${pct(tr.picks_avg_next_day_pct)}</div><div class="kc-sub">average · market ${pct(tr.market_avg_next_day_pct)}</div></div>
-      <div class="kc" style="--kca:var(--ts)"><div class="kc-lbl">5 biggest fallers</div><div class="kc-val">${pct(tr.biggest_fallers_avg_next_day_pct)}</div><div class="kc-sub">no-model comparison, next day</div></div>
-      <div class="kc" style="--kca:var(--ts)"><div class="kc-lbl">Picks that didn't move</div><div class="kc-val">${tr.picks_flat_next_day_pct}%</div><div class="kc-sub">thin trading — prices often sit still</div></div>
+      <div class="kc" style="--kca:var(--gain)"><div class="kc-lbl">Top 5, as a group</div><div class="kc-val" style="color:var(--gain)">${tr.beat_market_days ?? tr.beat_market_days_pct + '%'}${tr.beat_market_days != null ? ' of ' + tr.days + ' days' : ''}</div><div class="kc-sub">their average beat the market average the next day${tr.beat_market_days != null ? ' (' + tr.beat_market_days_pct + '%)' : ''}</div></div>
+      <div class="kc" style="--kca:var(--gold)"><div class="kc-lbl">Each pick on its own</div><div class="kc-val">${tr.picks_rose_next_day_pct != null ? tr.picks_rose_next_day_pct + '% rose' : '—'}</div><div class="kc-sub">${tr.picks_rose_next_day_pct != null ? tr.picks_flat_next_day_pct + '% flat · ' + tr.picks_fell_next_day_pct + '% fell · ' + tr.picks_total + ' picks' : ''}</div></div>
+      <div class="kc" style="--kca:var(--gain)"><div class="kc-lbl">Group average, next day</div><div class="kc-val" style="color:${tr.picks_avg_next_day_pct>=0?'var(--gain)':'var(--red)'}">${pct(tr.picks_avg_next_day_pct)}</div><div class="kc-sub">vs ${pct(tr.market_avg_next_day_pct)} for all counters</div></div>
+      <div class="kc" style="--kca:var(--ts)"><div class="kc-lbl">Without the model</div><div class="kc-val">${pct(tr.biggest_fallers_avg_next_day_pct)}</div><div class="kc-sub">day's 5 biggest fallers, next day</div></div>
     </div>` : '';
 
   el.innerHTML = `
@@ -1068,7 +1075,7 @@ function renderModelPicks() {
       <div class="tw"><table><thead><tr><th>Counter</th><th>Mkt</th><th>Sector</th><th>Close</th><th>Today %</th><th>20-day volatility</th></tr></thead>
       <tbody>${data.watchlist.map(row).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--ts);padding:20px">No counter traded today.</td></tr>'}</tbody></table></div>
       <div class="inv-note">
-        Track record is replayed day by day using only the data available at the time: each day's top ${data.watchlist.length||5} picks, held for one day, against the average of all counters. Trading costs are not included and can outweigh a one-day move on thinly traded counters.
+        Track record is replayed day by day using only the data available at the time: each day's top ${data.watchlist.length||5} picks, held for one day, against the average of all counters. It measures the picks as a group — it is not how often a single prediction is right; a group can beat the market on one strong bounce while the other picks barely move. Trading costs are not included and can outweigh a one-day move on thinly traded counters.
         ${acc.model_mae!=null ? `Predicted percentages are not shown: over the last ${acc.holdout_days} trading days they missed by ${fP2(acc.model_mae)} points on average, against ${fP2(acc.no_change_mae)} for simply assuming no change.` : ''}
         <br>${data.method||''} ${data.disclaimer||'Algorithmic signals only. Not financial advice.'}${generated?' Updated '+generated.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+'.':''}
       </div>
@@ -1248,6 +1255,7 @@ async function askSimulator(question) {
   const sqlToggle = document.getElementById('simAskSqlToggle');
   const sql = document.getElementById('simAskSql');
   answer.hidden = false;
+  document.getElementById('simAskClear').hidden = false;
   text.className = 'sim-ask-text loading';
   text.textContent = 'Thinking…';
   sqlToggle.hidden = true; sql.hidden = true;
@@ -1291,6 +1299,15 @@ document.querySelectorAll('.sim-ask-chip').forEach(chip => chip.addEventListener
   document.getElementById('simAskInput').value = chip.textContent;
   askSimulator(chip.textContent);
 }));
+// One click back to the starting state: empty box, no answer, every counter.
+document.getElementById('simAskClear').addEventListener('click', () => {
+  document.getElementById('simAskInput').value = '';
+  document.getElementById('simAskAnswer').hidden = true;
+  document.getElementById('simAskSql').hidden = true;
+  document.getElementById('simAskClear').hidden = true;
+  setAskFilter(null);
+  document.getElementById('simAskInput').focus();
+});
 document.getElementById('simAskSqlToggle').addEventListener('click', () => {
   const sql = document.getElementById('simAskSql');
   sql.hidden = !sql.hidden;
