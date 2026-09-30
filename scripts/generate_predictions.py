@@ -6,8 +6,8 @@ Ports Stages 1B-6B of zse_tensorflow_learner_v9.ipynb (the notebook Bob runs
 manually in Colab) into a plain script GitHub Actions can run unattended --
 reading the accumulated FBC price-sheet history from data/fbc-sheets/
 instead of a Google Drive folder, so no Drive mount / Colab session is
-needed. Retrains a fresh RandomForestRegressor on the full history every
-run, exactly like re-running the notebook top to bottom would.
+needed. Retrains a fresh RandomForestRegressor on the full history for each
+new trading day, and publishes a walk-forward track record beside it.
 
 Two deliberate differences from the notebook (confirmed with Bob):
 
@@ -43,7 +43,6 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
-from sklearn.model_selection import TimeSeriesSplit, train_test_split
 from sklearn.preprocessing import StandardScaler
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -300,47 +299,97 @@ def engineer_features(df):
     return df
 
 
-# ─── Stage 5: train a fresh RandomForestRegressor on the full history ─────
-def train_model(df):
-    model_df = df[FEATURE_COLS + [TARGET_COL]].dropna()
-    model_df = model_df[model_df[TARGET_COL].abs() <= 50]
+# ─── Stage 5: model, honest evaluation, and a walk-forward track record ────
+# What the model measurably does (checked 2026-09-30 over 60 walk-forward days):
+# its predicted % is worse than guessing "no change", but its ranking picks
+# counters that bounce after a fall -- the top 5 averaged +1.31% next day vs
+# +0.29% for the market, about the same as simply taking today's 5 biggest
+# fallers. So the page presents a rebound watchlist with its measured track
+# record, never the predicted % as a forecast.
+HOLDOUT_FRACTION = 0.2      # most recent share of trading days held out for accuracy
+TRACK_RECORD_DAYS = 60      # walk-forward window for the published track record
+WATCHLIST_SIZE = 5
+SIGNAL_THRESHOLD = 1.0      # pp; a prediction inside +/- this reads as "no clear signal"
 
-    if len(model_df) < 50:
-        raise ValueError(f"Only {len(model_df)} trainable row(s) -- too little history to train on yet.")
 
-    X = model_df[FEATURE_COLS].values
-    y = model_df[TARGET_COL].values
+def make_model():
+    return RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1, max_depth=10, min_samples_leaf=5)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
 
-    scaler = StandardScaler()
-    X_train = scaler.fit_transform(X_train)
-    X_test = scaler.transform(X_test)
+def fit(rows):
+    scaler = StandardScaler().fit(rows[FEATURE_COLS].values)
+    model = make_model().fit(scaler.transform(rows[FEATURE_COLS].values), rows[TARGET_COL].values)
+    return model, scaler
 
-    model = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1, max_depth=10, min_samples_leaf=5)
 
-    # Cross-validate on the training split (time-ordered folds), same as the notebook.
-    n_splits = min(5, max(2, len(X_train) // 50))
-    mae_scores = []
-    try:
-        tscv = TimeSeriesSplit(n_splits=n_splits, gap=0)
-        for train_idx, val_idx in tscv.split(X_train, y_train):
-            model.fit(X_train[train_idx], y_train[train_idx])
-            mae_scores.append(mean_absolute_error(y_train[val_idx], model.predict(X_train[val_idx])))
-    except ValueError:
-        pass  # not enough rows yet for the requested number of splits
+def predict(model, scaler, rows):
+    return model.predict(scaler.transform(rows[FEATURE_COLS].values))
 
-    model.fit(X_train, y_train)  # final fit on the full training set
 
-    if mae_scores:
-        model_mae = round(float(np.mean(mae_scores)), 4)
-    elif len(y_test):
-        model_mae = round(float(mean_absolute_error(y_test, model.predict(X_test))), 4)
-    else:
-        model_mae = None
+def trainable_rows(df):
+    rows = df[FEATURE_COLS + [TARGET_COL, "date", "counter"]].dropna()
+    rows = rows[rows[TARGET_COL].abs() <= 50]
+    if len(rows) < 50:
+        raise ValueError(f"Only {len(rows)} trainable row(s) -- too little history to train on yet.")
+    return rows.sort_values("date").reset_index(drop=True)
 
-    log(f"Trained on {len(X_train):,} row(s), held out {len(X_test):,} for test. model_mae={model_mae}")
-    return model, scaler, model_mae
+
+def holdout_accuracy(rows):
+    """MAE on the most recent trading days, trained only on earlier ones.
+
+    Split by date, not by row order: rows were previously ordered by counter,
+    so the old 80/20 split tested on the last counters alphabetically across
+    every date -- which says nothing about predicting tomorrow.
+    """
+    dates = sorted(rows["date"].unique())
+    n_hold = max(1, int(len(dates) * HOLDOUT_FRACTION))
+    cutoff = dates[-n_hold]
+    train, test = rows[rows["date"] < cutoff], rows[rows["date"] >= cutoff]
+    if train.empty or test.empty:
+        return {"holdout_days": 0, "model_mae": None, "no_change_mae": None}
+    model, scaler = fit(train)
+    actual = test[TARGET_COL].values
+    return {
+        "holdout_days": n_hold,
+        "model_mae": round(float(mean_absolute_error(actual, predict(model, scaler, test))), 3),
+        "no_change_mae": round(float(np.mean(np.abs(actual))), 3),
+    }
+
+
+def track_record(rows, traded):
+    """Replay the watchlist over recent days using only data available at the time.
+
+    For each day: train on earlier days, take the top WATCHLIST_SIZE counters that
+    traded that day by predicted change, and compare their next-day move with the
+    market average and with a no-model rule (that day's biggest fallers).
+    """
+    dates = sorted(rows["date"].unique())[-TRACK_RECORD_DAYS:]
+    picks_avg, market_avg, rule_avg, flat = [], [], [], []
+    for d in dates:
+        train, day = rows[rows["date"] < d], rows[rows["date"] == d]
+        if len(train) < 200 or day.empty:
+            continue
+        day = day.assign(pred=predict(*fit(train), day))
+        cands = day[day.index.isin(traded)]
+        if len(cands) < WATCHLIST_SIZE:
+            continue
+        picks = cands.nlargest(WATCHLIST_SIZE, "pred")
+        rule = cands.nsmallest(WATCHLIST_SIZE, "chg_pct_filled")
+        picks_avg.append(picks[TARGET_COL].mean())
+        market_avg.append(day[TARGET_COL].mean())
+        rule_avg.append(rule[TARGET_COL].mean())
+        flat.append((picks[TARGET_COL] == 0).mean())
+    if not picks_avg:
+        return None
+    picks_avg, market_avg = np.array(picks_avg), np.array(market_avg)
+    return {
+        "days": len(picks_avg),
+        "picks_avg_next_day_pct": round(float(picks_avg.mean()), 2),
+        "market_avg_next_day_pct": round(float(market_avg.mean()), 2),
+        "biggest_fallers_avg_next_day_pct": round(float(np.mean(rule_avg)), 2),
+        "beat_market_days_pct": round(float((picks_avg > market_avg).mean() * 100)),
+        "picks_flat_next_day_pct": round(float(np.mean(flat) * 100)),
+    }
 
 
 # ─── Stage 6: predict on the latest trading day + export predictions.json ─
@@ -352,6 +401,14 @@ def safe_float(v, dp=4):
         return None
 
 
+def signal_for(pred):
+    if pred >= SIGNAL_THRESHOLD:
+        return "bullish"
+    if pred <= -SIGNAL_THRESHOLD:
+        return "bearish"
+    return "neutral"
+
+
 def to_dict(row):
     return {
         "counter": str(row["counter"]),
@@ -360,52 +417,46 @@ def to_dict(row):
         "close": safe_float(row["close"], 4),
         "usd_price": safe_float(row.get("usd_price_ibr"), 6),
         "today_chg_pct": safe_float(row.get("change_pct"), 2),
+        "traded_today": bool(row["traded_today"]),
+        # Kept for data consumers; the page does not show it as a forecast.
         "predicted_chg_pct": safe_float(row["predicted_chg_pct"], 2),
-        "confidence_score": safe_float(row["confidence_score"], 3),
         "risk_score": safe_float(row["risk_score"], 2),
         "signal": str(row["signal"]),
     }
 
 
-def build_predictions(df, model, scaler, model_mae):
+def build_predictions(df, rows):
     latest_date = df["date"].max()
-    today_rows = df[df["date"] == latest_date].copy()
-
-    all_pred_cols = FEATURE_COLS + ["counter", "market", "sector", "close", "usd_price_ibr", "change_pct"]
-    pred_df = today_rows[all_pred_cols].dropna(subset=FEATURE_COLS).copy()
-
+    today = df[df["date"] == latest_date]
+    pred_df = today[FEATURE_COLS + ["counter", "market", "sector", "close", "usd_price_ibr", "change_pct"]] \
+        .dropna(subset=FEATURE_COLS).copy()
     if pred_df.empty:
         raise ValueError(
             f"No counters with complete features on {latest_date.date()} -- refusing to publish an empty snapshot."
         )
 
-    X_pred = scaler.transform(pred_df[FEATURE_COLS].values)
-    tree_preds = np.array([t.predict(X_pred) for t in model.estimators_])
-    preds = model.predict(X_pred).flatten()
-
-    pred_df["predicted_chg_pct"] = preds.round(2)
-    pred_std = preds.std()
-    if pred_std > 0:
-        pred_df["confidence_score"] = (1 - (tree_preds.std(axis=0) / pred_std)).clip(0, 1).round(3)
-    else:
-        pred_df["confidence_score"] = 1.0
+    model, scaler = fit(rows)  # everything up to today's known outcomes
+    pred_df["predicted_chg_pct"] = predict(model, scaler, pred_df).round(2)
     pred_df["risk_score"] = pred_df["roll20_std_chg"].round(2)
-    pred_df["signal"] = pred_df["predicted_chg_pct"].apply(
-        lambda x: "bullish" if x > 0 else ("bearish" if x < 0 else "neutral")
-    )
+    pred_df["signal"] = pred_df["predicted_chg_pct"].apply(signal_for)
     pred_df = pred_df.sort_values("predicted_chg_pct", ascending=False).reset_index(drop=True)
+    watchlist = pred_df[pred_df["traded_today"] == 1].head(WATCHLIST_SIZE)
 
-    snapshot = {
+    traded = df.index[df["traded_today"] == 1]
+    return {
         "generated": datetime.now(timezone.utc).isoformat(),
         "price_date": str(latest_date.date()),
         "training_days": int(df["date"].nunique()),
-        "model_mae": model_mae,
+        "method": (
+            "Random forest (scikit-learn) retrained daily on every archived FBC price sheet. "
+            "Watchlist = the counters that traded today with the highest predicted next-day change."
+        ),
         "disclaimer": "Algorithmic signals only. Not financial advice.",
-        "top_bullish": [to_dict(r) for _, r in pred_df.head(5).iterrows()],
-        "top_bearish": [to_dict(r) for _, r in pred_df.tail(5).iterrows()],
+        "watchlist": [to_dict(r) for _, r in watchlist.iterrows()],
+        "track_record": track_record(rows, traded),
+        "accuracy": holdout_accuracy(rows),
         "all_predictions": [to_dict(r) for _, r in pred_df.iterrows()],
     }
-    return snapshot
 
 
 def main():
@@ -425,13 +476,16 @@ def main():
         print("Every row was dropped by the sanity check -- refusing to publish.", file=sys.stderr)
         return 1
 
-    df = engineer_features(df)
-    model, scaler, model_mae = train_model(df)
-    snapshot = build_predictions(df, model, scaler, model_mae)
-
-    if existing and existing.get("price_date") == snapshot["price_date"]:
-        print(f"predictions.json already covers {snapshot['price_date']} -- nothing to do.")
+    # Checked before training: the workflow runs hourly, and the walk-forward
+    # track record is ~60 model fits, so a day already published costs nothing.
+    latest = str(df["date"].max().date())
+    if existing and existing.get("price_date") == latest and "track_record" in existing:
+        print(f"predictions.json already covers {latest} -- nothing to do.")
         return 0
+
+    df = engineer_features(df)
+    rows = trainable_rows(df)
+    snapshot = build_predictions(df, rows)
 
     with open(PREDICTIONS_PATH, "w") as f:
         json.dump(snapshot, f, indent=2)
@@ -439,11 +493,11 @@ def main():
 
     log(
         f"Wrote predictions.json -- price_date={snapshot['price_date']}, "
-        f"{len(snapshot['all_predictions'])} counters, model_mae={model_mae}"
+        f"{len(snapshot['all_predictions'])} counters, accuracy={snapshot['accuracy']}, "
+        f"track_record={snapshot['track_record']}"
     )
     return 0
 
 
 if __name__ == "__main__":
     sys.exit(main())
-
