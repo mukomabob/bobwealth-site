@@ -310,6 +310,8 @@ HOLDOUT_FRACTION = 0.2      # most recent share of trading days held out for acc
 TRACK_RECORD_DAYS = 60      # walk-forward window for the published track record
 WATCHLIST_SIZE = 5
 SIGNAL_THRESHOLD = 1.0      # pp; a prediction inside +/- this reads as "no clear signal"
+# Bump when predictions.json gains fields, so a day already published is rebuilt once.
+SCHEMA_VERSION = 2
 
 
 def make_model():
@@ -364,7 +366,7 @@ def track_record(rows, traded):
     market average and with a no-model rule (that day's biggest fallers).
     """
     dates = sorted(rows["date"].unique())[-TRACK_RECORD_DAYS:]
-    picks_avg, market_avg, rule_avg, flat = [], [], [], []
+    picks_avg, market_avg, rule_avg, pick_moves = [], [], [], []
     for d in dates:
         train, day = rows[rows["date"] < d], rows[rows["date"] == d]
         if len(train) < 200 or day.empty:
@@ -378,17 +380,23 @@ def track_record(rows, traded):
         picks_avg.append(picks[TARGET_COL].mean())
         market_avg.append(day[TARGET_COL].mean())
         rule_avg.append(rule[TARGET_COL].mean())
-        flat.append((picks[TARGET_COL] == 0).mean())
+        pick_moves.extend(picks[TARGET_COL].tolist())
     if not picks_avg:
         return None
-    picks_avg, market_avg = np.array(picks_avg), np.array(market_avg)
+    picks_avg, market_avg, moves = np.array(picks_avg), np.array(market_avg), np.array(pick_moves)
     return {
         "days": len(picks_avg),
+        # The group result: days on which the 5 picks' average beat the market average.
+        "beat_market_days": int((picks_avg > market_avg).sum()),
         "picks_avg_next_day_pct": round(float(picks_avg.mean()), 2),
         "market_avg_next_day_pct": round(float(market_avg.mean()), 2),
         "biggest_fallers_avg_next_day_pct": round(float(np.mean(rule_avg)), 2),
         "beat_market_days_pct": round(float((picks_avg > market_avg).mean() * 100)),
-        "picks_flat_next_day_pct": round(float(np.mean(flat) * 100)),
+        # The per-pick result, which is much weaker than the group one.
+        "picks_total": int(len(moves)),
+        "picks_rose_next_day_pct": round(float((moves > 0).mean() * 100)),
+        "picks_flat_next_day_pct": round(float((moves == 0).mean() * 100)),
+        "picks_fell_next_day_pct": round(float((moves < 0).mean() * 100)),
     }
 
 
@@ -444,6 +452,7 @@ def build_predictions(df, rows):
 
     traded = df.index[df["traded_today"] == 1]
     return {
+        "schema_version": SCHEMA_VERSION,
         "generated": datetime.now(timezone.utc).isoformat(),
         "price_date": str(latest_date.date()),
         "training_days": int(df["date"].nunique()),
@@ -479,7 +488,7 @@ def main():
     # Checked before training: the workflow runs hourly, and the walk-forward
     # track record is ~60 model fits, so a day already published costs nothing.
     latest = str(df["date"].max().date())
-    if existing and existing.get("price_date") == latest and "track_record" in existing:
+    if existing and existing.get("price_date") == latest and existing.get("schema_version") == SCHEMA_VERSION:
         print(f"predictions.json already covers {latest} -- nothing to do.")
         return 0
 
