@@ -248,12 +248,41 @@ def engineer_derived_fields(df):
     return df
 
 
+def add_usd_returns(df):
+    """USD return from the same starting point the site's Investment Simulator uses.
+
+    ytd_gain_loss is FBC's ZiG figure against its own base date, so on its own
+    the chat agent named a different "best performer" than the chart beside it.
+    The starting prices come from scripts/publish_fbc_prices.py itself -- the
+    6 Jan 2026 sheet, else a published listing price, else the counter's first
+    archived price -- so the two cannot drift apart.
+    """
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "scripts"))
+    import publish_fbc_prices as pub
+
+    base, base_date = pub.load_baseline()
+    starts = {k: {"price": v["price"], "since": base_date} for k, v in base.items()}
+    starts.update(pub.load_late_listing_baselines(set(base), "9999-12-31"))
+
+    key = df["counter"].str.strip().str.upper()
+    start_price = key.map(lambda k: starts.get(k, {}).get("price"))
+    start_date = key.map(lambda k: starts.get(k, {}).get("since"))
+    usd = pd.to_numeric(df["usd_price_ibr"], errors="coerce")
+    usable = start_price.notna() & (usd > 0) & (df["date"].dt.strftime("%Y-%m-%d") >= start_date.fillna("9999"))
+    df["usd_return_pct"] = ((usd / start_price - 1) * 100).where(usable)
+    df["return_since"] = start_date.where(usable)
+    log(f"USD returns: {int(usable.sum()):,} row(s) across {df.loc[usable, 'counter'].nunique()} counters "
+        f"measured from {base_date} or their listing.")
+    return df
+
+
 def build(sheets_dir, db_path):
     combined = load_sheets(sheets_dir)
     combined = clean_rows(combined)
     df = standardize(combined)
     df = sanity_check(df)
     df = engineer_derived_fields(df)
+    df = add_usd_returns(df)
 
     keep_cols = [
         "date", "counter", "isin", "market", "sector",
@@ -261,6 +290,7 @@ def build(sheets_dir, db_path):
         "usd_price_ibr", "change_pct", "volume", "value_traded_zig",
         "div_yield_fy25", "div_yield_fy26", "ytd_gain_loss",
         "chg_pct_filled", "roll5_chg", "roll20_std_chg", "traded",
+        "usd_return_pct", "return_since",
     ]
     df = df[[c for c in keep_cols if c in df.columns]].copy()
     df["date"] = df["date"].dt.strftime("%Y-%m-%d")
@@ -271,7 +301,7 @@ def build(sheets_dir, db_path):
     # queries (SQLite sorts TEXT lexicographically: "9.5" > "14.8"). Force
     # every non-identifier column to a real numeric dtype before it touches
     # SQLite.
-    text_cols = {"date", "counter", "isin", "market", "sector"}
+    text_cols = {"date", "counter", "isin", "market", "sector", "return_since"}
     for col in df.columns:
         if col not in text_cols:
             df[col] = pd.to_numeric(df[col], errors="coerce")

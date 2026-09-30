@@ -392,6 +392,7 @@ function parseSheet(raw,fname){
     const r=raw[i]; if(!r||!r[0])continue;
     const first=String(r[0]).trim(); if(!first)continue;
     if(first.toUpperCase().includes('VFEX PRICE SHEET')){mkt='VFEX';continue;}
+    if(/^ZSE (ETF|REIT)/i.test(first)){mkt='ZSE';continue;}  // ZiG sections follow the VFEX ones
     if(/VFEX BONDS|VFEX REITS|VFEX ETF|ZSE ETF|ZSE REIT|ZSE TOP|THIS PRICE SHEET/i.test(first))continue;
     if(isNaN(parseFloat(r[1]))&&typeof r[1]!=='string')continue;
     const sect=String(r[5]||'').trim();

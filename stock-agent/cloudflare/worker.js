@@ -46,6 +46,11 @@ Table: prices (one row per counter per trading day, ZSE/VFEX stock exchange data
   roll5_chg         REAL    5-day rolling mean of chg_pct_filled, per counter
   roll20_std_chg    REAL    20-day rolling std of change_pct, per counter (volatility proxy)
   traded            INTEGER 1 if volume > 0 else 0
+  usd_return_pct    REAL    % change in US DOLLARS since return_since -- the same figure the
+                            site's Investment Simulator charts ($100 -> 100 + usd_return_pct).
+                            Already a percentage. NULL before a counter's start date.
+  return_since      TEXT    'YYYY-MM-DD' start of usd_return_pct: 2026-01-06, or the listing /
+                            first-price date for counters listed later
 `.trim();
 
 const SQL_SYSTEM_PROMPT = `You are a SQLite query writer for a stock-market database. Given a user's
@@ -58,7 +63,12 @@ ${SCHEMA_DOC}
 
 Rules:
 - Only SELECT or WITH ... SELECT. Never INSERT/UPDATE/DELETE/DROP/etc.
-- Use usd_price_ibr for price/return questions unless the user asks about ZiG specifically.
+- For performance questions -- best/worst performer, gainers/losers, returns, "this year",
+  "since January" -- use usd_return_pct on the most recent date. Use ytd_gain_loss ONLY when
+  the user explicitly asks for ZiG / local-currency terms.
+- Use usd_price_ibr for price questions unless the user asks about ZiG specifically.
+- When querying the most recent date, also SELECT date (and return_since for usd_return_pct)
+  so the answer can say what the figures are as of.
 - "today" / "most recent" means the MAX(date) in the table, not a real-world date.
 - Always LIMIT results to at most 20 rows unless the question clearly needs a single aggregate.`;
 
@@ -74,6 +84,10 @@ already in a form fit to read aloud:
 - change_pct, chg_pct_filled, roll5_chg, roll20_std_chg, div_yield_fy25,
   div_yield_fy26 are already percentages (2.94 means 2.94%) -- state with a
   % sign, rounded to 1-2 decimals.
+- usd_return_pct is already a percentage in US dollars since return_since. State it as
+  "+X% in US dollars since <return_since>", and you may add what $100 would now be worth
+  (100 + usd_return_pct). This is the same measure as the site's Investment Simulator.
+- If the rows include a date, say the figures are "as of <date>".
 - ytd_gain_loss is a FRACTION of price change vs the 31-Dec-2024 baseline,
   in ZiG terms -- NOT already a percentage. Multiply by 100 before stating
   it as a %, e.g. a value of 6.54 means "+654%", never "+6.54%". Say this

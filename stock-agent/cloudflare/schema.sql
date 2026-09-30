@@ -24,7 +24,9 @@ CREATE TABLE prices (
   "chg_pct_filled"    REAL,
   "roll5_chg"         REAL,
   "roll20_std_chg"    REAL,
-  "traded"            INTEGER
+  "traded"            INTEGER,
+  "usd_return_pct"    REAL,
+  "return_since"      TEXT
 );
 
 CREATE INDEX idx_counter_date ON prices(counter, date);

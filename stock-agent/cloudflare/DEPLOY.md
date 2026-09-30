@@ -92,30 +92,35 @@ reuses the site's existing CSS variables, so no extra styling is needed.
 
 ## 6. Keeping D1 fresh as new sheets arrive
 
-The existing GitHub Actions workflow (`fbc-daily-publish-v2.yml`) already
-archives each new day's sheet into `data/fbc-sheets/` and regenerates
-`market-data.json`/`predictions.json`. To keep D1 in sync too, add a step
-to that workflow (or a separate scheduled one) that runs, after the sheet
-archive step:
+Both workflows are already in the repo and do nothing until two GitHub
+secrets exist:
 
-```yaml
-- name: Rebuild D1 stock-agent database
-  run: |
-    pip install pandas openpyxl
-    python3 stock-agent/build_dataset.py data/fbc-sheets stock-agent/fbc_history.db
-    python3 stock-agent/cloudflare/export_to_d1.py stock-agent/fbc_history.db stock-agent/cloudflare/d1_data.sql
-    npx wrangler d1 execute fbc-history --remote --file=stock-agent/cloudflare/d1_data.sql
-  env:
-    CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-    CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-```
+- `fbc-daily-publish.yml` rebuilds D1 from `data/fbc-sheets/` whenever it
+  publishes a new day's sheet, so the chatbot answers from the same date as
+  the website.
+- `chatbot-deploy.yml` redeploys the Worker and reloads D1 whenever
+  `stock-agent/` (or the publish script it shares baselines with) changes on
+  `main`, and can be run by hand from the Actions tab.
 
-You'd create a Cloudflare API token (My Profile → API Tokens → "Edit
-Cloudflare Workers" template, scoped to D1 edit) and add it plus your
-account ID as GitHub Actions secrets (Settings → Secrets and variables →
-Actions) for this to authenticate. This step isn't included in the repo's
-actual workflow file yet — add it when you're ready to automate the daily
-refresh; until then, re-run step 3 by hand whenever you want D1 updated.
+To switch them on:
+
+1. **Create a Cloudflare API token.** Cloudflare dashboard → My Profile →
+   API Tokens → Create Token → "Edit Cloudflare Workers" template, then add
+   the permission **Account → D1 → Edit**. Limit it to your own account.
+2. **Find your account ID.** Workers & Pages overview → right-hand sidebar.
+3. **Add both as repository secrets.** GitHub → the repo → Settings →
+   Secrets and variables → Actions → New repository secret:
+   `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
+4. **Run it once.** Actions → "Deploy chatbot (Worker + D1 data)" → Run
+   workflow. After that the daily run keeps D1 current on its own.
+
+The export recreates the `prices` table on every import (it inlines
+`schema.sql`), so adding a column to the schema reaches D1 with the next
+refresh.
+
+`usd_return_pct` / `return_since` are computed with
+`scripts/publish_fbc_prices.py`'s own baselines, so the chatbot's
+"best performer" is the same one the Investment Simulator shows.
 
 ## Costs and limits to know about
 
