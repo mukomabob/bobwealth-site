@@ -58,6 +58,8 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           PRICE_DATE=$(python -c "import json;print(json.load(open('market-data.json'))['priceDate'])")
           git commit -m "market-data + predictions: ${PRICE_DATE}"
+          # Another push may have landed while this job ran; replay on top of it.
+          git pull --rebase origin "${GITHUB_REF_NAME}"
           git push
 
       - name: Purge jsDelivr CDN cache

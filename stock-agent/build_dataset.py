@@ -104,8 +104,11 @@ def load_sheets(sheets_dir):
             # until the ZiG-priced "ZSE ETF"/"ZSE REIT" sections switch back.
             # (A hard-coded list of VFEX names went stale: it missed Pfuma
             # REIT and Eagle REIT.)
+            # Blank cells stay NaN under pandas 3's astype(str), so convert
+            # each value by hand.
             market, mkt = [], "ZSE"
-            for first in df["COUNTER"].astype(str).str.strip():
+            for v in df["COUNTER"]:
+                first = "" if pd.isna(v) else str(v).strip()
                 if "VFEX PRICE SHEET" in first.upper():
                     mkt = "VFEX"
                 elif ZSE_SECTION_RE.match(first):

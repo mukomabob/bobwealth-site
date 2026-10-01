@@ -41,4 +41,6 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           COUNT=$(git diff --cached --name-only | wc -l | tr -d ' ')
           git commit -m "backfill: archive ${COUNT} historical FBC sheet(s) from Gmail"
+          # Another push may have landed while this job ran; replay on top of it.
+          git pull --rebase origin "${GITHUB_REF_NAME}"
           git push
