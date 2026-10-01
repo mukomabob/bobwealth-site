@@ -1192,14 +1192,14 @@ function renderBarChart() {
   const results = window.ASK_FILTER ? allResults.filter(window.ASK_FILTER.test) : allResults;
   const excluded = window.PS.filter(r => getInvValue(r) == null)
     .map(r => r.counter.trim() + (r.suspended ? ' (suspended)' : r.usdPrice > 0 ? ' (no starting price)' : ' (no price today)'));
-  const lateCount = results.filter(r => r.baseSince).length;
   if (!results.length) { el.innerHTML='<div class="state-card"><h3>No investment data</h3><p>Data will appear after a snapshot with baseline is published.</p></div>'; return; }
   results.sort((a,b) => b.inv100 - a.inv100);
   const mktF = document.getElementById('bcMktF')?.value || '';
   const cntF = parseInt(document.getElementById('bcCntF')?.value || '999') || 999;
   let filtered = mktF ? results.filter(r=>r.market===mktF) : results;
   filtered = filtered.slice(0, Math.min(cntF, filtered.length));
-  const investment = 100;
+  const investment = 1;
+  const fUsd = v => v.toFixed(2);  // band edges like $1.20 need cents
   const maxVal = Math.max(...filtered.map(r=>(r.inv100/100)*investment), investment*2);
   const narrow = window.innerWidth <= 768;
   const avail = el.clientWidth || 900;
@@ -1223,11 +1223,11 @@ function renderBarChart() {
       <div class="bchart-header">
         <div class="bc-print-brand">Bob Wealth Holdings · Zimbabwe Capital Markets</div>
         <div class="bc-headline">US$<span id="dynamicLabelAmount">${investment.toLocaleString()}</span> invested in each counter on ${window.BASE_DATE||'6 Jan 2026'} — value on ${priceDate}</div>
-        <div class="bc-meta"><span>${allResults.length} of ${window.PS.length} counters tracked</span><span>${filtered.length} shown</span>${lateCount ? `<span>${lateCount} listed later, measured from first price (marked since …)</span>` : ''}</div>
+        <div class="bc-meta"><span>${allResults.length} of ${window.PS.length} counters tracked</span></div>
         ${excluded.length ? `<details class="bc-untracked"><summary>${excluded.length} not tracked</summary><div>${excluded.join(' · ')}</div></details>` : ''}
       </div>
       <div class="kpi-row k3">
-        <div class="kc"><div class="kc-lbl">Amount per counter</div><div class="kc-val">$${investment.toLocaleString()}</div></div>
+        <div class="kc"><div class="kc-lbl">Amount per counter</div><div class="kc-val">$${fUsd(investment)}</div></div>
         <div class="kc"><div class="kc-lbl">Best performer</div><div class="kc-val" style="font-size:14px">${best?best.counter:'—'}</div></div>
         <div class="kc"><div class="kc-lbl">Highest value</div><div class="kc-val up">$${bestVal.toFixed(2)}</div></div>
       </div>
@@ -1237,11 +1237,11 @@ function renderBarChart() {
         <button class="btn-print" onclick="printChart()">Print / PDF</button>
       </div>
       <div class="bchart-legend">
-        <div class="bl-item"><div class="bl-dot" style="background:var(--tier-a)"></div> &gt;$${(investment*1.5).toFixed(0)}</div>
-        <div class="bl-item"><div class="bl-dot" style="background:var(--tier-b)"></div> $${(investment*1.2).toFixed(0)}–$${(investment*1.5).toFixed(0)}</div>
-        <div class="bl-item"><div class="bl-dot" style="background:var(--tier-c)"></div> $${investment.toFixed(0)}–$${(investment*1.2).toFixed(0)}</div>
-        <div class="bl-item"><div class="bl-dot" style="background:var(--tier-d)"></div> $${(investment*0.8).toFixed(0)}–$${investment.toFixed(0)}</div>
-        <div class="bl-item"><div class="bl-dot" style="background:var(--tier-e)"></div> &lt;$${(investment*0.8).toFixed(0)}</div>
+        <div class="bl-item"><div class="bl-dot" style="background:var(--tier-a)"></div> &gt;$${fUsd(investment*1.5)}</div>
+        <div class="bl-item"><div class="bl-dot" style="background:var(--tier-b)"></div> $${fUsd(investment*1.2)}–$${fUsd(investment*1.5)}</div>
+        <div class="bl-item"><div class="bl-dot" style="background:var(--tier-c)"></div> $${fUsd(investment)}–$${fUsd(investment*1.2)}</div>
+        <div class="bl-item"><div class="bl-dot" style="background:var(--tier-d)"></div> $${fUsd(investment*0.8)}–$${fUsd(investment)}</div>
+        <div class="bl-item"><div class="bl-dot" style="background:var(--tier-e)"></div> &lt;$${fUsd(investment*0.8)}</div>
       </div>
       <div id="bcRows">${rows}</div>
       <div class="bchart-footer">

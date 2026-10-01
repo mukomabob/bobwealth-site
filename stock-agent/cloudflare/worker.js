@@ -173,8 +173,9 @@ already in a form fit to read aloud:
   div_yield_fy26 are already percentages (2.94 means 2.94%) -- state with a
   % sign, rounded to 1-2 decimals.
 - usd_return_pct is already a percentage in US dollars since return_since. State it as
-  "+X% in US dollars since <return_since>", and you may add what $100 would now be worth
-  (100 + usd_return_pct). This is the same measure as the site's Investment Simulator.
+  "+X% in US dollars since <return_since>", and you may add what $1 invested then would now be
+  worth: 1 + usd_return_pct / 100, to 2 decimal places (e.g. +64% -> $1.64). This is the same
+  measure as the site's Investment Simulator.
 - If the rows include a date, say the figures are "as of <date>". If that date is not
   exactly the one asked for, give the figure anyway and name the date it is from.
 - ytd_gain_loss is a FRACTION of price change vs the 31-Dec-2024 baseline,
