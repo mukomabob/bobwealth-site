@@ -10,7 +10,7 @@
 <link rel="icon" type="image/png" href="https://bobwealth.org/images/bob_logo.png">
 <link rel="apple-touch-icon" href="https://bobwealth.org/images/bob_logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -49,7 +49,7 @@
 
 
   /* Typography */
-  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;--serif:'Playfair Display',serif;
+  --font:'IBM Plex Sans',sans-serif;--mono:'IBM Plex Mono',monospace;--display:'IBM Plex Sans Condensed','IBM Plex Sans',sans-serif;
 }
 html,body{height:100%;overflow:hidden}
 body{font-family:var(--font);background:var(--bg);color:var(--text);display:flex;flex-direction:column;font-size:13px}
@@ -58,8 +58,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);display:flex
 .site-header{background:#09111A;border-bottom:2px solid var(--gold);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:62px;flex-shrink:0;box-shadow:0 2px 24px rgba(0,0,0,.5)}
 .hd-brand{display:flex;align-items:center;gap:13px;text-decoration:none}
 .hd-logo{height:36px;width:36px;object-fit:contain}
-.hd-logo-fb{width:36px;height:36px;border-radius:4px;background:var(--gold);display:none;align-items:center;justify-content:center;font-family:var(--serif);font-size:17px;font-weight:700;color:#09111A;flex-shrink:0}
-.hd-name{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--white);letter-spacing:.2px;line-height:1.1}
+.hd-logo-fb{width:36px;height:36px;border-radius:4px;background:var(--gold);display:none;align-items:center;justify-content:center;font-family:var(--display);font-size:17px;font-weight:700;color:#09111A;flex-shrink:0}
+.hd-name{font-family:var(--display);font-size:17px;font-weight:700;color:var(--white);letter-spacing:.2px;line-height:1.1}
 .hd-name span{display:block;font-family:var(--mono);font-size:9px;font-weight:400;color:var(--gold-l);letter-spacing:.15em;text-transform:uppercase;margin-top:2px}
 .site-nav{display:flex;align-items:center;gap:3px}
 .site-nav a{color:rgba(255,255,255,.5);font-size:12px;font-weight:500;text-decoration:none;padding:6px 13px;border-radius:3px;transition:all .15s;letter-spacing:.02em}
@@ -77,7 +77,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);display:flex
 /* SIDEBAR */
 .sb{width:216px;background:#09111A;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;height:100%;overflow-y:auto}
 .sb-hdr{padding:18px 16px 14px;border-bottom:1px solid var(--border)}
-.sb-title{font-family:var(--serif);font-size:13px;font-weight:700;color:var(--gold-l)}
+.sb-title{font-family:var(--display);font-size:13px;font-weight:700;color:var(--gold-l)}
 .sb-date{font-family:var(--mono);font-size:10px;color:var(--ts);margin-top:4px;letter-spacing:.04em}
 .sb-nav{padding:10px 8px;flex:1}
 .ng{margin-bottom:6px}
@@ -93,7 +93,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);display:flex
 /* WORKSPACE */
 .ws{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .topbar{padding:12px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;background:#09111A}
-.tb-left h1{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--text);letter-spacing:.1px}
+.tb-left h1{font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);letter-spacing:.1px}
 .tb-left .tb-sub{font-size:10px;font-family:var(--mono);color:var(--ts);margin-top:2px;letter-spacing:.04em}
 .tb-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 
@@ -181,7 +181,7 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 /* $100 TRACKER */
 .base-banner{background:linear-gradient(135deg,#0E1826,#172A3D);border-radius:6px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:14px;border:1px solid rgba(174,187,200,.2)}
 .base-banner .bb-icon{font-size:22px;flex-shrink:0}
-.base-banner .bb-text h3{font-family:var(--serif);font-size:14px;font-weight:700;color:var(--gold-l);margin-bottom:2px}
+.base-banner .bb-text h3{font-family:var(--display);font-size:14px;font-weight:700;color:var(--gold-l);margin-bottom:2px}
 .base-banner .bb-text p{font-size:10px;color:var(--ts);font-family:var(--mono)}
 .base-banner .bb-badge{margin-left:auto;background:rgba(174,187,200,.15);color:var(--gold-l);font-family:var(--mono);font-size:9px;font-weight:700;padding:4px 10px;border-radius:3px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;flex-shrink:0;border:1px solid rgba(174,187,200,.3)}
 .iv-bar{display:inline-block;height:4px;border-radius:2px;min-width:3px;vertical-align:middle;margin-left:5px}
@@ -189,7 +189,7 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 
 /* ASK THE DATA (above the simulator) */
 .sim-ask{margin:8px 0 28px;padding:16px 18px;background:var(--gold-p);border:1px solid rgba(174,187,200,.35);border-radius:6px}
-.sim-ask-title{display:flex;align-items:baseline;gap:8px;margin-bottom:10px;font-family:var(--serif);font-size:15px;font-weight:700;color:var(--gold-l)}
+.sim-ask-title{display:flex;align-items:baseline;gap:8px;margin-bottom:10px;font-family:var(--display);font-size:15px;font-weight:700;color:var(--gold-l)}
 .sim-ask-title span{font-family:var(--font);font-size:11px;font-weight:400;color:var(--tm)}
 .sim-ask-form{display:flex;gap:8px}
 .sim-ask-input{flex:1;min-width:0;background:var(--surface-2);border:1px solid rgba(174,187,200,.45);border-radius:4px;padding:9px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none}
@@ -222,7 +222,7 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 /* LOADING / ERROR */
 .state-card{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;color:var(--ts)}
 .state-card .sc-icon{font-size:40px;margin-bottom:14px;opacity:.4}
-.state-card h3{font-family:var(--serif);font-size:17px;color:var(--text);margin-bottom:8px;font-weight:600}
+.state-card h3{font-family:var(--display);font-size:17px;color:var(--text);margin-bottom:8px;font-weight:600}
 .state-card p{font-size:12px;line-height:1.7;max-width:340px;color:var(--tm)}
 .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--gl);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
 
@@ -781,8 +781,8 @@ function mk(id,cfg) {
   CH[id]=new Chart(cv,cfg);
   return CH[id];
 }
-const scX = () => ({grid:{display:false},ticks:{color:'#708090',font:{family:'DM Mono,monospace',size:10},maxRotation:30}});
-const scY = cb => ({grid:{color:'rgba(45,59,75,.8)'},ticks:{color:'#708090',font:{family:'DM Mono,monospace',size:10},callback:cb}});
+const scX = () => ({grid:{display:false},ticks:{color:'#708090',font:{family:'IBM Plex Mono,monospace',size:10},maxRotation:30}});
+const scY = cb => ({grid:{color:'rgba(45,59,75,.8)'},ticks:{color:'#708090',font:{family:'IBM Plex Mono,monospace',size:10},callback:cb}});
 
 function render() { if(!window.PS.length)return; renderOverview(); renderMovers(); renderScreener(); }
 
@@ -899,7 +899,7 @@ function renderLiquidity() {
 
   document.getElementById('liquidityContent').innerHTML = `
     <div style="background:linear-gradient(135deg,#0E1826,#172A3D);border-radius:6px;padding:14px 20px;margin-bottom:16px;border:1px solid rgba(174,187,200,.2)">
-      <div style="font-family:var(--serif);font-size:13px;font-weight:700;color:var(--gold-l);margin-bottom:4px">Liquidity Score — Quality of Exit Analysis</div>
+      <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--gold-l);margin-bottom:4px">Liquidity Score — Quality of Exit Analysis</div>
       <div style="font-size:10px;font-family:var(--mono);color:var(--ts);line-height:1.7;max-width:740px">
         Bob Wealth Holdings' proprietary liquidity ranking. Counters are classified as <strong style="color:var(--gain)">Liquid</strong>, <strong style="color:var(--gold-l)">Fairly Liquid</strong>, or <strong style="color:var(--red)">Illiquid</strong> based on their relative trading activity and value-to-market-cap ratio — ranked against all other counters in the same dataset.
       </div>
@@ -992,7 +992,7 @@ function renderLiquidity() {
       },
       scales: {
         x: { display: false, grid: { display: false } },
-        y: { grid: { display: false }, ticks: { color: '#E8EDF2', font: { family: 'DM Mono,monospace', size: 10 } } }
+        y: { grid: { display: false }, ticks: { color: '#E8EDF2', font: { family: 'IBM Plex Mono,monospace', size: 10 } } }
       }
     }
   });
@@ -1138,7 +1138,7 @@ function renderBarChart() {
       <div class="bchart-header">
         <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px">
           <img src="https://bobwealth.org/images/bob_logo.png" style="height:36px;object-fit:contain" onerror="this.style.display='none'">
-          <div><div style="font-family:var(--serif);font-size:15px;font-weight:700;color:var(--gold-l)">Bob Wealth Holdings</div><div style="font-family:var(--mono);font-size:9px;color:var(--ts);letter-spacing:.1em;text-transform:uppercase">Zimbabwe Capital Markets</div></div>
+          <div><div style="font-family:var(--display);font-size:15px;font-weight:700;color:var(--gold-l)">Bob Wealth Holdings</div><div style="font-family:var(--mono);font-size:9px;color:var(--ts);letter-spacing:.1em;text-transform:uppercase">Zimbabwe Capital Markets</div></div>
         </div>
         <div style="font-size:14px;font-weight:600;color:var(--text);font-family:var(--font)">If you invested US$<span id="dynamicLabelAmount">${investment.toLocaleString()}</span> in each counter at the beginning of the year,</div>
         <div style="font-size:14px;font-weight:600;color:var(--text);font-family:var(--font);margin-top:2px">on <strong>${priceDate}</strong> it would be worth;</div>

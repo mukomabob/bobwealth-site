@@ -10,7 +10,7 @@
 <link rel="icon" type="image/png" href="images/bob_logo.png">
 <link rel="apple-touch-icon" href="images/bob_logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -33,9 +33,9 @@
   --ts:#708090;
   --red:#E05252;
   --gain:#4AB870;
-  --font:'DM Sans',sans-serif;
-  --mono:'DM Mono',monospace;
-  --serif:'Playfair Display',serif;
+  --font:'IBM Plex Sans',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  --display:'IBM Plex Sans Condensed','IBM Plex Sans',sans-serif;
 }
 
 html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.6}
@@ -49,8 +49,8 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
 }
 .hd-brand{display:flex;align-items:center;gap:13px;text-decoration:none}
 .hd-logo{height:36px;width:36px;object-fit:contain}
-.hd-logo-fb{width:36px;height:36px;border-radius:4px;background:var(--gold);display:none;align-items:center;justify-content:center;font-family:var(--serif);font-size:17px;font-weight:700;color:#09111A;flex-shrink:0}
-.hd-name{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--white);letter-spacing:.2px;line-height:1.1}
+.hd-logo-fb{width:36px;height:36px;border-radius:4px;background:var(--gold);display:none;align-items:center;justify-content:center;font-family:var(--display);font-size:17px;font-weight:700;color:#09111A;flex-shrink:0}
+.hd-name{font-family:var(--display);font-size:17px;font-weight:700;color:var(--white);letter-spacing:.2px;line-height:1.1}
 .hd-name span{display:block;font-family:var(--mono);font-size:9px;font-weight:400;color:var(--gold-l);letter-spacing:.15em;text-transform:uppercase;margin-top:2px}
 .site-nav{display:flex;align-items:center;gap:3px}
 .site-nav a{color:rgba(255,255,255,.5);font-size:12px;font-weight:500;text-decoration:none;padding:6px 13px;border-radius:3px;transition:all .15s;letter-spacing:.02em}
@@ -80,7 +80,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
   text-transform:uppercase;color:var(--gold-l);margin-bottom:14px;
 }
 .hero h1{
-  font-family:var(--serif);font-size:clamp(32px,5vw,52px);font-weight:700;
+  font-family:var(--display);font-size:clamp(32px,5vw,52px);font-weight:700;
   color:var(--white);line-height:1.1;margin-bottom:16px;
 }
 .hero-sub{font-size:15px;color:var(--tm);line-height:1.75;max-width:460px;margin:0 auto}
@@ -94,7 +94,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
   text-transform:uppercase;color:var(--ts);margin-bottom:10px;
 }
 .section-title{
-  font-family:var(--serif);font-size:clamp(24px,3.5vw,34px);font-weight:700;
+  font-family:var(--display);font-size:clamp(24px,3.5vw,34px);font-weight:700;
   color:var(--white);margin-bottom:16px;line-height:1.2;
 }
 .section-body{font-size:15px;color:var(--tm);line-height:1.85}
@@ -141,7 +141,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
 }
 .highlight-icon{font-size:32px;flex-shrink:0}
 .highlight-text h3{
-  font-family:var(--serif);font-size:18px;font-weight:700;
+  font-family:var(--display);font-size:18px;font-weight:700;
   color:var(--gold-l);margin-bottom:6px;
 }
 .highlight-text p{font-size:13px;color:var(--ts);font-family:var(--mono);line-height:1.6}
@@ -172,7 +172,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
   letter-spacing:.1em;margin-bottom:12px;text-transform:uppercase;
 }
 .vision-card h3{
-  font-family:var(--serif);font-size:17px;font-weight:700;
+  font-family:var(--display);font-size:17px;font-weight:700;
   color:var(--text);margin-bottom:10px;line-height:1.25;
 }
 .vision-card p{font-size:13px;color:var(--tm);line-height:1.75}
@@ -268,7 +268,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
       <div class="story-body">
         <div class="story-tag gold">Education · Epworth</div>
         <div style="font-family:var(--mono);font-size:9px;color:var(--ts);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px">October 2025</div>
-        <h3 style="font-family:var(--serif);font-size:22px;font-weight:700;color:var(--white);margin-bottom:16px;line-height:1.2">Shuvai — <em>"Make a Wish"</em></h3>
+        <h3 style="font-family:var(--display);font-size:22px;font-weight:700;color:var(--white);margin-bottom:16px;line-height:1.2">Shuvai — <em>"Make a Wish"</em></h3>
         <p>
           Through our school assistance programme, we have helped cover monthly fees for a young girl named 
           <strong>Shuvai</strong> — whose name means <strong>"make a wish."</strong> She is completing 
