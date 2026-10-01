@@ -166,11 +166,11 @@ def main():
                 missing = [e for e in expected if not matches(e, cells)]
                 ok, note = not missing, (f"missing {missing}" if missing else "")
             except urllib.error.HTTPError as e:
-                if e.code in (401, 402, 403):
-                    # Credentials refused or no balance: this model can't be scored at
-                    # all, so skip it instead of counting every question as a failure.
+                if e.code in (401, 402, 403, 429):
+                    # Credentials refused, no balance, or a daily limit reached: the rest
+                    # can't be scored, so stop this model instead of counting failures.
                     skipped[model] = f"HTTP {e.code} {e.read()[:160]!r}"
-                    print(f"SKIPPED: provider refused the request ({skipped[model]}). "
+                    print(f"SKIPPED from here: provider refused the request ({skipped[model]}). "
                           "For Workers AI the API token needs the 'Workers AI - Read' permission.", flush=True)
                     results[model].append(None)
                     continue
@@ -184,7 +184,8 @@ def main():
                 print(f"        expected {expected}\n        {note}\n        SQL: {' '.join(sql.split())[:300]}", flush=True)
 
     lines = ["| Model | Passed |", "|---|---|"] + [
-        f"| `{m}` | " + (f"not run: {skipped[m]}" if m in skipped else f"{sum(bool(x) for x in r)}/{len(r)}") + " |"
+        f"| `{m}` | {sum(bool(x) for x in r)}/{sum(x is not None for x in r)} scored"
+        + (f" (stopped: {skipped[m]})" if m in skipped else "") + " |"
         for m, r in results.items()
     ]
     lines += ["", "| Question | " + " | ".join(m.split("/")[-1] for m in models) + " |",
