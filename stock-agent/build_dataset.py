@@ -164,9 +164,9 @@ def standardize(combined_df):
     df["sector_is_str"] = df["sector"].apply(lambda x: isinstance(x, str))
     df["sector"] = df["sector"].astype(str)
     df["volume"] = pd.to_numeric(df["volume"], errors="coerce")
-    # A sheet occasionally carries a non-number in these (a "-", an Excel
-    # error); one such cell turns the whole column into text and breaks the
-    # maths downstream, so treat it as missing instead.
+    # read_excel types these as object (the leaderboard block below the data
+    # puts text in them, and cutting those rows off does not re-type the
+    # column), so make them numeric; any stray non-number becomes missing.
     df["change_pct"] = pd.to_numeric(df["change_pct"], errors="coerce")
     df["ytd_gain_loss"] = pd.to_numeric(df["ytd_gain_loss"], errors="coerce")
 

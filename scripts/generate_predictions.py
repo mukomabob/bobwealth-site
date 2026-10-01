@@ -216,9 +216,11 @@ def standardize(combined_df):
     df["sector_is_str"] = df["sector"].apply(lambda x: isinstance(x, str))
     df["sector"] = df["sector"].astype(str)
     df["volume"] = pd.to_numeric(df["volume"], errors="coerce")
-    # A sheet occasionally carries a non-number here (a "-", an Excel error);
-    # one such cell turns the whole column into text and the model can't use
-    # it (30.09.26 failed this way), so treat it as missing instead.
+    # read_excel types this column as object: the leaderboard block below the
+    # data puts text in it, and cutting those rows off does not re-type the
+    # column. pandas 3 won't rank an object column (track_record's nsmallest
+    # failed in CI from 30.09.26), so make it numeric; any stray non-number
+    # becomes missing.
     df["change_pct"] = pd.to_numeric(df["change_pct"], errors="coerce")
 
     df["market"] = df["counter"].apply(lambda x: "VFEX" if x.upper() in VFEX_COUNTERS else "ZSE")
