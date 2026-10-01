@@ -27,10 +27,11 @@ ALLOWED_ORIGINS = "https://bobwealth.org,https://www.bobwealth.org"
 # Free Workers AI model that writes the SQL (used when no ANTHROPIC_API_KEY is
 # set). Chosen by comparing models with .github/workflows/sql-eval.yml.
 SQL_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
-# Econet's Caimex gateway (OpenAI-compatible, prepaid). Used for the SQL step
-# when the CAIMEX_API_KEY secret is set and Claude isn't; empty model = off.
+# Econet's Caimex gateway (OpenAI-compatible, prepaid). Writes the SQL (when
+# Claude isn't set) and words the answer; an empty model turns that step off.
 CAIMEX_BASE_URL = "https://caimex.econetai.co.zw:2052/v1"
 CAIMEX_SQL_MODEL = "Caimex2/deepseek-ai/DeepSeek-V4-Flash"
+CAIMEX_ANSWER_MODEL = "Caimex2/deepseek-ai/DeepSeek-V4-Flash"
 
 # Per-IP rate limit: 10 questions per 60 seconds. Stops anyone scripting the
 # endpoint from burning through the daily Workers AI allowance.

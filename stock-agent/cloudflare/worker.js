@@ -26,8 +26,9 @@
  *             the SQL (step 1); Workers AI still words the answer (step 2)
  *             and takes over step 1 if Claude is unavailable.
  *   env.CAIMEX_API_KEY - optional Worker secret for Econet's Caimex gateway
- *             (OpenAI-compatible). Used for step 1 when Claude isn't, with the
- *             model in CAIMEX_SQL_MODEL; Workers AI is still the fallback.
+ *             (OpenAI-compatible). Writes the SQL when Claude isn't set
+ *             (CAIMEX_SQL_MODEL) and words the answer (CAIMEX_ANSWER_MODEL);
+ *             Workers AI takes over either step if Caimex fails.
  */
 
 import Anthropic from "@anthropic-ai/sdk";
@@ -195,21 +196,8 @@ async function writeSql(env, messages) {
     }
   }
   if (env.CAIMEX_API_KEY && env.CAIMEX_SQL_MODEL) {
-    try {
-      const res = await fetch(`${env.CAIMEX_BASE_URL}/chat/completions`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${env.CAIMEX_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ model: env.CAIMEX_SQL_MODEL, messages, max_tokens: 2048 }),
-        signal: AbortSignal.timeout(25_000),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text()).slice(0, 200)}`);
-      const text = aiText(await res.json());
-      if (!text) throw new Error("empty reply");
-      return { sql: extractSql(text), by: env.CAIMEX_SQL_MODEL };
-    } catch (e) {
-      // Out of balance, down or unreachable: fall through to the free model.
-      console.error("Caimex request failed; using Workers AI for SQL:", e?.message || e);
-    }
+    const text = await caimexChat(env, env.CAIMEX_SQL_MODEL, messages, 2048);
+    if (text) return { sql: extractSql(text), by: env.CAIMEX_SQL_MODEL };
   }
   // The free Workers AI model for this step is set by SQL_MODEL in wrangler.toml.
   const model = env.SQL_MODEL || MODEL;
@@ -218,6 +206,27 @@ async function writeSql(env, messages) {
 }
 
 
+
+// One chat request to Econet's Caimex gateway. Returns the reply text, or null
+// when it is out of balance, over a limit, down or unreachable -- the caller
+// then falls back to the free Workers AI model.
+async function caimexChat(env, model, messages, maxTokens) {
+  try {
+    const res = await fetch(`${env.CAIMEX_BASE_URL}/chat/completions`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${env.CAIMEX_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ model, messages, max_tokens: maxTokens }),
+      signal: AbortSignal.timeout(25_000),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text()).slice(0, 200)}`);
+    const text = aiText(await res.json());
+    if (!text) throw new Error("empty reply");
+    return text;
+  } catch (e) {
+    console.error(`Caimex (${model}) failed; falling back to Workers AI:`, e?.message || e);
+    return null;
+  }
+}
 
 // Workers AI models answer in different shapes: { response } (Llama),
 // OpenAI-style { choices }, or Responses-style { output }.
@@ -315,19 +324,25 @@ async function handleAsk(request, env, origin) {
     );
   }
 
-  // Step 3: SQL results -> natural-language answer
-  const answerResp = await env.AI.run(MODEL, {
-    messages: [
-      { role: "system", content: answerSystemPrompt(rows.length) },
-      {
-        role: "user",
-        content: `${prompt}\n\nQuery results (JSON):\n${JSON.stringify(rows).slice(0, 4000)}`,
-      },
-    ],
-  });
+  // Step 3: SQL results -> natural-language answer. Caimex first when
+  // configured (the free model ignored instructions, e.g. said "no data" for a
+  // price from the nearest trading day); Workers AI otherwise.
+  const answerMessages = [
+    { role: "system", content: answerSystemPrompt(rows.length) },
+    {
+      role: "user",
+      content: `${prompt}\n\nQuery results (JSON):\n${JSON.stringify(rows).slice(0, 4000)}`,
+    },
+  ];
+  let answer = null, answerBy = MODEL;
+  if (env.CAIMEX_API_KEY && env.CAIMEX_ANSWER_MODEL) {
+    answer = await caimexChat(env, env.CAIMEX_ANSWER_MODEL, answerMessages, 1024);
+    if (answer) answerBy = env.CAIMEX_ANSWER_MODEL;
+  }
+  if (!answer) answer = aiText(await env.AI.run(MODEL, { messages: answerMessages }));
 
   return new Response(
-    JSON.stringify({ answer: (answerResp.response || "").trim(), sql, sqlBy, rows: rows.slice(0, 20) }),
+    JSON.stringify({ answer: (answer || "").trim(), sql, sqlBy, answerBy, rows: rows.slice(0, 20) }),
     { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders(origin) } }
   );
 }
