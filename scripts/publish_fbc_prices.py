@@ -260,20 +260,22 @@ def decode_str(s):
     return "".join(out)
 
 
-def fetch_latest_attachment():
-    """Returns (filename, bytes) for the most recent FBC price-sheet attachment
-    found in the last few days, or (None, None).
+def fetch_recent_attachments():
+    """Returns [(filename, bytes), ...] for every FBC price-sheet attachment
+    found in the last few days, oldest email first.
 
     Deliberately does NOT restrict the IMAP search to "today" only: FBC's send
     time has drifted later and later (observed as late as ~14:52 UTC / 16:52
     Harare in practice, well past a same-day polling window that stops
     earlier), so a same-day-only search can permanently miss a day's sheet
     the moment it arrives after the last scheduled tick -- the next day's
-    "since today" search would then no longer include it. Searching back a
-    few days and picking the NEWEST matching attachment is safe because the
-    actual price date is read from the attachment's own filename (not the
-    email's arrival date) and main() already skips re-publishing a date
-    that's already in market-data.json.
+    "since today" search would then no longer include it.
+
+    Every sheet in the window is returned, not just the newest: when a run
+    fails or GitHub skips scheduled runs, the next good run still archives
+    the days in between (30.09.26 was nearly lost this way). The actual
+    price date is read from each attachment's own filename, not the email's
+    arrival date.
     """
     since_date = (datetime.now(HARARE) - timedelta(days=5)).date()
     imap_date = since_date.strftime("%d-%b-%Y")  # IMAP SINCE wants e.g. 22-Aug-2026
@@ -288,12 +290,8 @@ def fetch_latest_attachment():
         typ, data = conn.search(None, f'(FROM "{FBC_SENDER}" SINCE {imap_date})')
         if typ != "OK":
             raise RuntimeError(f"IMAP search failed: {typ}")
-        ids = data[0].split()
-        if not ids:
-            return None, None
-
-        # walk newest-first, return the first message that actually has an xlsx attachment
-        for msg_id in reversed(ids):
+        found = []
+        for msg_id in data[0].split():
             typ, msg_data = conn.fetch(msg_id, "(RFC822)")
             if typ != "OK":
                 continue
@@ -304,37 +302,59 @@ def fetch_latest_attachment():
                     continue
                 fname = decode_str(fname)
                 if fname.lower().endswith((".xlsx", ".xls")):
-                    return fname, part.get_payload(decode=True)
-        return None, None
+                    found.append((fname, part.get_payload(decode=True)))
+                    break
+        return found
     finally:
         conn.logout()
 
 
 # ─── main ────────────────────────────────────────────────────────────────────
+def archive_name(fname):
+    date_match = re.search(r"\d{2}\.\d{2}\.\d{2}", fname)
+    return f"{date_match.group(0)}.xlsx" if date_match else fname
+
+
 def main():
-    fname, blob = fetch_latest_attachment()
-    if not blob:
+    found = [(fname, blob) for fname, blob in fetch_recent_attachments() if blob]
+    if not found:
         print("No FBC price-sheet email found in the last 5 days — nothing to do.")
         return 0
 
-    date_match = re.search(r"\d{2}\.\d{2}\.\d{2}", fname)
-    parse_fname = f"{date_match.group(0)}.xlsx" if date_match else fname
+    # One sheet per price date; if FBC sent a date twice, the later email wins.
+    by_name = {}
+    for fname, blob in found:
+        by_name[archive_name(fname)] = (fname, blob)
 
-    # Archive the raw sheet for the predictions pipeline (generate_predictions.py
-    # reads every file here to rebuild the full training history). Written
-    # unconditionally so a re-poll of the same day's email just overwrites it
-    # with identical bytes — no-op for git.
+    # Archive the raw sheets for the predictions pipeline (generate_predictions.py
+    # reads every file here to rebuild the full training history). Days missing
+    # from the archive are filled in; the newest is always rewritten so a
+    # same-day resend replaces it (identical bytes are a no-op for git).
+    newest = max(by_name, key=lambda n: archive_iso_date(n) or "")
     os.makedirs(SHEETS_DIR, exist_ok=True)
-    with open(os.path.join(SHEETS_DIR, parse_fname), "wb") as f:
-        f.write(blob)
+    for name, (_, blob) in sorted(by_name.items()):
+        path = os.path.join(SHEETS_DIR, name)
+        if name == newest or not os.path.exists(path):
+            if name != newest:
+                print(f"Archiving missed sheet {name}.")
+            with open(path, "wb") as f:
+                f.write(blob)
 
-    # idempotency: skip if we've already published today's date
+    fname, blob = by_name[newest]
+    parse_fname = newest
+
+    # idempotency: skip if market-data.json already has this date or a later one
     if os.path.exists(MARKET_DATA_PATH):
         with open(MARKET_DATA_PATH) as f:
             existing = json.load(f)
         expected_date = sheet_date(parse_fname)
         if existing.get("priceDate") == expected_date:
             print(f"market-data.json already has priceDate {expected_date} — nothing to do.")
+            return 0
+        existing_iso = archive_iso_date(f"{existing.get('priceDate')}.xlsx")
+        newest_iso = archive_iso_date(parse_fname)
+        if existing_iso and newest_iso and newest_iso < existing_iso:
+            print(f"market-data.json already has a later priceDate ({existing.get('priceDate')}) — nothing to do.")
             return 0
 
     raw = sheet_to_raw(blob)
