@@ -49,6 +49,11 @@ jobs:
           workingDirectory: stock-agent/cloudflare
           command: d1 execute fbc-history --remote --file=d1_data.sql --yes
 
+      - name: Install the Worker's dependencies (Anthropic SDK)
+        if: env.CLOUDFLARE_API_TOKEN != ''
+        working-directory: stock-agent/cloudflare
+        run: npm ci
+
       - name: Deploy the Worker
         if: env.CLOUDFLARE_API_TOKEN != ''
         uses: cloudflare/wrangler-action@v3

@@ -22,9 +22,17 @@
  *             `predictions` and `model_track_record` tables (schema.sql /
  *             build_dataset.py / export_to_d1.py build these)
  *   env.AI  - Workers AI binding, bound as "AI"
+ *   env.ANTHROPIC_API_KEY - optional Worker secret. When set, Claude writes
+ *             the SQL (step 1); Workers AI still words the answer (step 2)
+ *             and takes over step 1 if Claude is unavailable.
  */
 
+import Anthropic from "@anthropic-ai/sdk";
+
 const MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
+// Writing the query is where the answers went wrong (wrong day, wrong counter),
+// so that step goes to Claude. Haiku 4.5 is the cheapest Claude model.
+const SQL_MODEL = "claude-haiku-4-5";
 
 const SCHEMA_DOC = `
 Table: prices (one row per counter per trading day, ZSE/VFEX stock exchange data for Zimbabwe)
@@ -277,6 +285,32 @@ function withHistory(question, history) {
 }
 
 async function writeSql(env, messages) {
+  if (env.ANTHROPIC_API_KEY) {
+    const [system, ...turns] = messages;
+    try {
+      const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY, maxRetries: 1, timeout: 20_000 });
+      const resp = await client.messages.create({
+        model: SQL_MODEL,
+        max_tokens: 1024,
+        system: system.content,
+        messages: turns,
+      });
+      const text = resp.content.filter((b) => b.type === "text").map((b) => b.text).join("");
+      return extractSql(text);
+    } catch (e) {
+      // Fall through to Workers AI so a Claude outage, rate limit or spending
+      // cap never takes the chatbot down.
+      if (e instanceof Anthropic.AuthenticationError) {
+        console.error("ANTHROPIC_API_KEY was rejected; using Workers AI for SQL.");
+      } else if (e instanceof Anthropic.RateLimitError) {
+        console.error("Claude rate-limited; using Workers AI for SQL.");
+      } else if (e instanceof Anthropic.APIError) {
+        console.error(`Claude API error ${e.status}; using Workers AI for SQL:`, e.message);
+      } else {
+        console.error("Claude request failed; using Workers AI for SQL:", e);
+      }
+    }
+  }
   const resp = await env.AI.run(MODEL, { messages });
   return extractSql(resp.response || "");
 }

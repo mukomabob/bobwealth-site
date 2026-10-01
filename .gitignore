@@ -1,3 +1,4 @@
 __pycache__/
 stock-agent/fbc_history.db
 stock-agent/cloudflare/d1_data.sql
+node_modules/
