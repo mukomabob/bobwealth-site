@@ -14,23 +14,23 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0E1110;
-  --surface:#161A17;
-  --surface-2:#1C2119;
-  --surface-3:#222720;
-  --border:#2A332A;
-  --bl:#242B23;
-  --gd:#1A3A2A;
-  --gm:#2D5A40;
-  --gl:#4A9464;
-  --gp:rgba(74,148,100,.12);
-  --gold:#C9973A;
-  --gold-l:#E0B455;
-  --gold-p:rgba(201,151,58,.1);
+  --bg:#0B1118;
+  --surface:#121B26;
+  --surface-2:#182433;
+  --surface-3:#202D3B;
+  --border:#2D3B4B;
+  --bl:#263545;
+  --gd:#172A3D;
+  --gm:#3F5A73;
+  --gl:#ABB9C7;
+  --gp:rgba(171,185,199,.12);
+  --gold:#AEBBC8;
+  --gold-l:#DCE3EA;
+  --gold-p:rgba(174,187,200,.1);
   --white:#FFFFFF;
-  --text:#E8EDE9;
-  --tm:#9BA89C;
-  --ts:#5A6B5C;
+  --text:#E8EDF2;
+  --tm:#A4B0BC;
+  --ts:#708090;
   --red:#E05252;
   --gain:#4AB870;
   --font:'DM Sans',sans-serif;
@@ -42,25 +42,25 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
 
 /* ─── HEADER ─────────────────────────────────────────────────────────────── */
 .site-header{
-  background:#0A0E0B;border-bottom:2px solid var(--gold);
+  background:#09111A;border-bottom:2px solid var(--gold);
   padding:0 40px;display:flex;align-items:center;justify-content:space-between;
   height:62px;position:sticky;top:0;z-index:100;
   box-shadow:0 2px 24px rgba(0,0,0,.5);
 }
 .hd-brand{display:flex;align-items:center;gap:13px;text-decoration:none}
 .hd-logo{height:36px;width:36px;object-fit:contain}
-.hd-logo-fb{width:36px;height:36px;border-radius:4px;background:var(--gold);display:none;align-items:center;justify-content:center;font-family:var(--serif);font-size:17px;font-weight:700;color:#0A0E0B;flex-shrink:0}
+.hd-logo-fb{width:36px;height:36px;border-radius:4px;background:var(--gold);display:none;align-items:center;justify-content:center;font-family:var(--serif);font-size:17px;font-weight:700;color:#09111A;flex-shrink:0}
 .hd-name{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--white);letter-spacing:.2px;line-height:1.1}
 .hd-name span{display:block;font-family:var(--mono);font-size:9px;font-weight:400;color:var(--gold-l);letter-spacing:.15em;text-transform:uppercase;margin-top:2px}
 .site-nav{display:flex;align-items:center;gap:3px}
 .site-nav a{color:rgba(255,255,255,.5);font-size:12px;font-weight:500;text-decoration:none;padding:6px 13px;border-radius:3px;transition:all .15s;letter-spacing:.02em}
 .site-nav a:hover{color:var(--white);background:rgba(255,255,255,.06)}
-.site-nav a.active{color:var(--white);background:rgba(201,151,58,.18);border:1px solid rgba(201,151,58,.35)}
+.site-nav a.active{color:var(--white);background:rgba(174,187,200,.18);border:1px solid rgba(174,187,200,.35)}
 
 /* ─── HERO ───────────────────────────────────────────────────────────────── */
 .hero{
   min-height:52vh;display:flex;align-items:center;justify-content:center;
-  position:relative;overflow:hidden;background:#0A0E0B;
+  position:relative;overflow:hidden;background:#09111A;
 }
 .hero-bg{
   position:absolute;inset:0;
@@ -69,7 +69,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
 }
 .hero-bg::after{
   content:'';position:absolute;inset:0;
-  background:linear-gradient(to bottom,transparent 50%,#0E1110 100%);
+  background:linear-gradient(to bottom,transparent 50%,#0B1118 100%);
 }
 .hero-content{
   position:relative;z-index:1;text-align:center;
@@ -125,17 +125,17 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
   display:inline-block;font-family:var(--mono);font-size:9px;font-weight:700;
   letter-spacing:.12em;text-transform:uppercase;padding:3px 10px;border-radius:3px;
   margin-bottom:16px;background:var(--gp);color:var(--gl);
-  border:1px solid rgba(74,148,100,.2);width:fit-content;
+  border:1px solid rgba(171,185,199,.2);width:fit-content;
 }
-.story-tag.gold{background:var(--gold-p);color:var(--gold-l);border-color:rgba(201,151,58,.2)}
+.story-tag.gold{background:var(--gold-p);color:var(--gold-l);border-color:rgba(174,187,200,.2)}
 .story-body p{font-size:14px;color:var(--tm);line-height:1.85;margin-bottom:14px}
 .story-body p:last-child{margin-bottom:0}
 .story-body strong{color:var(--text);font-weight:600}
 
 /* ─── HIGHLIGHT STAT ─────────────────────────────────────────────────────── */
 .highlight{
-  background:linear-gradient(135deg,#0f1f16,#1a3326);
-  border:1px solid rgba(201,151,58,.2);border-radius:8px;
+  background:linear-gradient(135deg,#0E1826,#172A3D);
+  border:1px solid rgba(174,187,200,.2);border-radius:8px;
   padding:32px 40px;margin-bottom:24px;
   display:flex;align-items:center;gap:28px;
 }
@@ -147,10 +147,10 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
 .highlight-text p{font-size:13px;color:var(--ts);font-family:var(--mono);line-height:1.6}
 .highlight-badge{
   margin-left:auto;flex-shrink:0;
-  background:rgba(201,151,58,.15);color:var(--gold-l);
+  background:rgba(174,187,200,.15);color:var(--gold-l);
   font-family:var(--mono);font-size:9px;font-weight:700;
   padding:4px 12px;border-radius:3px;text-transform:uppercase;
-  letter-spacing:.08em;border:1px solid rgba(201,151,58,.3);white-space:nowrap;
+  letter-spacing:.08em;border:1px solid rgba(174,187,200,.3);white-space:nowrap;
 }
 
 /* ─── VISION ─────────────────────────────────────────────────────────────── */
@@ -179,7 +179,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
 
 /* ─── FOOTER ─────────────────────────────────────────────────────────────── */
 .site-footer{
-  background:#0A0E0B;border-top:1px solid var(--border);
+  background:#09111A;border-top:1px solid var(--border);
   padding:28px 40px;display:flex;align-items:center;
   justify-content:space-between;flex-wrap:wrap;gap:12px;
 }
