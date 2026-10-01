@@ -294,6 +294,11 @@ def engineer_features(df):
     df["roll5_vol"] = grp["volume"].transform(lambda x: x.rolling(5, min_periods=1).mean())
 
     df["traded_today"] = (df["volume"] > 0).astype(int)
+    # How many of the counter's last 20 sheets it actually traded on: a price
+    # that barely moves because nobody trades is not a calm stock.
+    df["days_traded_20"] = df.groupby("counter")["traded_today"].transform(
+        lambda x: x.rolling(20, min_periods=1).sum()
+    )
 
     def days_since_last_trade(grp_df):
         result = []
@@ -328,7 +333,11 @@ TRACK_RECORD_DAYS = 60      # walk-forward window for the published track record
 WATCHLIST_SIZE = 5
 SIGNAL_THRESHOLD = 1.0      # pp; a prediction inside +/- this reads as "no clear signal"
 # Bump when predictions.json gains fields, so a day already published is rebuilt once.
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
+# Volatility bands for the page and chatbot: the 20-day volatility split into
+# thirds across counters that traded on at least MIN_TRADED_DAYS of their last
+# 20 sheets. Counters below that are "Too little trading" rather than "Calm".
+MIN_TRADED_DAYS = 6
 
 
 def make_model():
@@ -446,6 +455,8 @@ def to_dict(row):
         # Kept for data consumers; the page does not show it as a forecast.
         "predicted_chg_pct": safe_float(row["predicted_chg_pct"], 2),
         "risk_score": safe_float(row["risk_score"], 2),
+        "volatility_band": str(row["volatility_band"]),
+        "days_traded_20": int(row["days_traded_20"]),
         "signal": str(row["signal"]),
     }
 
@@ -453,7 +464,7 @@ def to_dict(row):
 def build_predictions(df, rows):
     latest_date = df["date"].max()
     today = df[df["date"] == latest_date]
-    pred_df = today[FEATURE_COLS + ["counter", "market", "sector", "close", "usd_price_ibr", "change_pct"]] \
+    pred_df = today[FEATURE_COLS + ["counter", "market", "sector", "close", "usd_price_ibr", "change_pct", "days_traded_20"]] \
         .dropna(subset=FEATURE_COLS).copy()
     if pred_df.empty:
         raise ValueError(
@@ -464,6 +475,16 @@ def build_predictions(df, rows):
     pred_df["predicted_chg_pct"] = predict(model, scaler, pred_df).round(2)
     pred_df["risk_score"] = pred_df["roll20_std_chg"].round(2)
     pred_df["signal"] = pred_df["predicted_chg_pct"].apply(signal_for)
+
+    active = pred_df[(pred_df["days_traded_20"] >= MIN_TRADED_DAYS) & pred_df["risk_score"].notna()]
+    calm_below, volatile_from = (float(round(q, 2)) for q in active["risk_score"].quantile([1 / 3, 2 / 3]))
+
+    def band(r):
+        if r["days_traded_20"] < MIN_TRADED_DAYS or pd.isna(r["risk_score"]):
+            return "Too little trading"
+        return "Calm" if r["risk_score"] < calm_below else "Moderate" if r["risk_score"] < volatile_from else "Volatile"
+
+    pred_df["volatility_band"] = pred_df.apply(band, axis=1)
     pred_df = pred_df.sort_values("predicted_chg_pct", ascending=False).reset_index(drop=True)
     watchlist = pred_df[pred_df["traded_today"] == 1].head(WATCHLIST_SIZE)
 
@@ -478,6 +499,12 @@ def build_predictions(df, rows):
             "Watchlist = the counters that traded today with the highest predicted next-day change."
         ),
         "disclaimer": "Algorithmic signals only. Not financial advice.",
+        "volatility_bands": {
+            "calm_below": calm_below,
+            "volatile_from": volatile_from,
+            "min_traded_days": MIN_TRADED_DAYS,
+            "window_days": 20,
+        },
         "watchlist": [to_dict(r) for _, r in watchlist.iterrows()],
         "track_record": track_record(rows, traded),
         "accuracy": holdout_accuracy(rows),

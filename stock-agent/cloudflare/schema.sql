@@ -47,6 +47,8 @@ CREATE TABLE predictions (
   "traded_today"      INTEGER,
   "predicted_chg_pct" REAL,
   "risk_score"        REAL,
+  "volatility_band"   TEXT,
+  "days_traded_20"    INTEGER,
   "signal"            TEXT,
   "watchlist_rank"    INTEGER
 );

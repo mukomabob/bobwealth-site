@@ -37,7 +37,7 @@ COLUMNS = [
 PREDICTION_COLUMNS = [
     "price_date", "counter", "market", "sector", "close", "usd_price",
     "today_chg_pct", "traded_today", "predicted_chg_pct", "risk_score",
-    "signal", "watchlist_rank",
+    "volatility_band", "days_traded_20", "signal", "watchlist_rank",
 ]
 
 TRACK_RECORD_COLUMNS = [

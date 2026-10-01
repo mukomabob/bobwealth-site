@@ -147,6 +147,13 @@ button{font:inherit}
 .qs-high{color:var(--text);font-weight:600}
 .qs-mid{color:var(--text-2)}
 .qs-zero{color:var(--text-3)}
+/* VOLATILITY BAND: how far the price swings, not a direction, so no green/red */
+.vband{font-family:var(--mono);font-size:10px;white-space:nowrap;text-transform:uppercase;letter-spacing:.04em}
+.vb-volatile{color:var(--text);font-weight:600}
+.vb-moderate{color:var(--text-2)}
+.vb-calm{color:var(--text-2)}
+.vb-thin{color:var(--text-3);text-transform:none;letter-spacing:0}
+.bc-vol{margin-left:6px}
 
 /* TABLES */
 .tw{overflow-x:auto}
@@ -299,7 +306,7 @@ select option{background:var(--panel-2);color:var(--text)}
   thead th:nth-child(2),tbody td:nth-child(2){position:sticky;left:0;background:var(--bg);z-index:1}
   .bc-label{width:96px;font-size:9px}
   .sim-ask{padding:16px;margin:8px 0 20px}
-  .bc-sect,.bc-liq,.bc-mkt{display:none}
+  .bc-sect,.bc-liq,.bc-mkt,.bc-vol{display:none}
   .mc-title .tools{margin-left:0;width:100%}
   .mc-title .tools .inp{flex:1;min-width:0}
 }
@@ -375,6 +382,13 @@ try { const t = localStorage.getItem('bw_theme'); if (t === 'light') document.do
           <span class="tools">
             <input type="text" class="inp" id="scrSearch" placeholder="Search counter, sector, ISIN" oninput="debouncedRenderScreener()">
             <select class="inp" id="scrSect" onchange="renderScreener()"><option value="">All sectors</option></select>
+            <select class="inp" id="scrVol" onchange="renderScreener()">
+              <option value="">All volatility</option>
+              <option>Calm</option>
+              <option>Moderate</option>
+              <option>Volatile</option>
+              <option>Too little trading</option>
+            </select>
             <select class="inp" id="scrSort" onchange="renderScreener()">
               <option value="mktcap_d">Mkt cap ↓</option>
               <option value="pct_d">% chg ↓</option>
@@ -388,8 +402,8 @@ try { const t = localStorage.getItem('bw_theme'); if (t === 'light') document.do
             </select>
           </span>
         </div>
-        <div class="tw"><table><thead><tr><th>#</th><th>Counter</th><th>ISIN</th><th>Sector</th><th>Mkt</th><th>Open</th><th>Close</th><th>Chg</th><th>% Chg</th><th>Volume</th><th>Value</th><th>Mkt cap (USD)</th><th>YTD</th><th>Div yld</th><th>Liquidity</th><th>Days out †</th></tr></thead><tbody id="tblScreener"></tbody></table></div>
-        <div class="inv-note"><span id="scrCount"></span> · † Days out: ZSE is a directional estimate only; VFEX is USD-native.</div>
+        <div class="tw"><table><thead><tr><th>#</th><th>Counter</th><th>ISIN</th><th>Sector</th><th>Mkt</th><th>Open</th><th>Close</th><th>Chg</th><th>% Chg</th><th>Volume</th><th>Value</th><th>Mkt cap (USD)</th><th>YTD</th><th>Div yld</th><th>Liquidity</th><th>Volatility ‡</th><th>Days out †</th></tr></thead><tbody id="tblScreener"></tbody></table></div>
+        <div class="inv-note"><span id="scrCount"></span> · † Days out: ZSE is a directional estimate only; VFEX is USD-native. ‡ Volatility: how far the price has swung over its last 20 trading days, in either direction — Calm, Moderate and Volatile are thirds of the counters that trade; "Too little trading" means it traded on fewer than 6 of those days. Not a measure of safety.</div>
       </div>
     </div>
 
@@ -557,6 +571,21 @@ function assignLiquidityTiers(rows) {
 
 const TIER_CSS = { 'Liquid': 'qs-high', 'Fairly Liquid': 'qs-mid', 'Illiquid': 'qs-zero' };
 
+// Volatility band from predictions.json, matched by counter name.
+function volBand(r) {
+  const map = window.PREDICTIONS?._bandByCounter;
+  return map ? map[r.counter.trim().toUpperCase()] || null : null;
+}
+const VOL_CLASS = { 'Calm': 'vb-calm', 'Moderate': 'vb-moderate', 'Volatile': 'vb-volatile', 'Too little trading': 'vb-thin' };
+const VOL_CELL = r => {
+  const v = volBand(r);
+  if (!v) return '<span class="nc">—</span>';
+  const why = v.band === 'Too little trading'
+    ? `Traded on ${v.days} of the last 20 sheets`
+    : `20-day volatility ${fP2(v.score)} (daily % moves)`;
+  return `<span class="vband ${VOL_CLASS[v.band] || ''}" title="${why}">${v.band}</span>`;
+};
+
 const Q_SCORE_CELL = liq =>
   `<span class="qscore ${TIER_CSS[liq.tier] || 'qs-zero'}" title="Liquidity Tier: ${liq.tier}">${liq.tier}</span>`;
 
@@ -611,6 +640,13 @@ async function loadPredictions() {
       const text = await res.text();
       if (text.length < 50) throw new Error('Response too small');
       window.PREDICTIONS = JSON.parse(text);
+      window.PREDICTIONS._bandByCounter = Object.fromEntries((window.PREDICTIONS.all_predictions || [])
+        .filter(p => p.volatility_band)
+        .map(p => [p.counter.trim().toUpperCase(), { band: p.volatility_band, score: p.risk_score, days: p.days_traded_20 }]));
+      if (window.PS.length) {
+        renderScreener();
+        if (document.getElementById('page-barchart').classList.contains('on')) renderBarChart();
+      }
       if (document.getElementById('page-modelpicks').classList.contains('on')) renderModelPicks();
       return;
     } catch(err) { /* try next */ }
@@ -926,6 +962,7 @@ function renderScreener() {
   let D=[...window.PS];
   if(q)D=D.filter(r=>r.counter.toLowerCase().includes(q)||r.sector.toLowerCase().includes(q)||r.isin.toLowerCase().includes(q));
   if(m)D=D.filter(r=>r.market===m); if(s)D=D.filter(r=>r.sector===s);
+  const vf=document.getElementById('scrVol').value; if(vf)D=D.filter(r=>volBand(r)?.band===vf);
   if(so==='mktcap_d')     D.sort((a,b)=>b.mktCapIBR-a.mktCapIBR);
   else if(so==='pct_d')   D.sort((a,b)=>b.chgPct-a.chgPct);
   else if(so==='pct_a')   D.sort((a,b)=>a.chgPct-b.chgPct);
@@ -954,10 +991,11 @@ function renderScreener() {
       <td class="${pC(r.ytd)}">${(r.ytd*100).toFixed(1)}%</td>
       <td>${r.divYield>0?(r.divYield*100).toFixed(2)+'%':'<span class="nc">—</span>'}</td>
       <td>${Q_SCORE_CELL(liq)}</td>
+      <td>${VOL_CELL(r)}</td>
       <td class="nc">${LIQ_DTL(liq.dtl)}</td>
     </tr>`;
   }).join('');
-  document.getElementById('scrCount').textContent=`Showing ${D.length} of ${window.PS.length} counters · click name to add to watchlist`;
+  document.getElementById('scrCount').textContent=`Showing ${D.length} of ${window.PS.length} counters`;
 }
 
 // ─── LIQUIDITY SCORE RANKINGS PAGE ───────────────────────────────────────────
@@ -1133,7 +1171,7 @@ function renderModelPicks() {
     <td><span class="sect">${r.sector}</span></td>
     <td>${r.close!=null?fP2(r.close):'—'}</td>
     <td class="${pC(r.today_chg_pct)}">${pct(r.today_chg_pct)}</td>
-    <td class="nc">${r.risk_score!=null?fP2(r.risk_score):'—'}</td>
+    <td>${r.volatility_band ? `<span class="vband ${VOL_CLASS[r.volatility_band] || ''}">${r.volatility_band}</span>` : ''} <span class="nc">${r.risk_score!=null?fP2(r.risk_score):'—'}</span></td>
   </tr>`;
 
   const record = tr ? `
@@ -1155,7 +1193,7 @@ function renderModelPicks() {
     ${record}
     <div class="mc">
       <div class="mc-title">Today's watchlist <span class="hint">ranked by the model · 20-day volatility shows how jumpy each counter is</span></div>
-      <div class="tw"><table><thead><tr><th>Counter</th><th>Mkt</th><th>Sector</th><th>Close</th><th>Today %</th><th>20-day volatility</th></tr></thead>
+      <div class="tw"><table><thead><tr><th>Counter</th><th>Mkt</th><th>Sector</th><th>Close</th><th>Today %</th><th>Volatility (20-day)</th></tr></thead>
       <tbody>${data.watchlist.map(row).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--ts);padding:20px">No counter traded today.</td></tr>'}</tbody></table></div>
     </div>`;
 }
@@ -1208,7 +1246,7 @@ function renderBarChart() {
   const rows = filtered.map(r => {
     const v=(r.inv100/100)*investment, cls=r.inv100>100?'iv-up':r.inv100<100?'iv-dn':'iv-nc';
     const liq=calcLiquidity(r);
-    return `<div class="bc-row"><div class="bc-label" title="${r.counter}">${r.counter}${r.suspended?' *':''}</div><div class="bc-bar-wrap"><div class="bc-bar" style="width:${scale(v)}px;background:${barColor(v)}"></div><span class="bc-val ${cls}">$${v.toFixed(2)}</span><span class="bc-sect">${r.sector}</span>${SINCE_TAG(r)}${r.market==='VFEX'?'<span class="bc-mkt">VFEX</span>':''}<span class="bc-liq">${Q_SCORE_CELL(liq)}</span></div></div>`;
+    return `<div class="bc-row"><div class="bc-label" title="${r.counter}">${r.counter}${r.suspended?' *':''}</div><div class="bc-bar-wrap"><div class="bc-bar" style="width:${scale(v)}px;background:${barColor(v)}"></div><span class="bc-val ${cls}">$${v.toFixed(2)}</span><span class="bc-sect">${r.sector}</span>${SINCE_TAG(r)}${r.market==='VFEX'?'<span class="bc-mkt">VFEX</span>':''}<span class="bc-liq">${Q_SCORE_CELL(liq)}</span><span class="bc-vol">${VOL_CELL(r)}</span></div></div>`;
   }).join('');
 
   el.innerHTML=`

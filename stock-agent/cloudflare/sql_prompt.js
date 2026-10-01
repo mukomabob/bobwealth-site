@@ -46,6 +46,9 @@ Table: predictions (the site's ML watchlist: one row per counter from the latest
   traded_today      INTEGER 1 if it traded on price_date
   predicted_chg_pct REAL    model's predicted next-day % change -- use ONLY to rank/order
   risk_score        REAL    20-day volatility of daily % changes (higher = jumpier)
+  volatility_band   TEXT    'Calm', 'Moderate', 'Volatile' (thirds of risk_score among counters that trade),
+                            or 'Too little trading' (traded on fewer than 6 of the last 20 sheets)
+  days_traded_20    INTEGER how many of the last 20 sheets the counter traded on
   signal            TEXT    'bullish', 'bearish' or 'neutral'
   watchlist_rank    INTEGER 1-5 for the counters on today's watchlist, NULL otherwise
 
@@ -102,10 +105,12 @@ Rules:
     ORDER BY date DESC LIMIT 1
 - Questions about the watchlist, picks, signals, what the model/AI thinks, "bullish", "risk"
   use the predictions table: the watchlist is WHERE watchlist_rank IS NOT NULL ORDER BY
-  watchlist_rank. Select price_date, signal, risk_score and watchlist_rank; you may ORDER BY
+  watchlist_rank. Select price_date, signal, risk_score, volatility_band and watchlist_rank; you may ORDER BY
   predicted_chg_pct but do not SELECT it.
 - Questions about how accurate the model is, its track record, or whether the picks work
   use model_track_record: SELECT * FROM model_track_record.
+- Questions about how calm, volatile, jumpy or risky counters are use predictions.volatility_band
+  and risk_score, e.g. WHERE volatility_band = 'Calm'.
 - If earlier turns are given, use them only to work out what "it", "that one", "and Delta?",
   "the same for VFEX" etc. refer to. Write SQL for the NEW question only.
 - Always LIMIT results to at most 20 rows unless the question clearly needs a single aggregate.`;
