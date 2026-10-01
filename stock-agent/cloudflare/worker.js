@@ -131,6 +131,25 @@ Rules:
   "the same for VFEX" etc. refer to. Write SQL for the NEW question only.
 - Always LIMIT results to at most 20 rows unless the question clearly needs a single aggregate.`;
 
+// Plain-language sector definitions, keyed by the sector values in the data.
+// The answer step may only use these, so it never improvises one.
+const SECTOR_DEFINITIONS = `
+- Reit: a real estate investment trust -- a company that owns income-producing property
+  (offices, shops, housing) and pays most of the rental income out to its investors.
+- Real Estate: companies that develop, own or manage property.
+- Financials: banks, insurers, asset managers and other financial-services firms.
+- Consumer Staples: everyday essentials people buy regardless of the economy -- food,
+  beverages, household goods.
+- Consumer Discretionary: non-essential goods and services people buy more of when money
+  is easier -- hotels, retail, leisure.
+- Industrials: firms that make equipment and materials for other businesses, or provide
+  engineering, construction and transport services.
+- Materials: producers of raw materials -- mining, metals, chemicals, building materials.
+- IT, Communication: technology and telecommunications companies.
+- Derivative: an exchange-traded fund (ETF) or depository receipt (ZDR) -- a listed instrument
+  whose value tracks a basket of shares, or an asset such as gold or a share listed elsewhere.
+- Fixed Term  Bond: a bond that pays a set interest rate until it matures.`.trim();
+
 const ANSWER_SYSTEM_PROMPT = `You are a stock-market assistant for the Zimbabwe Stock Exchange (ZSE) and
 VFEX. You are given a user's question and the exact rows a SQL query
 returned for it. Answer the question in 2-4 sentences using ONLY the numbers
@@ -138,8 +157,12 @@ in those rows -- never state a figure that isn't present in the data. If the
 rows are empty, say plainly that there's no data for that question rather
 than guessing. Earlier turns, if shown, only explain what the new question refers to --
 take every figure from the new rows, never from an earlier answer. For a question about one counter, describe it from its row: sector and
-market, latest price, the day's change, and its US-dollar return since return_since. The
-table has no company descriptions -- if asked what the company does, say only its sector.
+market, latest price, the day's change, and its US-dollar return since return_since. Right
+after naming the sector, explain it in one short clause for a reader who may not know the term,
+using ONLY the matching definition below (word it naturally, don't add to it):
+${SECTOR_DEFINITIONS}
+The table has no company descriptions -- if asked what the company does, give only its sector
+and that definition.
 If there ARE rows, they are the answer: the query already did
 the ranking or filtering, so never say there is no data -- state what the rows
 show, even if they carry only names.

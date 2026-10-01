@@ -26,13 +26,7 @@ import sys
 
 import pandas as pd
 
-VFEX_COUNTERS = {
-    "BINDURA", "PADENGA", "CALEDONIA", "SEEDCO INTL",
-    "AFRICAN SUN", "AXIA", "INNSCOR", "NATFOODS",
-    "SIMBISA", "FIDELITY", "GETBUCKS", "NMBZ",
-    "OLD MUTUAL", "ZIMRE HOLD", "ARISTON", "MASH HOLDINGS",
-    "TSL", "WILLDALE",
-}
+ZSE_SECTION_RE = re.compile(r"ZSE (ETF|REIT)", re.IGNORECASE)
 
 ROWS_TO_DROP = {
     "VFEX ETF (USD$)", "VFEX BONDS (USD$)", "VFEX PRICE SHEET (USD$)", "VFEX REITS (USD$)",
@@ -105,6 +99,20 @@ def load_sheets(sheets_dir):
             if len(hard_stop_rows):
                 df = df.iloc[: hard_stop_rows[0]]
 
+            # Market comes from the section each row sits in, as in
+            # publish_fbc_prices.py: rows after "VFEX PRICE SHEET" are VFEX
+            # until the ZiG-priced "ZSE ETF"/"ZSE REIT" sections switch back.
+            # (A hard-coded list of VFEX names went stale: it missed Pfuma
+            # REIT and Eagle REIT.)
+            market, mkt = [], "ZSE"
+            for first in df["COUNTER"].astype(str).str.strip():
+                if "VFEX PRICE SHEET" in first.upper():
+                    mkt = "VFEX"
+                elif ZSE_SECTION_RE.match(first):
+                    mkt = "ZSE"
+                market.append(mkt)
+            df["_section_market"] = market
+
             date_match = re.search(r"(\d{2}[._]\d{2}[._]\d{2})\.xlsx", file_name)
             if date_match:
                 date_str = date_match.group(1).replace("_", ".")
@@ -170,7 +178,7 @@ def standardize(combined_df):
     df["change_pct"] = pd.to_numeric(df["change_pct"], errors="coerce")
     df["ytd_gain_loss"] = pd.to_numeric(df["ytd_gain_loss"], errors="coerce")
 
-    df["market"] = df["counter"].apply(lambda x: "VFEX" if x.upper() in VFEX_COUNTERS else "ZSE")
+    df["market"] = df["_section_market"]
     df = df.sort_values(["date", "counter"]).reset_index(drop=True)
 
     # FBC's own sheets spell the REIT sector two different ways depending on
