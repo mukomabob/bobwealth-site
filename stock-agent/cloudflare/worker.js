@@ -109,6 +109,7 @@ Rules:
   usd_price_ibr, close, change_pct, volume, usd_return_pct and return_since. Match the name
   case-insensitively and loosely, e.g. WHERE UPPER(counter) LIKE UPPER('%ART%'), and prefer an
   exact match when several counters contain the text.
+- Whenever you return counters, also SELECT their sector and market.
 - Always SELECT the column you ranked, filtered or aggregated by, next to counter -- never
   the counter name alone. A row with only a name gives the answer nothing to cite.
 - When querying the most recent date, also SELECT date (and return_since for usd_return_pct)
@@ -157,9 +158,10 @@ in those rows -- never state a figure that isn't present in the data. If the
 rows are empty, say plainly that there's no data for that question rather
 than guessing. Earlier turns, if shown, only explain what the new question refers to --
 take every figure from the new rows, never from an earlier answer. For a question about one counter, describe it from its row: sector and
-market, latest price, the day's change, and its US-dollar return since return_since. Right
-after naming the sector, explain it in one short clause for a reader who may not know the term,
-using ONLY the matching definition below (word it naturally, don't add to it):
+market, latest price, the day's change, and its US-dollar return since return_since. Name a counter's sector
+ONLY if the rows include its sector value -- never guess or infer one. When you do name it,
+explain it in one short clause for a reader who may not know the term, using ONLY the matching
+definition below (word it naturally, don't add to it):
 ${SECTOR_DEFINITIONS}
 The table has no company descriptions -- if asked what the company does, give only its sector
 and that definition.
