@@ -1,0 +1,43 @@
+name: Compare chatbot SQL models
+
+# Run by hand from the Actions tab. Scores Workers AI models on the chatbot's
+# text-to-SQL step (stock-agent/eval/sql_eval.py) using the same database the
+# chatbot queries. Each run uses part of the day's free Workers AI allowance:
+# roughly 100-250 neurons per question per model, against 10,000 a day.
+on:
+  workflow_dispatch:
+    inputs:
+      models:
+        description: Workers AI model IDs to compare, space-separated
+        default: "@cf/meta/llama-3.3-70b-instruct-fp8-fast @cf/openai/gpt-oss-120b"
+
+permissions:
+  contents: read
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build the chatbot database from the sheet archive
+        run: |
+          pip install openpyxl pandas
+          python stock-agent/build_dataset.py data/fbc-sheets stock-agent/fbc_history.db
+          python stock-agent/cloudflare/export_to_d1.py stock-agent/fbc_history.db eval.sql
+          sqlite3 eval.db < eval.sql
+
+      - name: Score the models
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          MODELS: ${{ inputs.models }}  # via env, not inlined, so the input can't inject shell
+        run: python stock-agent/eval/sql_eval.py eval.db $MODELS

@@ -24,6 +24,9 @@ binding = "AI"
 # Sites allowed to call this Worker from a browser (comma-separated).
 [vars]
 ALLOWED_ORIGINS = "https://bobwealth.org,https://www.bobwealth.org"
+# Free Workers AI model that writes the SQL (used when no ANTHROPIC_API_KEY is
+# set). Chosen by comparing models with .github/workflows/sql-eval.yml.
+SQL_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
 
 # Per-IP rate limit: 10 questions per 60 seconds. Stops anyone scripting the
 # endpoint from burning through the daily Workers AI allowance.
