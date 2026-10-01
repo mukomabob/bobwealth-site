@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-01T10:06:43Z",
+  "generated": "2026-10-01T10:31:12Z",
   "priceDate": "30.09.26",
   "usdZig": {
     "rate": 26.7965,
@@ -21,6 +21,11 @@
       "date": "2026-09-29",
       "sent": "2026-09-30",
       "title": "CAFCA (+8%) & Delta (+7%) supported the ZSE ALSI to close 2% firmer"
+    },
+    {
+      "date": "2026-09-29",
+      "sent": "2026-09-30",
+      "title": "CAFCA (+8%) & Delta (+7%) supported the ZSE ALSI\r\n to close 2% firmer"
     },
     {
       "date": "2026-09-28",
