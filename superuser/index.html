@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Markets — Bob Wealth Holdings</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -18,15 +18,15 @@
   --text:#1A1A1A;--tm:#4A4A4A;--ts:#7A7A7A;
   --border:#D5DEE7;--bl:#EAEFF4;
   --red:#C0392B;--gain:#1D6B3A;
-  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;--serif:'Playfair Display',serif;
+  --font:'IBM Plex Sans',sans-serif;--mono:'IBM Plex Mono',monospace;--display:'IBM Plex Sans Condensed','IBM Plex Sans',sans-serif;
 }
 html,body{height:100%;overflow:hidden}
 body{font-family:var(--font);background:var(--cream);color:var(--text);display:flex;flex-direction:column;font-size:13px}
 .site-header{background:var(--gd);border-bottom:3px solid var(--gold);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:62px;flex-shrink:0;box-shadow:0 2px 16px rgba(0,0,0,.2)}
 .hd-brand{display:flex;align-items:center;gap:13px;text-decoration:none}
 .hd-logo{height:36px;width:36px;object-fit:contain}
-.hd-logo-fb{width:36px;height:36px;border-radius:4px;background:var(--gold);display:none;align-items:center;justify-content:center;font-family:var(--serif);font-size:17px;font-weight:700;color:var(--white);flex-shrink:0}
-.hd-name{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--white);letter-spacing:.2px;line-height:1.1}
+.hd-logo-fb{width:36px;height:36px;border-radius:4px;background:var(--gold);display:none;align-items:center;justify-content:center;font-family:var(--display);font-size:17px;font-weight:700;color:var(--white);flex-shrink:0}
+.hd-name{font-family:var(--display);font-size:17px;font-weight:700;color:var(--white);letter-spacing:.2px;line-height:1.1}
 .hd-name span{display:block;font-family:var(--mono);font-size:9px;font-weight:400;color:var(--gold-l);letter-spacing:.15em;text-transform:uppercase;margin-top:2px}
 .site-nav{display:flex;align-items:center;gap:3px}
 .site-nav a{color:rgba(255,255,255,.7);font-size:12px;font-weight:500;text-decoration:none;padding:6px 13px;border-radius:3px;transition:all .15s;letter-spacing:.02em}
@@ -35,7 +35,7 @@ body{font-family:var(--font);background:var(--cream);color:var(--text);display:f
 .app{display:flex;flex:1;overflow:hidden}
 .sb{width:216px;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;height:100%;overflow-y:auto}
 .sb-hdr{padding:18px 16px 14px;border-bottom:1px solid var(--border);background:var(--gb)}
-.sb-title{font-family:var(--serif);font-size:13px;font-weight:700;color:var(--gd)}
+.sb-title{font-family:var(--display);font-size:13px;font-weight:700;color:var(--gd)}
 .sb-date{font-family:var(--mono);font-size:10px;color:var(--ts);margin-top:4px;letter-spacing:.04em}
 .sb-nav{padding:10px 8px;flex:1}
 .ng{margin-bottom:6px}
@@ -49,7 +49,7 @@ body{font-family:var(--font);background:var(--cream);color:var(--text);display:f
 .sb-foot .sfs{color:var(--ts);font-size:9px}
 .ws{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--cream)}
 .topbar{padding:12px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;background:var(--white)}
-.tb-left h1{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--gd);letter-spacing:.1px}
+.tb-left h1{font-family:var(--display);font-size:17px;font-weight:700;color:var(--gd);letter-spacing:.1px}
 .tb-left .tb-sub{font-size:10px;font-family:var(--mono);color:var(--ts);margin-top:2px;letter-spacing:.04em}
 .tb-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .uw{position:relative;overflow:hidden;display:inline-block}
@@ -119,11 +119,11 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px;text-align:center;color:var(--ts)}
 .empty-state .es-icon{font-size:36px;margin-bottom:12px;opacity:.4}
-.empty-state h3{font-family:var(--serif);font-size:16px;color:var(--gd);margin-bottom:6px;font-weight:600}
+.empty-state h3{font-family:var(--display);font-size:16px;color:var(--gd);margin-bottom:6px;font-weight:600}
 .empty-state p{font-size:12px;line-height:1.7;max-width:300px}
 .base-banner{background:linear-gradient(135deg,var(--gd),var(--gm));border-radius:6px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:14px;border:1px solid rgba(94,115,137,.25)}
 .base-banner .bb-icon{font-size:22px;flex-shrink:0}
-.base-banner .bb-text h3{font-family:var(--serif);font-size:14px;font-weight:700;color:var(--white);margin-bottom:2px}
+.base-banner .bb-text h3{font-family:var(--display);font-size:14px;font-weight:700;color:var(--white);margin-bottom:2px}
 .base-banner .bb-text p{font-size:10px;color:rgba(255,255,255,.68);font-family:var(--mono)}
 .base-banner .bb-badge{margin-left:auto;background:var(--gold);color:var(--white);font-family:var(--mono);font-size:9px;font-weight:700;padding:4px 10px;border-radius:3px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;flex-shrink:0}
 .inv-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
@@ -137,8 +137,8 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
 .bchart-wrap{background:var(--white);border:1px solid var(--border);border-radius:6px;padding:24px 28px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
 .bchart-header{text-align:center;margin-bottom:22px;padding-bottom:16px;border-bottom:2px solid var(--border)}
 .bchart-header .bch-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px}
-.bchart-header .bch-logo-mark{width:40px;height:40px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:17px;font-weight:700;color:var(--gd)}
-.bchart-header h2{font-family:var(--serif);font-size:16px;font-weight:700;color:var(--gd)}
+.bchart-header .bch-logo-mark{width:40px;height:40px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:17px;font-weight:700;color:var(--gd)}
+.bchart-header h2{font-family:var(--display);font-size:16px;font-weight:700;color:var(--gd)}
 .bchart-header .bch-sub{font-size:11px;font-family:var(--mono);color:var(--ts);margin-top:4px;line-height:1.6}
 .bchart-header .bch-title{font-size:14px;font-weight:600;color:var(--text);margin:10px 0 2px;font-family:var(--font)}
 .bchart-header .bch-date{font-size:11px;font-family:var(--mono);color:var(--gold);font-weight:600}
@@ -177,7 +177,7 @@ tbody td.tf{font-family:var(--font);color:var(--text);font-weight:500}
   .bc-val{font-size:9px}
 }
 .setup-panel{background:var(--white);border:1px solid var(--border);border-radius:6px;padding:22px;margin-bottom:16px}
-.setup-panel h3{font-family:var(--serif);font-size:16px;font-weight:700;color:var(--gd);margin-bottom:6px}
+.setup-panel h3{font-family:var(--display);font-size:16px;font-weight:700;color:var(--gd);margin-bottom:6px}
 .setup-panel > p{font-size:11px;color:var(--tm);margin-bottom:16px;line-height:1.7}
 .setup-steps{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .setup-step{background:var(--gb);border:1px solid var(--bl);border-radius:5px;padding:14px 16px}
@@ -538,8 +538,8 @@ function setMktAct(m,el){window.MKT_A=m;hlBtn(el);renderActivity();}
 function hlBtn(el){el.parentNode.querySelectorAll('.mkt-btn').forEach(b=>b.classList.remove('on'));el.classList.add('on');}
 
 function mk(id,cfg){if(CH[id]){CH[id].destroy();delete CH[id];}const cv=document.getElementById(id);if(!cv)return;CH[id]=new Chart(cv,cfg);return CH[id];}
-const scX=()=>({grid:{display:false},ticks:{color:'#7A7A7A',font:{family:'DM Mono,monospace',size:10},maxRotation:30}});
-const scY=cb=>({grid:{color:'rgba(213,222,231,.5)'},ticks:{color:'#7A7A7A',font:{family:'DM Mono,monospace',size:10},callback:cb}});
+const scX=()=>({grid:{display:false},ticks:{color:'#7A7A7A',font:{family:'IBM Plex Mono,monospace',size:10},maxRotation:30}});
+const scY=cb=>({grid:{color:'rgba(213,222,231,.5)'},ticks:{color:'#7A7A7A',font:{family:'IBM Plex Mono,monospace',size:10},callback:cb}});
 
 function render(){if(!window.PS.length)return;renderOverview();renderMovers();renderActivity();renderSectors();renderScreener();}
 
@@ -773,7 +773,7 @@ function renderBarChart(){
         <div class="bch-logo">
           <img src="https://bobwealth.org/images/bob_logo.png" style="height:36px;width:36px;object-fit:contain" onerror="this.style.display='none'">
           <div>
-            <div style="font-family:var(--serif);font-size:15px;font-weight:700;color:var(--gd)">Bob Wealth Holdings</div>
+            <div style="font-family:var(--display);font-size:15px;font-weight:700;color:var(--gd)">Bob Wealth Holdings</div>
             <div style="font-family:var(--mono);font-size:9px;color:var(--ts);letter-spacing:.1em;text-transform:uppercase">Zimbabwe Capital Markets</div>
           </div>
         </div>
