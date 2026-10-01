@@ -4,6 +4,9 @@
 name = "fbc-stock-agent"
 main = "worker.js"
 compatibility_date = "2026-09-03"
+# The Anthropic SDK imports a few Node built-ins (node:stream etc.); this flag
+# lets the Workers runtime provide them.
+compatibility_flags = ["nodejs_compat"]
 
 # D1 (hosted SQLite) -- holds the `prices` table built from the 111 FBC
 # sheets. Create with `npx wrangler d1 create fbc-history`, then paste the
