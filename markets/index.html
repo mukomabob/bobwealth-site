@@ -1125,8 +1125,6 @@ function renderModelPicks() {
   }
 
   const tr = data.track_record;
-  const acc = data.accuracy || {};
-  const generated = data.generated ? new Date(data.generated) : null;
   const pct = v => v == null ? '—' : (v > 0 ? '+' : '') + fP2(v) + '%';
 
   const row = r => `<tr>
@@ -1159,11 +1157,6 @@ function renderModelPicks() {
       <div class="mc-title">Today's watchlist <span class="hint">ranked by the model · 20-day volatility shows how jumpy each counter is</span></div>
       <div class="tw"><table><thead><tr><th>Counter</th><th>Mkt</th><th>Sector</th><th>Close</th><th>Today %</th><th>20-day volatility</th></tr></thead>
       <tbody>${data.watchlist.map(row).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--ts);padding:20px">No counter traded today.</td></tr>'}</tbody></table></div>
-      <div class="inv-note">
-        Track record is replayed day by day using only the data available at the time: each day's top ${data.watchlist.length||5} picks, held for one day, against the average of all counters. It measures the picks as a group — it is not how often a single prediction is right; a group can beat the market on one strong bounce while the other picks barely move. Trading costs are not included and can outweigh a one-day move on thinly traded counters.
-        ${acc.model_mae!=null ? `Predicted percentages are not shown: over the last ${acc.holdout_days} trading days they missed by ${fP2(acc.model_mae)} points on average, against ${fP2(acc.no_change_mae)} for simply assuming no change.` : ''}
-        <br>${data.method||''} ${data.disclaimer||'Algorithmic signals only. Not financial advice.'}${generated?' Updated '+generated.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+'.':''}
-      </div>
     </div>`;
 }
 
