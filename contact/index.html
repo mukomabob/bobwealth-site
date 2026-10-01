@@ -14,23 +14,23 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0E1110;
-  --surface:#161A17;
-  --surface-2:#1C2119;
-  --surface-3:#222720;
-  --border:#2A332A;
-  --bl:#242B23;
-  --gd:#1A3A2A;
-  --gm:#2D5A40;
-  --gl:#4A9464;
-  --gp:rgba(74,148,100,.12);
-  --gold:#C9973A;
-  --gold-l:#E0B455;
-  --gold-p:rgba(201,151,58,.1);
+  --bg:#0B1118;
+  --surface:#121B26;
+  --surface-2:#182433;
+  --surface-3:#202D3B;
+  --border:#2D3B4B;
+  --bl:#263545;
+  --gd:#172A3D;
+  --gm:#3F5A73;
+  --gl:#ABB9C7;
+  --gp:rgba(171,185,199,.12);
+  --gold:#AEBBC8;
+  --gold-l:#DCE3EA;
+  --gold-p:rgba(174,187,200,.1);
   --white:#FFFFFF;
-  --text:#E8EDE9;
-  --tm:#9BA89C;
-  --ts:#5A6B5C;
+  --text:#E8EDF2;
+  --tm:#A4B0BC;
+  --ts:#708090;
   --red:#E05252;
   --gain:#4AB870;
   --font:'DM Sans',sans-serif;
@@ -42,28 +42,28 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
 
 /* ─── HEADER ─────────────────────────────────────────────────────────────── */
 .site-header{
-  background:#0A0E0B;border-bottom:2px solid var(--gold);
+  background:#09111A;border-bottom:2px solid var(--gold);
   padding:0 40px;display:flex;align-items:center;justify-content:space-between;
   height:62px;position:sticky;top:0;z-index:100;
   box-shadow:0 2px 24px rgba(0,0,0,.5);
 }
 .hd-brand{display:flex;align-items:center;gap:13px;text-decoration:none}
 .hd-logo{height:36px;width:36px;object-fit:contain}
-.hd-logo-fb{width:36px;height:36px;border-radius:4px;background:var(--gold);display:none;align-items:center;justify-content:center;font-family:var(--serif);font-size:17px;font-weight:700;color:#0A0E0B;flex-shrink:0}
+.hd-logo-fb{width:36px;height:36px;border-radius:4px;background:var(--gold);display:none;align-items:center;justify-content:center;font-family:var(--serif);font-size:17px;font-weight:700;color:#09111A;flex-shrink:0}
 .hd-name{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--white);letter-spacing:.2px;line-height:1.1}
 .hd-name span{display:block;font-family:var(--mono);font-size:9px;font-weight:400;color:var(--gold-l);letter-spacing:.15em;text-transform:uppercase;margin-top:2px}
 .site-nav{display:flex;align-items:center;gap:3px}
 .site-nav a{color:rgba(255,255,255,.5);font-size:12px;font-weight:500;text-decoration:none;padding:6px 13px;border-radius:3px;transition:all .15s;letter-spacing:.02em}
 .site-nav a:hover{color:var(--white);background:rgba(255,255,255,.06)}
-.site-nav a.active{color:var(--white);background:rgba(201,151,58,.18);border:1px solid rgba(201,151,58,.35)}
+.site-nav a.active{color:var(--white);background:rgba(174,187,200,.18);border:1px solid rgba(174,187,200,.35)}
 
 /* ─── HERO ───────────────────────────────────────────────────────────────── */
 .hero{
   min-height:40vh;display:flex;align-items:center;justify-content:center;
-  position:relative;overflow:hidden;background:#0A0E0B;
+  position:relative;overflow:hidden;background:#09111A;
 }
 .hero-bg{
-  position:absolute;inset:0;background:#0A0E0B;
+  position:absolute;inset:0;background:#09111A;
 }
 .hero-content{
   position:relative;z-index:1;text-align:center;
@@ -151,7 +151,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
 }
 .form-input::placeholder,.form-textarea::placeholder{color:var(--ts)}
 .form-select{cursor:pointer;appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235A6B5C' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23708090' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 12px center;
   padding-right:32px;
 }
@@ -159,7 +159,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
 .form-textarea{resize:vertical;min-height:120px;line-height:1.6}
 .form-submit{
   width:100%;margin-top:20px;
-  background:var(--gold);color:#0A0E0B;border:none;
+  background:var(--gold);color:#09111A;border:none;
   font-family:var(--font);font-size:13px;font-weight:700;
   padding:13px 24px;border-radius:4px;cursor:pointer;
   letter-spacing:.04em;transition:background .14s;
@@ -183,7 +183,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
 
 /* ─── FOOTER ─────────────────────────────────────────────────────────────── */
 .site-footer{
-  background:#0A0E0B;border-top:1px solid var(--border);
+  background:#09111A;border-top:1px solid var(--border);
   padding:28px 40px;display:flex;align-items:center;
   justify-content:space-between;flex-wrap:wrap;gap:12px;
 }
@@ -217,7 +217,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
 <!-- HEADER -->
 <header class="site-header">
   <a href="index.html" class="hd-brand">
-    <img src="images/bob_logo.png" class="hd-logo" alt="Bob Wealth"
+    <img src="../images/bob_logo.png" class="hd-logo" alt="Bob Wealth"
          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
     <div class="hd-logo-fb">B</div>
     <div class="hd-name">Bob Wealth Holdings<span>Wealth · Purpose · Impact</span></div>
@@ -283,7 +283,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
         </div>
       </div>
 
-      <div style="background:linear-gradient(135deg,#0f1f16,#1a3326);border:1px solid rgba(201,151,58,.18);border-radius:6px;padding:18px 20px;margin-top:4px">
+      <div style="background:linear-gradient(135deg,#0E1826,#172A3D);border:1px solid rgba(174,187,200,.18);border-radius:6px;padding:18px 20px;margin-top:4px">
         <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ts);margin-bottom:8px">Response Time</div>
         <div style="font-size:13px;color:var(--tm);line-height:1.7">
           We typically respond within <strong style="color:var(--gold-l)">24–48 hours</strong> on business days.
