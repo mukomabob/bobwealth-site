@@ -25,6 +25,9 @@
  *   env.ANTHROPIC_API_KEY - optional Worker secret. When set, Claude writes
  *             the SQL (step 1); Workers AI still words the answer (step 2)
  *             and takes over step 1 if Claude is unavailable.
+ *   env.CAIMEX_API_KEY - optional Worker secret for Econet's Caimex gateway
+ *             (OpenAI-compatible). Used for step 1 when Claude isn't, with the
+ *             model in CAIMEX_SQL_MODEL; Workers AI is still the fallback.
  */
 
 import Anthropic from "@anthropic-ai/sdk";
@@ -176,7 +179,7 @@ async function writeSql(env, messages) {
         messages: turns,
       });
       const text = resp.content.filter((b) => b.type === "text").map((b) => b.text).join("");
-      return extractSql(text);
+      return { sql: extractSql(text), by: CLAUDE_SQL_MODEL };
     } catch (e) {
       // Fall through to Workers AI so a Claude outage, rate limit or spending
       // cap never takes the chatbot down.
@@ -191,10 +194,30 @@ async function writeSql(env, messages) {
       }
     }
   }
+  if (env.CAIMEX_API_KEY && env.CAIMEX_SQL_MODEL) {
+    try {
+      const res = await fetch(`${env.CAIMEX_BASE_URL}/chat/completions`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${env.CAIMEX_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ model: env.CAIMEX_SQL_MODEL, messages, max_tokens: 2048 }),
+        signal: AbortSignal.timeout(25_000),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text()).slice(0, 200)}`);
+      const text = aiText(await res.json());
+      if (!text) throw new Error("empty reply");
+      return { sql: extractSql(text), by: env.CAIMEX_SQL_MODEL };
+    } catch (e) {
+      // Out of balance, down or unreachable: fall through to the free model.
+      console.error("Caimex request failed; using Workers AI for SQL:", e?.message || e);
+    }
+  }
   // The free Workers AI model for this step is set by SQL_MODEL in wrangler.toml.
-  const resp = await env.AI.run(env.SQL_MODEL || MODEL, { messages, max_tokens: 2048 });
-  return extractSql(aiText(resp));
+  const model = env.SQL_MODEL || MODEL;
+  const resp = await env.AI.run(model, { messages, max_tokens: 2048 });
+  return { sql: extractSql(aiText(resp)), by: model };
 }
+
+
 
 // Workers AI models answer in different shapes: { response } (Llama),
 // OpenAI-style { choices }, or Responses-style { output }.
@@ -242,7 +265,7 @@ async function handleAsk(request, env, origin) {
     { role: "system", content: SQL_SYSTEM_PROMPT },
     { role: "user", content: prompt },
   ];
-  let sql = await writeSql(env, sqlMessages);
+  let { sql, by: sqlBy } = await writeSql(env, sqlMessages);
   const check = validateSql(sql);
 
   if (!check.ok) {
@@ -262,7 +285,7 @@ async function handleAsk(request, env, origin) {
   try {
     rows = (await env.DB.prepare(sql).all()).results || [];
   } catch (e) {
-    const retrySql = await writeSql(env, [
+    const retry = await writeSql(env, [
       ...sqlMessages,
       { role: "assistant", content: sql },
       {
@@ -271,10 +294,11 @@ async function handleAsk(request, env, origin) {
           "Write a corrected query. Output ONLY the SQL.",
       },
     ]);
-    if (validateSql(retrySql).ok) {
+    if (validateSql(retry.sql).ok) {
       try {
-        rows = (await env.DB.prepare(retrySql).all()).results || [];
-        sql = retrySql;
+        rows = (await env.DB.prepare(retry.sql).all()).results || [];
+        sql = retry.sql;
+        sqlBy = retry.by;
       } catch (e2) {
         console.error("retry query failed:", e2);
       }
@@ -303,7 +327,7 @@ async function handleAsk(request, env, origin) {
   });
 
   return new Response(
-    JSON.stringify({ answer: (answerResp.response || "").trim(), sql, rows: rows.slice(0, 20) }),
+    JSON.stringify({ answer: (answerResp.response || "").trim(), sql, sqlBy, rows: rows.slice(0, 20) }),
     { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders(origin) } }
   );
 }

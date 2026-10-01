@@ -62,3 +62,8 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: stock-agent/cloudflare
           command: deploy
+          # Uploaded as Worker secrets (encrypted, never in the code).
+          secrets: |
+            CAIMEX_API_KEY
+        env:
+          CAIMEX_API_KEY: ${{ secrets.CAIMEX_API_KEY }}

@@ -96,19 +96,28 @@ def matches(expected, cells):
 
 
 # ─── model calls ─────────────────────────────────────────────────────────────
+CAIMEX_BASE_URL = "https://caimex.econetai.co.zw:2052/v1"
+
+
 def run_model(model, system, question):
-    url = (f"https://api.cloudflare.com/client/v4/accounts/{os.environ['CLOUDFLARE_ACCOUNT_ID']}"
-           f"/ai/run/{model}")
-    body = json.dumps({
-        "messages": [{"role": "system", "content": system}, {"role": "user", "content": question}],
-        "max_tokens": 2048,
-    }).encode()
-    req = urllib.request.Request(url, data=body, method="POST", headers={
-        "Authorization": f"Bearer {os.environ['CLOUDFLARE_API_TOKEN']}",
+    """`caimex:<model>` goes to Econet's Caimex gateway (OpenAI-compatible);
+    anything else is a Workers AI model ID."""
+    messages = [{"role": "system", "content": system}, {"role": "user", "content": question}]
+    if model.startswith("caimex:"):
+        url, key = f"{CAIMEX_BASE_URL}/chat/completions", os.environ.get("CAIMEX_API_KEY", "")
+        payload = {"model": model[len("caimex:"):], "messages": messages, "max_tokens": 2048}
+    else:
+        url = (f"https://api.cloudflare.com/client/v4/accounts/{os.environ['CLOUDFLARE_ACCOUNT_ID']}"
+               f"/ai/run/{model}")
+        key, payload = os.environ.get("CLOUDFLARE_API_TOKEN", ""), {"messages": messages, "max_tokens": 2048}
+    req = urllib.request.Request(url, data=json.dumps(payload).encode(), method="POST", headers={
+        "Authorization": f"Bearer {key}",
         "Content-Type": "application/json",
+        "User-Agent": "bobwealth-sql-eval",
     })
     with urllib.request.urlopen(req, timeout=120) as res:
-        return json.load(res)["result"]
+        body = json.load(res)
+    return body["result"] if "result" in body else body
 
 
 def ai_text(result):
@@ -142,9 +151,13 @@ def main():
     truths = [(q, expected_values(db, t)) for q, t in QUESTIONS]
 
     results = {m: [] for m in models}
+    skipped = {}
     for model in models:
         print(f"\n=== {model}", flush=True)
         for (question, expected) in truths:
+            if model in skipped:
+                results[model].append(None)
+                continue
             t0 = time.time()
             try:
                 result = run_model(model, system, question)
@@ -153,9 +166,14 @@ def main():
                 missing = [e for e in expected if not matches(e, cells)]
                 ok, note = not missing, (f"missing {missing}" if missing else "")
             except urllib.error.HTTPError as e:
-                if e.code in (401, 403):
-                    sys.exit(f"Cloudflare rejected the API token ({e.code}): it needs the "
-                             "'Workers AI - Read' permission. Nothing was scored.")
+                if e.code in (401, 402, 403):
+                    # Credentials refused or no balance: this model can't be scored at
+                    # all, so skip it instead of counting every question as a failure.
+                    skipped[model] = f"HTTP {e.code} {e.read()[:160]!r}"
+                    print(f"SKIPPED: provider refused the request ({skipped[model]}). "
+                          "For Workers AI the API token needs the 'Workers AI - Read' permission.", flush=True)
+                    results[model].append(None)
+                    continue
                 sql, ok, note = "", False, f"HTTP {e.code}: {e.read()[:200]!r}"
             except Exception as e:
                 ok, note = False, f"{type(e).__name__}: {e}"
@@ -166,12 +184,14 @@ def main():
                 print(f"        expected {expected}\n        {note}\n        SQL: {' '.join(sql.split())[:300]}", flush=True)
 
     lines = ["| Model | Passed |", "|---|---|"] + [
-        f"| `{m}` | {sum(r)}/{len(r)} |" for m, r in results.items()
+        f"| `{m}` | " + (f"not run: {skipped[m]}" if m in skipped else f"{sum(bool(x) for x in r)}/{len(r)}") + " |"
+        for m, r in results.items()
     ]
     lines += ["", "| Question | " + " | ".join(m.split("/")[-1] for m in models) + " |",
               "|---|" + "---|" * len(models)]
     for i, (q, _) in enumerate(truths):
-        lines.append(f"| {q} | " + " | ".join("✅" if results[m][i] else "❌" for m in models) + " |")
+        lines.append(f"| {q} | " + " | ".join(
+            "—" if results[m][i] is None else "✅" if results[m][i] else "❌" for m in models) + " |")
     summary = "\n".join(lines)
     print("\n" + summary)
     if os.environ.get("GITHUB_STEP_SUMMARY"):

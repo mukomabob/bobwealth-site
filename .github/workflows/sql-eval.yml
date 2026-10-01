@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
     inputs:
       models:
-        description: Workers AI model IDs to compare, space-separated
-        default: "@cf/meta/llama-3.3-70b-instruct-fp8-fast @cf/openai/gpt-oss-120b"
+        description: Models to compare, space-separated (Workers AI IDs, or caimex:<model> for Econet Caimex)
+        default: "caimex:Caimex2/deepseek-ai/DeepSeek-V4-Flash caimex:qwen-qwen3.5-122b-a10b-gptq-int4 @cf/meta/llama-3.3-70b-instruct-fp8-fast @cf/openai/gpt-oss-120b"
 
 permissions:
   contents: read
@@ -39,5 +39,6 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CAIMEX_API_KEY: ${{ secrets.CAIMEX_API_KEY }}
           MODELS: ${{ inputs.models }}  # via env, not inlined, so the input can't inject shell
         run: python stock-agent/eval/sql_eval.py eval.db $MODELS
