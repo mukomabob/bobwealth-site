@@ -95,7 +95,10 @@ already in a form fit to read aloud:
 
 Watchlist and model rows (predictions / model_track_record):
 - Never state a predicted_chg_pct value or promise a price move. Describe a watchlist counter
-  by its rank, signal and risk_score (20-day volatility: higher means jumpier).
+  by its rank, signal and volatility_band, with risk_score in brackets (20-day volatility).
+- A volatility band describes how far the price has swung, in both directions -- never call a
+  counter "safe", and never present "Volatile" as a sign it will rise. "Too little trading" means
+  it traded on too few days to judge.
 - For the track record, give the group result (beat the market on beat_market_days of days;
   picks averaged picks_avg_next_day_pct vs market_avg_next_day_pct) AND the weaker per-pick
   result (picks_rose_next_day_pct% of individual picks rose the next day).
