@@ -153,6 +153,9 @@ def main():
                 missing = [e for e in expected if not matches(e, cells)]
                 ok, note = not missing, (f"missing {missing}" if missing else "")
             except urllib.error.HTTPError as e:
+                if e.code in (401, 403):
+                    sys.exit(f"Cloudflare rejected the API token ({e.code}): it needs the "
+                             "'Workers AI - Read' permission. Nothing was scored.")
                 sql, ok, note = "", False, f"HTTP {e.code}: {e.read()[:200]!r}"
             except Exception as e:
                 ok, note = False, f"{type(e).__name__}: {e}"
