@@ -205,22 +205,22 @@ select option{background:var(--panel-2);color:var(--text)}
 .base-banner .bb-badge{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;flex-shrink:0}
 .inv-note{font-size:10px;font-family:var(--mono);color:var(--text-3);margin-top:8px;padding-top:8px;border-top:1px solid var(--border-soft);line-height:1.6}
 
-/* ASK THE DATA */
-.sim-ask{margin:0 0 12px;border:1px solid var(--border)}
-.sim-ask-title{display:flex;align-items:baseline;gap:8px;padding:7px 12px;border-bottom:1px solid var(--border);background:var(--panel-2);font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.08em}
-.sim-ask-title span{font-family:var(--font);font-size:11px;font-weight:400;color:var(--text-3);text-transform:none;letter-spacing:0}
-.sim-ask-form{display:flex;gap:6px;padding:10px 12px 0}
-.sim-ask-input{flex:1;min-width:0;background:var(--panel-2);border:1px solid var(--border);padding:7px 10px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;border-radius:0}
-.sim-ask-input:focus{border-color:var(--text-3)}
-.sim-ask-btn{background:var(--strong);border:1px solid var(--strong);color:var(--bg);font-weight:600;font-size:12px;padding:7px 16px;cursor:pointer}
+/* ASK THE DATA: its own block above the simulator, with room around it */
+.sim-ask{margin:12px 0 28px;border:1px solid var(--border);background:var(--panel-2);padding:20px 24px}
+.sim-ask-title{display:flex;flex-direction:column;gap:4px;margin-bottom:14px;font-family:var(--display);font-size:18px;font-weight:700;color:var(--strong)}
+.sim-ask-title span{font-family:var(--font);font-size:12px;font-weight:400;color:var(--text-2)}
+.sim-ask-form{display:flex;gap:8px}
+.sim-ask-input{flex:1;min-width:0;background:var(--bg);border:1px solid var(--border);padding:11px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;border-radius:0}
+.sim-ask-input:focus{border-color:var(--text-2)}
+.sim-ask-btn{background:var(--strong);border:1px solid var(--strong);color:var(--bg);font-weight:600;font-size:13px;padding:11px 22px;cursor:pointer}
 .sim-ask-btn:disabled{opacity:.5;cursor:default}
-.sim-ask-clear{background:transparent;border:1px solid var(--border);color:var(--text-2);font-size:12px;padding:7px 12px;cursor:pointer;white-space:nowrap}
+.sim-ask-clear{background:transparent;border:1px solid var(--border);color:var(--text-2);font-size:13px;padding:11px 14px;cursor:pointer;white-space:nowrap}
 .sim-ask-clear:hover{color:var(--text)}
 .sim-ask-clear[hidden]{display:none}
-.sim-ask-chips{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px 10px}
-.sim-ask-chip{background:transparent;border:1px solid var(--border);color:var(--text-2);font-family:var(--mono);font-size:10px;padding:3px 8px;cursor:pointer}
+.sim-ask-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.sim-ask-chip{background:var(--bg);border:1px solid var(--border);color:var(--text-2);font-family:var(--mono);font-size:11px;padding:5px 10px;cursor:pointer}
 .sim-ask-chip:hover{color:var(--text);border-color:var(--text-3)}
-.sim-ask-answer{margin:0 12px 12px;border:1px solid var(--border);border-left:2px solid var(--text-2);padding:8px 12px}
+.sim-ask-answer{margin-top:16px;background:var(--bg);border:1px solid var(--border);border-left:2px solid var(--text-2);padding:12px 14px}
 .sim-ask-text{font-size:13px;line-height:1.6;color:var(--text)}
 .sim-ask-text.loading{color:var(--text-3)}
 .sim-ask-text.error{color:var(--down)}
@@ -298,6 +298,7 @@ select option{background:var(--panel-2);color:var(--text)}
   .fresh-lbl{max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   thead th:nth-child(2),tbody td:nth-child(2){position:sticky;left:0;background:var(--bg);z-index:1}
   .bc-label{width:96px;font-size:9px}
+  .sim-ask{padding:16px;margin:8px 0 20px}
   .bc-sect,.bc-liq,.bc-mkt{display:none}
   .mc-title .tools{margin-left:0;width:100%}
   .mc-title .tools .inp{flex:1;min-width:0}
@@ -420,7 +421,7 @@ try { const t = localStorage.getItem('bw_theme'); if (t === 'light') document.do
     <!-- SIMULATOR -->
     <div class="vp" id="page-barchart">
     <div class="sim-ask" id="simAsk">
-      <div class="sim-ask-title">Ask the data <span>Plain-English questions; the chart narrows to the counters in the answer.</span></div>
+      <h2 class="sim-ask-title">Ask the data <span>Ask about ZSE and VFEX prices, returns and the watchlist in plain English. The chart below narrows to the counters in the answer.</span></h2>
       <form class="sim-ask-form" id="simAskForm">
         <input type="text" class="sim-ask-input" id="simAskInput" placeholder="e.g. Which REITs have gained most this year?" autocomplete="off" maxlength="500" required>
         <button type="submit" class="sim-ask-btn" id="simAskBtn">Ask</button>
@@ -633,6 +634,10 @@ async function loadContext() {
 // ─── TICKER TAPE + RIGHT RAIL ─────────────────────────────────────────────────
 const sgn = v => v > 0 ? '+' : v < 0 ? '−' : '';
 const fPct = v => v == null || isNaN(v) ? '—' : sgn(v) + Math.abs(v).toFixed(2) + '%';
+// A counter's close with its currency: ZSE trades in ZiG, VFEX in US dollars.
+// Prices under 1 keep four decimals so small moves stay visible.
+const fPx = r => r.close == null ? '—'
+  : (r.market === 'VFEX' ? 'US$' : 'ZiG ') + r.close.toFixed(Math.abs(r.close) < 1 ? 4 : 2);
 const esc = v => String(v ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 // Market-cap-weighted day move of a market's counters. Our own measure, not the
@@ -653,12 +658,12 @@ function renderTicker() {
   const up = window.PS.filter(r => r.chg > 0).length, dn = window.PS.filter(r => r.chg < 0).length;
   const movers = [...window.PS].filter(r => r.chg !== 0 && !r.suspended).sort((a, b) => Math.abs(b.chgPct) - Math.abs(a.chgPct)).slice(0, 6);
   el.innerHTML =
-    item('ZSE', fM(z.cap), z.pct, 'Market-cap-weighted day move of ZSE counters (USD market cap). Bob Wealth calculation, not the official ZSE All Share index.') +
-    item('VFEX', fM(v.cap), v.pct, 'Market-cap-weighted day move of VFEX counters. Bob Wealth calculation, not the official VFEX All Share index.') +
+    item('ZSE', 'US' + fM(z.cap), z.pct, 'Market-cap-weighted day move of ZSE counters (USD market cap). Bob Wealth calculation, not the official ZSE All Share index.') +
+    item('VFEX', 'US' + fM(v.cap), v.pct, 'Market-cap-weighted day move of VFEX counters. Bob Wealth calculation, not the official VFEX All Share index.') +
     item('USD/ZiG', fx?.rate != null ? fx.rate.toFixed(4) : '—', fx?.chgPct ?? null, 'Interbank rate implied by the FBC price sheet (ZiG close ÷ USD price). A fall means a stronger ZiG.') +
-    item('Gold ETF', gold?.price != null ? '$' + gold.price.toFixed(4) : '—', gold?.chgPct ?? null, 'FMW Gold ETF on VFEX, US dollars per unit. Tracks gold; not the spot gold price.') +
+    item('Gold ETF', gold?.price != null ? 'US$' + gold.price.toFixed(4) : '—', gold?.chgPct ?? null, 'FMW Gold ETF on VFEX, US dollars per unit. Tracks gold; not the spot gold price.') +
     item('Adv/Dec', `<span class="up">${up}</span><span class="nc"> / </span><span class="dn">${dn}</span>`, null) +
-    movers.map(r => item(esc(r.counter.trim()), r.close != null ? fP2(r.close) : '—', r.chgPct)).join('') +
+    movers.map(r => item(esc(r.counter.trim()), fPx(r), r.chgPct)).join('') +
     `<div class="tk tk-gap"><span class="tk-note">${esc(window.PRICE_DATE)}</span></div>`;
 }
 
@@ -1194,7 +1199,7 @@ function renderBarChart() {
   const cntF = parseInt(document.getElementById('bcCntF')?.value || '999') || 999;
   let filtered = mktF ? results.filter(r=>r.market===mktF) : results;
   filtered = filtered.slice(0, Math.min(cntF, filtered.length));
-  const investment = parseFloat(document.getElementById('investmentAmount')?.value || 100);
+  const investment = 100;
   const maxVal = Math.max(...filtered.map(r=>(r.inv100/100)*investment), investment*2);
   const narrow = window.innerWidth <= 768;
   const avail = el.clientWidth || 900;
@@ -1221,20 +1226,11 @@ function renderBarChart() {
         <div class="bc-meta"><span>${allResults.length} of ${window.PS.length} counters tracked</span><span>${filtered.length} shown</span>${lateCount ? `<span>${lateCount} listed later, measured from first price (marked since …)</span>` : ''}</div>
         ${excluded.length ? `<details class="bc-untracked"><summary>${excluded.length} not tracked</summary><div>${excluded.join(' · ')}</div></details>` : ''}
       </div>
-      <div class="bchart-controls">
-        <label for="investmentAmount">Amount (US$)</label>
-        <input type="number" id="investmentAmount" value="${investment}" min="1" step="1" style="width:120px" oninput="renderBarChart()">
-        <button class="mkt-btn" onclick="setInvestment(1)">$1</button>
-        <button class="mkt-btn" onclick="setInvestment(100)">$100</button>
-        <button class="mkt-btn" onclick="setInvestment(1000)">$1,000</button>
-        <button class="mkt-btn" onclick="setInvestment(10000)">$10,000</button>
-      </div>
       <div class="kpi-row k3">
         <div class="kc"><div class="kc-lbl">Amount per counter</div><div class="kc-val">$${investment.toLocaleString()}</div></div>
         <div class="kc"><div class="kc-lbl">Best performer</div><div class="kc-val" style="font-size:14px">${best?best.counter:'—'}</div></div>
         <div class="kc"><div class="kc-lbl">Highest value</div><div class="kc-val up">$${bestVal.toFixed(2)}</div></div>
       </div>
-      <div id="simAskSlot"></div>
       <div class="bchart-controls" id="bcControls">
         <select id="bcMktF" onchange="renderBarChart()"><option value="">All Markets</option><option ${mktF==='ZSE'?'selected':''}>ZSE</option><option ${mktF==='VFEX'?'selected':''}>VFEX</option></select>
         <select id="bcCntF" onchange="renderBarChart()"><option value="999" ${cntF===999?'selected':''}>All counters</option><option value="20" ${cntF===20?'selected':''}>Top/bottom 20</option><option value="30" ${cntF===30?'selected':''}>Top/bottom 30</option><option value="50" ${cntF===50?'selected':''}>Top/bottom 50</option></select>
@@ -1257,11 +1253,8 @@ function renderBarChart() {
         </div>
       </div>
     </div>`;
-  const slot = document.getElementById('simAskSlot');
-  if (slot && askEl) slot.replaceWith(askEl);
 }
 
-function setInvestment(amount) { const el=document.getElementById('investmentAmount'); if(el)el.value=amount; renderBarChart(); }
 function printChart() { const c=document.getElementById('bcControls'); if(c)c.style.display='none'; window.print(); setTimeout(()=>{if(c)c.style.display='flex';},500); }
 
 // Width only: a phone keyboard opening changes the height, and a re-render then
