@@ -26,6 +26,7 @@ import re
 import sys
 from datetime import datetime, timedelta, timezone
 from email.header import decode_header
+from email.utils import parsedate_to_datetime
 from io import BytesIO
 from zoneinfo import ZoneInfo
 
@@ -261,8 +262,8 @@ def decode_str(s):
 
 
 def fetch_recent_attachments():
-    """Returns [(filename, bytes), ...] for every FBC price-sheet attachment
-    found in the last few days, oldest email first.
+    """Returns [(filename, bytes, sent_date), ...] for every FBC price-sheet
+    attachment found in the last few days, oldest email first.
 
     Deliberately does NOT restrict the IMAP search to "today" only: FBC's send
     time has drifted later and later (observed as late as ~14:52 UTC / 16:52
@@ -296,35 +297,55 @@ def fetch_recent_attachments():
             if typ != "OK":
                 continue
             msg = email.message_from_bytes(msg_data[0][1])
+            try:
+                sent = parsedate_to_datetime(msg["Date"]).astimezone(HARARE).date()
+            except (TypeError, ValueError):
+                sent = None
             for part in msg.walk():
                 fname = part.get_filename()
                 if not fname:
                     continue
                 fname = decode_str(fname)
                 if fname.lower().endswith((".xlsx", ".xls")):
-                    found.append((fname, part.get_payload(decode=True)))
-                    break
+                    found.append((fname, part.get_payload(decode=True), sent))
         return found
     finally:
         conn.logout()
 
 
 # ─── main ────────────────────────────────────────────────────────────────────
-def archive_name(fname):
+def archive_name(fname, sent=None):
+    """'DD.MM.YY.xlsx' from the attachment's filename. FBC occasionally
+    mistypes the month (the sheet sent on 15 May 2026 is named "15.04.26"),
+    and the sheets carry no date of their own, so the email's send date is
+    the cross-check: a name more than 5 days off with the same day of the
+    month takes the send date. Any other mismatch is left as named (a
+    genuinely old sheet resent later)."""
     date_match = re.search(r"\d{2}\.\d{2}\.\d{2}", fname)
-    return f"{date_match.group(0)}.xlsx" if date_match else fname
+    if not date_match:
+        return fname
+    name = f"{date_match.group(0)}.xlsx"
+    try:
+        named = datetime.strptime(date_match.group(0), "%d.%m.%y").date()
+    except ValueError:
+        return name
+    if sent and abs(named - sent) > timedelta(days=5) and named.day == sent.day:
+        fixed = sent.strftime("%d.%m.%y") + ".xlsx"
+        print(f"Sheet {fname!r} was sent on {sent}; archiving it as {fixed}.")
+        return fixed
+    return name
 
 
 def main():
-    found = [(fname, blob) for fname, blob in fetch_recent_attachments() if blob]
+    found = [(fname, blob, sent) for fname, blob, sent in fetch_recent_attachments() if blob]
     if not found:
         print("No FBC price-sheet email found in the last 5 days — nothing to do.")
         return 0
 
     # One sheet per price date; if FBC sent a date twice, the later email wins.
     by_name = {}
-    for fname, blob in found:
-        by_name[archive_name(fname)] = (fname, blob)
+    for fname, blob, sent in found:
+        by_name[archive_name(fname, sent)] = (fname, blob)
 
     # Archive the raw sheets for the predictions pipeline (generate_predictions.py
     # reads every file here to rebuild the full training history). Days missing
