@@ -24,7 +24,7 @@ import math
 import os
 import re
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from email.header import decode_header
 from email.utils import parsedate_to_datetime
 from io import BytesIO
@@ -328,6 +328,46 @@ AM_NOTE_RE = re.compile(r"^AM NOTE\b", re.IGNORECASE)
 AM_NOTE_PREFIX_RE = re.compile(r"^AM NOTE\s*[\d./]*\s*[-–:]?\s*", re.IGNORECASE)
 
 
+def easter_sunday(year):
+    """Gregorian Easter (anonymous Gregorian algorithm)."""
+    a, b, c = year % 19, year // 100, year % 100
+    d, e = b // 4, b % 4
+    f = (b + 8) // 25
+    g = (b - f + 1) // 3
+    h = (19 * a + b - d - g + 15) % 30
+    i, k = c // 4, c % 4
+    l = (32 + 2 * e + 2 * i - h - k) % 7
+    m = (a + 11 * h + 22 * l) // 451
+    month = (h + l - 7 * m + 114) // 31
+    return date(year, month, (h + l - 7 * m + 114) % 31 + 1)
+
+
+def zim_holidays(year):
+    """Zimbabwe public holidays, when the exchanges are shut. A holiday on a
+    Sunday moves to the Monday."""
+    fixed = [date(year, 1, 1), date(year, 2, 21), date(year, 4, 18), date(year, 5, 1),
+             date(year, 5, 25), date(year, 12, 22), date(year, 12, 25), date(year, 12, 26)]
+    days = set()
+    for d in fixed:
+        days.add(d + timedelta(days=1) if d.weekday() == 6 else d)
+    easter = easter_sunday(year)
+    days |= {easter - timedelta(days=2), easter + timedelta(days=1)}  # Good Friday, Easter Monday
+    heroes = date(year, 8, 8) + timedelta(days=(0 - date(year, 8, 8).weekday()) % 7)  # 2nd Monday of August
+    days |= {heroes, heroes + timedelta(days=1)}  # Heroes' Day, Defence Forces Day
+    return days
+
+
+def trading_day_before(sent):
+    """The session an AM Note describes: FBC sends it the morning after, so the
+    last weekday before the send date that wasn't a public holiday. (Not the
+    last archived sheet: FBC skipped the 15 Sept 2026 sheet although the
+    market traded, and the 16 Sept note covers that day.)"""
+    d = sent - timedelta(days=1)
+    while d.weekday() >= 5 or d in zim_holidays(d.year):
+        d -= timedelta(days=1)
+    return d
+
+
 def usd_zig_rate(rows):
     """The interbank ZiG-per-USD rate the sheet converts at: each ZSE counter's
     ZiG close over its USD (IBR) price. Median, so one odd row can't move it."""
@@ -360,10 +400,15 @@ def write_context(new_notes):
     if os.path.exists(CONTEXT_PATH):
         with open(CONTEXT_PATH) as f:
             for n in json.load(f).get("notes", []):
-                notes[(n["date"], n["title"])] = n
+                # Notes saved before "sent" was recorded carry the send date in "date".
+                sent = date.fromisoformat(n.get("sent") or n["date"])
+                notes[(sent, n["title"])] = sent
     for sent, subject in new_notes:
         title = AM_NOTE_PREFIX_RE.sub("", subject).strip() or subject
-        notes[(sent.isoformat(), title)] = {"date": sent.isoformat(), "title": title}
+        notes[(sent, title)] = sent
+    # "date" is the trading day the note describes, so it lines up with the prices.
+    notes = {key: {"date": trading_day_before(sent).isoformat(), "sent": sent.isoformat(), "title": key[1]}
+             for key, sent in notes.items()}
 
     sheets = sorted(
         (n for n in os.listdir(SHEETS_DIR) if archive_iso_date(n)),
