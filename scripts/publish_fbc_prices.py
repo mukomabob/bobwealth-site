@@ -34,6 +34,11 @@ from openpyxl import load_workbook
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MARKET_DATA_PATH = os.path.join(REPO_ROOT, "market-data.json")
+# Ticker-tape and sidebar context for the Markets page: USD/ZiG, the gold ETF,
+# and FBC's AM Note headlines. Kept apart from market-data.json, whose shape
+# mirrors the admin panel's manual upload.
+CONTEXT_PATH = os.path.join(REPO_ROOT, "market-context.json")
+MAX_NOTES = 15
 BASELINE_PATH = os.path.join(REPO_ROOT, "Price Sheet 06.01.26.xlsx")
 BASELINE_FNAME = "Price_Sheet_06_01_26.xlsx"  # underscored on purpose — see sheet_date()
 SHEETS_DIR = os.path.join(REPO_ROOT, "data", "fbc-sheets")  # archive for the predictions pipeline
@@ -261,9 +266,10 @@ def decode_str(s):
     return "".join(out)
 
 
-def fetch_recent_attachments():
-    """Returns [(filename, bytes, sent_date), ...] for every FBC price-sheet
-    attachment found in the last few days, oldest email first.
+def fetch_recent_mail():
+    """Returns (sheets, notes) from the last few days of FBC email, oldest
+    first: sheets as [(filename, bytes, sent_date), ...] for every price-sheet
+    attachment, notes as [(sent_date, subject), ...] for every AM Note.
 
     Deliberately does NOT restrict the IMAP search to "today" only: FBC's send
     time has drifted later and later (observed as late as ~14:52 UTC / 16:52
@@ -291,7 +297,7 @@ def fetch_recent_attachments():
         typ, data = conn.search(None, f'(FROM "{FBC_SENDER}" SINCE {imap_date})')
         if typ != "OK":
             raise RuntimeError(f"IMAP search failed: {typ}")
-        found = []
+        found, notes = [], []
         for msg_id in data[0].split():
             typ, msg_data = conn.fetch(msg_id, "(RFC822)")
             if typ != "OK":
@@ -301,6 +307,9 @@ def fetch_recent_attachments():
                 sent = parsedate_to_datetime(msg["Date"]).astimezone(HARARE).date()
             except (TypeError, ValueError):
                 sent = None
+            subject = decode_str(msg["Subject"]).strip()
+            if sent and AM_NOTE_RE.match(subject):
+                notes.append((sent, subject))
             for part in msg.walk():
                 fname = part.get_filename()
                 if not fname:
@@ -308,9 +317,90 @@ def fetch_recent_attachments():
                 fname = decode_str(fname)
                 if fname.lower().endswith((".xlsx", ".xls")):
                     found.append((fname, part.get_payload(decode=True), sent))
-        return found
+        return found, notes
     finally:
         conn.logout()
+
+
+# ─── market context (ticker tape + sidebar) ──────────────────────────────────
+AM_NOTE_RE = re.compile(r"^AM NOTE\b", re.IGNORECASE)
+# "AM NOTE 30.09.2026 - CAFCA (+8%) ..." / "AM NOTE 18.05.26- ZSE up 0.97% ..."
+AM_NOTE_PREFIX_RE = re.compile(r"^AM NOTE\s*[\d./]*\s*[-–:]?\s*", re.IGNORECASE)
+
+
+def usd_zig_rate(rows):
+    """The interbank ZiG-per-USD rate the sheet converts at: each ZSE counter's
+    ZiG close over its USD (IBR) price. Median, so one odd row can't move it."""
+    rates = sorted(
+        r["close"] / r["usdIBR"]
+        for r in rows
+        if r["market"] == "ZSE" and r["close"] and r["usdIBR"] and r["usdIBR"] > 0
+    )
+    return round(rates[len(rates) // 2], 4) if rates else None
+
+
+def gold_etf(raw):
+    """The FMW Gold ETF row (VFEX, USD). It sits in the Derivative sector that
+    parse_sheet leaves out, so it is read straight from the sheet."""
+    for r in raw:
+        if r and str(r[0] or "").strip().upper().startswith("FMW GOLD ETF"):
+            price, chg = parse_float(r[8] if len(r) > 8 else None), parse_float(r[12] if len(r) > 12 else None)
+            return {
+                "name": "FMW Gold ETF",
+                "price": None if math.isnan(price) else price,
+                "chgPct": None if math.isnan(chg) else round(chg, 2),
+            }
+    return None
+
+
+def write_context(new_notes):
+    """Rewrite market-context.json from the two newest archived sheets plus the
+    AM Note headlines, merged with the ones already published."""
+    notes = {}
+    if os.path.exists(CONTEXT_PATH):
+        with open(CONTEXT_PATH) as f:
+            for n in json.load(f).get("notes", []):
+                notes[(n["date"], n["title"])] = n
+    for sent, subject in new_notes:
+        title = AM_NOTE_PREFIX_RE.sub("", subject).strip() or subject
+        notes[(sent.isoformat(), title)] = {"date": sent.isoformat(), "title": title}
+
+    sheets = sorted(
+        (n for n in os.listdir(SHEETS_DIR) if archive_iso_date(n)),
+        key=archive_iso_date,
+    )[-2:]
+    parsed = []
+    for name in sheets:
+        with open(os.path.join(SHEETS_DIR, name), "rb") as f:
+            raw = sheet_to_raw(f.read())
+        parsed.append((name, raw, parse_sheet(raw, name)[0]))
+
+    context = {"generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
+    if parsed:
+        name, raw, rows = parsed[-1]
+        rate = usd_zig_rate(rows)
+        prev = usd_zig_rate(parsed[0][2]) if len(parsed) == 2 else None
+        context["priceDate"] = sheet_date(name)
+        context["usdZig"] = {
+            "rate": rate,
+            "prevRate": prev,
+            "chgPct": round((rate / prev - 1) * 100, 2) if rate and prev else None,
+        }
+        context["gold"] = gold_etf(raw)
+    context["notes"] = sorted(notes.values(), key=lambda n: n["date"], reverse=True)[:MAX_NOTES]
+
+    # The job runs hourly; leave the file alone unless something besides the
+    # timestamp changed, or every run would make a commit.
+    if os.path.exists(CONTEXT_PATH):
+        with open(CONTEXT_PATH) as f:
+            old = json.load(f)
+        if {k: v for k, v in old.items() if k != "generated"} == {k: v for k, v in context.items() if k != "generated"}:
+            print("market-context.json unchanged.")
+            return
+    with open(CONTEXT_PATH, "w") as f:
+        json.dump(context, f, indent=2)
+        f.write("\n")
+    print(f"Wrote market-context.json — USD/ZiG {context.get('usdZig', {}).get('rate')}, {len(context['notes'])} note(s).")
 
 
 # ─── main ────────────────────────────────────────────────────────────────────
@@ -337,8 +427,10 @@ def archive_name(fname, sent=None):
 
 
 def main():
-    found = [(fname, blob, sent) for fname, blob, sent in fetch_recent_attachments() if blob]
+    sheets, notes = fetch_recent_mail()
+    found = [(fname, blob, sent) for fname, blob, sent in sheets if blob]
     if not found:
+        write_context(notes)
         print("No FBC price-sheet email found in the last 5 days — nothing to do.")
         return 0
 
@@ -360,6 +452,8 @@ def main():
                 print(f"Archiving missed sheet {name}.")
             with open(path, "wb") as f:
                 f.write(blob)
+
+    write_context(notes)
 
     fname, blob = by_name[newest]
     parse_fname = newest

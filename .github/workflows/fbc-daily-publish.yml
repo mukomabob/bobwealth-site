@@ -48,7 +48,7 @@ jobs:
       - name: Commit and push if anything changed
         id: commit
         run: |
-          git add market-data.json predictions.json data/fbc-sheets
+          git add market-data.json market-context.json predictions.json data/fbc-sheets
           if git diff --cached --quiet; then
             echo "Nothing changed -- skipping commit."
             exit 0
@@ -67,6 +67,7 @@ jobs:
         run: |
           curl -s "https://purge.jsdelivr.net/gh/${{ github.repository }}@${{ github.ref_name }}/market-data.json" || true
           curl -s "https://purge.jsdelivr.net/gh/${{ github.repository }}@${{ github.ref_name }}/predictions.json" || true
+          curl -s "https://purge.jsdelivr.net/gh/${{ github.repository }}@${{ github.ref_name }}/market-context.json" || true
 
       # After the site is published, so a Cloudflare problem can never hold back
       # the day's prices. Runs only when this run committed new data.
