@@ -54,6 +54,19 @@ const SECTOR_DEFINITIONS = `
   whose value tracks a basket of shares, or an asset such as gold or a share listed elsewhere.
 - Fixed Term  Bond: a bond that pays a set interest rate until it matures.`.trim();
 
+// Sector definitions go to the model only when the rows describe one counter:
+// given them alongside a list, it attached a definition to every name.
+const SECTOR_GUIDANCE_ONE = `Explain the counter's sector in one short clause for a reader who may not
+know the term, using ONLY the matching definition below (word it naturally, don't add to it):
+${SECTOR_DEFINITIONS}
+The table has no company descriptions -- if asked what the company does, give only its sector
+and that definition.`;
+const SECTOR_GUIDANCE_MANY = `When listing several counters, just name each one's sector if you mention it -- do
+not explain what the sectors mean.`;
+
+const answerSystemPrompt = (rowCount) =>
+  ANSWER_SYSTEM_PROMPT.replace("${SECTOR_GUIDANCE}", rowCount === 1 ? SECTOR_GUIDANCE_ONE : SECTOR_GUIDANCE_MANY);
+
 const ANSWER_SYSTEM_PROMPT = `You are a stock-market assistant for the Zimbabwe Stock Exchange (ZSE) and
 VFEX. You are given a user's question and the exact rows a SQL query
 returned for it. Answer the question in 2-4 sentences using ONLY the numbers
@@ -62,13 +75,8 @@ rows are empty, say plainly that there's no data for that question rather
 than guessing. Earlier turns, if shown, only explain what the new question refers to --
 take every figure from the new rows, never from an earlier answer. For a question about one counter, describe it from its row: sector and
 market, latest price, the day's change, and its US-dollar return since return_since. Name a counter's sector
-ONLY if the rows include its sector value -- never guess or infer one. When the answer is about a
-single counter, explain its sector in one short clause for a reader who may not know the term
-(in a list of several counters, just name each sector -- no explanations), using ONLY the matching
-definition below (word it naturally, don't add to it):
-${SECTOR_DEFINITIONS}
-The table has no company descriptions -- if asked what the company does, give only its sector
-and that definition.
+ONLY if the rows include its sector value -- never guess or infer one.
+\${SECTOR_GUIDANCE}
 If there ARE rows, they are the answer: the query already did
 the ranking or filtering, so never say there is no data -- state what the rows
 show, even if they carry only names.
@@ -286,7 +294,7 @@ async function handleAsk(request, env, origin) {
   // Step 3: SQL results -> natural-language answer
   const answerResp = await env.AI.run(MODEL, {
     messages: [
-      { role: "system", content: ANSWER_SYSTEM_PROMPT },
+      { role: "system", content: answerSystemPrompt(rows.length) },
       {
         role: "user",
         content: `${prompt}\n\nQuery results (JSON):\n${JSON.stringify(rows).slice(0, 4000)}`,
