@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-01T09:05:49Z",
+  "generated": "2026-10-01T10:06:43Z",
   "priceDate": "30.09.26",
   "usdZig": {
     "rate": 26.7965,
@@ -13,59 +13,73 @@
   },
   "notes": [
     {
-      "date": "2026-10-01",
+      "date": "2026-09-30",
+      "sent": "2026-10-01",
       "title": "VFEX falters in midweek trades"
     },
     {
-      "date": "2026-09-30",
+      "date": "2026-09-29",
+      "sent": "2026-09-30",
       "title": "CAFCA (+8%) & Delta (+7%) supported the ZSE ALSI to close 2% firmer"
     },
     {
-      "date": "2026-09-29",
+      "date": "2026-09-28",
+      "sent": "2026-09-29",
       "title": "ZSE ALSI closed 2.2% lower"
     },
     {
-      "date": "2026-09-25",
+      "date": "2026-09-24",
+      "sent": "2026-09-25",
       "title": "VFEX closed 2% firmer; Innscor target price is under review (U/R)"
     },
     {
-      "date": "2026-09-24",
+      "date": "2026-09-23",
+      "sent": "2026-09-24",
       "title": "ZSE Holdings (+13%) leads ZSE top gainers"
     },
     {
-      "date": "2026-09-23",
+      "date": "2026-09-22",
+      "sent": "2026-09-23",
       "title": "VFEX up 2.21% supported by Econet InfraCo & Padenga"
     },
     {
-      "date": "2026-09-22",
+      "date": "2026-09-21",
+      "sent": "2026-09-22",
       "title": "ZSE closed marginally higher"
     },
     {
-      "date": "2026-09-21",
+      "date": "2026-09-18",
+      "sent": "2026-09-21",
       "title": "VFEX up 0.39% as Old Mutual grew by 4.3%"
     },
     {
-      "date": "2026-09-18",
+      "date": "2026-09-17",
+      "sent": "2026-09-18",
       "title": "YTD yield remains above 50% for both ZSE & VFEX"
     },
     {
-      "date": "2026-09-17",
+      "date": "2026-09-16",
+      "sent": "2026-09-17",
       "title": "Innscor floor price now $1.50"
     },
     {
-      "date": "2026-09-16",
+      "date": "2026-09-15",
+      "sent": "2026-09-16",
       "title": "ZSE up 0.25%"
     },
     {
-      "date": "2026-09-14",
+      "date": "2026-09-11",
+      "sent": "2026-09-14",
       "title": "VFEX closed 1.1% firmer, as it breaches the 50% YTD gain mark"
     },
     {
-      "date": "2026-09-11",
+      "date": "2026-09-10",
+      "sent": "2026-09-11",
       "title": "ZSE up 1% led by SeedCo Ltd"
     },
     {
-      "date": "2026-09-10",
+      "date": "2026-09-09",
+      "sent": "2026-09-10",
       "title": "ZSE daily turnover ratio reaches 0.5% as ZWG517m changed hands on CBZ"
     }
   ]
