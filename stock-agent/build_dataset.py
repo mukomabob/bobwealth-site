@@ -253,6 +253,10 @@ def engineer_derived_fields(df):
     df["change_pct"] = df["change_pct"].astype(float)
     df["ytd_gain_loss"] = df["ytd_gain_loss"].astype(float)
     df.loc[no_price, ["change_pct", "ytd_gain_loss"]] = float("nan")
+    # The USD column comes through as 0.0 on those rows (Edgars from 29 Sep 2026),
+    # which a query reads as a 100% fall. No close means no price.
+    df["usd_price_ibr"] = pd.to_numeric(df["usd_price_ibr"], errors="coerce")
+    df.loc[no_price | (df["usd_price_ibr"] <= 0), "usd_price_ibr"] = float("nan")
 
     grp = df.groupby("counter")
 

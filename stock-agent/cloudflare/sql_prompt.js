@@ -96,6 +96,20 @@ Rules:
 - When querying the most recent date, also SELECT date (and return_since for usd_return_pct)
   so the answer can say what the figures are as of.
 - "today" / "most recent" means the MAX(date) in the table, not a real-world date.
+- You do not know today's date or year. A month or day named without a year ("September",
+  "on the 15th") means the most recent one in the data: take the year from MAX(date) with
+  strftime('%Y', MAX(date)). Never write a year the user didn't give (the data starts in 2026).
+- "How much has X moved in <month>" / "X's performance in <month>": compare the last price
+  before the month with the last price in it, ignoring days with no price, e.g. Edgars in
+  September:
+    SELECT s.date AS start_date, s.usd_price_ibr AS start_usd, e.date AS end_date,
+           e.usd_price_ibr AS end_usd, ROUND((e.usd_price_ibr / s.usd_price_ibr - 1) * 100, 2) AS pct_change_usd
+    FROM (SELECT date, usd_price_ibr FROM prices WHERE UPPER(counter) LIKE UPPER('%Edgars%')
+            AND usd_price_ibr > 0 AND date < (SELECT strftime('%Y', MAX(date)) || '-09-01' FROM prices)
+            ORDER BY date DESC LIMIT 1) s,
+         (SELECT date, usd_price_ibr FROM prices WHERE UPPER(counter) LIKE UPPER('%Edgars%')
+            AND usd_price_ibr > 0 AND date < (SELECT strftime('%Y', MAX(date)) || '-10-01' FROM prices)
+            ORDER BY date DESC LIMIT 1) e
 - Relative times -- "2 months ago", "last week", "a month back" -- count back from MAX(date),
   and markets are shut some days, so take the last trading date on or before that point,
   e.g. "Pfuma price 2 months ago":
