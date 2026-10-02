@@ -1318,6 +1318,9 @@ function askFilterFromRows(rows) {
     const names = new Set(rows.map(r => norm(r[counterKey])));
     const hits = tracked.filter(r => names.has(norm(r.counter)));
     if (hits.length) return { test: r => names.has(norm(r.counter)), label: hits.length + ' counter' + (hits.length === 1 ? '' : 's') };
+    // The answer is about specific counters that aren't on the chart (e.g. no
+    // price today): leave the chart alone rather than showing their whole sector.
+    return null;
   }
   if (sectorKey) {
     const sectors = new Set(rows.map(r => norm(r[sectorKey])));

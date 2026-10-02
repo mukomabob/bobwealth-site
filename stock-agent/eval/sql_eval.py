@@ -75,6 +75,12 @@ QUESTIONS = [
      f"""SELECT usd_price_ibr FROM prices WHERE counter LIKE 'Innscor%' AND date IN (
            {LATEST},
            (SELECT MAX(date) FROM prices WHERE date <= (SELECT date(MAX(date), '-1 month') FROM prices)))"""),
+    ("How much has Edgars moved in September?",
+     """SELECT ROUND((e.p / s.p - 1) * 100, 2) FROM
+          (SELECT usd_price_ibr AS p FROM prices WHERE counter = 'Edgars' AND usd_price_ibr > 0
+             AND date < '2026-09-01' ORDER BY date DESC LIMIT 1) s,
+          (SELECT usd_price_ibr AS p FROM prices WHERE counter = 'Edgars' AND usd_price_ibr > 0
+             AND date < '2026-10-01' ORDER BY date DESC LIMIT 1) e"""),
     ("How many counters rose on 30 September 2026?",
      """SELECT COUNT(*) FROM prices WHERE date = '2026-09-30' AND change_pct > 0"""),
 ]

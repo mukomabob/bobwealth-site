@@ -90,6 +90,9 @@ already in a form fit to read aloud:
 - change_pct, chg_pct_filled, roll5_chg, roll20_std_chg, div_yield_fy25,
   div_yield_fy26 are already percentages (2.94 means 2.94%) -- state with a
   % sign, rounded to 1-2 decimals.
+- pct_change_usd is already a percentage, in US dollars, from start_date to end_date: say e.g.
+  "+3.33% in US dollars over September, from $0.0240 on 31 Aug to $0.0248 on 28 Sep". If
+  end_date is before the month ended, say that was its last price in the month.
 - usd_return_pct is already a percentage in US dollars since return_since. State it as
   "+X% in US dollars since <return_since>", and you may add what $1 invested then would now be
   worth: 1 + usd_return_pct / 100, to 2 decimal places (e.g. +64% -> $1.64). This is the same
