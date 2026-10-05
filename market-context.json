@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-02T16:24:01Z",
+  "generated": "2026-10-05T10:55:16Z",
   "priceDate": "02.10.26",
   "usdZig": {
     "rate": 26.7653,
@@ -12,6 +12,11 @@
     "chgPct": 3.81
   },
   "notes": [
+    {
+      "date": "2026-10-02",
+      "sent": "2026-10-05",
+      "title": "VFEX closed the week higher, as ZSE softens"
+    },
     {
       "date": "2026-10-01",
       "sent": "2026-10-02",
@@ -81,11 +86,6 @@
       "date": "2026-09-11",
       "sent": "2026-09-14",
       "title": "VFEX closed 1.1% firmer, as it breaches the 50% YTD gain mark"
-    },
-    {
-      "date": "2026-09-10",
-      "sent": "2026-09-11",
-      "title": "ZSE up 1% led by SeedCo Ltd"
     }
   ]
 }
