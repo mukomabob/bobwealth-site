@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-06T16:58:41Z",
+  "generated": "2026-10-07T10:38:18Z",
   "priceDate": "06.10.26",
   "usdZig": {
     "rate": 26.7653,
@@ -12,6 +12,11 @@
     "chgPct": 0.0
   },
   "notes": [
+    {
+      "date": "2026-10-06",
+      "sent": "2026-10-07",
+      "title": "ZSE ALSI closed2% lower"
+    },
     {
       "date": "2026-10-05",
       "sent": "2026-10-06",
@@ -81,11 +86,6 @@
       "date": "2026-09-16",
       "sent": "2026-09-17",
       "title": "Innscor floor price now $1.50"
-    },
-    {
-      "date": "2026-09-15",
-      "sent": "2026-09-16",
-      "title": "ZSE up 0.25%"
     }
   ]
 }
