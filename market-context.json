@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-07T17:34:39Z",
+  "generated": "2026-10-08T10:59:16Z",
   "priceDate": "07.10.26",
   "usdZig": {
     "rate": 26.7051,
@@ -12,6 +12,11 @@
     "chgPct": 7.69
   },
   "notes": [
+    {
+      "date": "2026-10-07",
+      "sent": "2026-10-08",
+      "title": "ZSE closed firmer in a near flat session; VFEX\r\n closed in red"
+    },
     {
       "date": "2026-10-06",
       "sent": "2026-10-07",
@@ -81,11 +86,6 @@
       "date": "2026-09-17",
       "sent": "2026-09-18",
       "title": "YTD yield remains above 50% for both ZSE & VFEX"
-    },
-    {
-      "date": "2026-09-16",
-      "sent": "2026-09-17",
-      "title": "Innscor floor price now $1.50"
     }
   ]
 }
