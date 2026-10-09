@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-08T17:42:42Z",
+  "generated": "2026-10-09T10:58:21Z",
   "priceDate": "08.10.26",
   "usdZig": {
     "rate": 26.714,
@@ -12,6 +12,11 @@
     "chgPct": -0.59
   },
   "notes": [
+    {
+      "date": "2026-10-08",
+      "sent": "2026-10-09",
+      "title": "VFEX slips further"
+    },
     {
       "date": "2026-10-07",
       "sent": "2026-10-08",
@@ -81,11 +86,6 @@
       "date": "2026-09-18",
       "sent": "2026-09-21",
       "title": "VFEX up 0.39% as Old Mutual grew by 4.3%"
-    },
-    {
-      "date": "2026-09-17",
-      "sent": "2026-09-18",
-      "title": "YTD yield remains above 50% for both ZSE & VFEX"
     }
   ]
 }
