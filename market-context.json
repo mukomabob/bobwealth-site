@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-09T17:16:45Z",
+  "generated": "2026-10-12T11:23:44Z",
   "priceDate": "09.10.26",
   "usdZig": {
     "rate": 26.6875,
@@ -12,6 +12,11 @@
     "chgPct": -0.85
   },
   "notes": [
+    {
+      "date": "2026-10-09",
+      "sent": "2026-10-12",
+      "title": "Buying Opportunities Created on Innscor, Padenga\r\n & SeedCo Int."
+    },
     {
       "date": "2026-10-08",
       "sent": "2026-10-09",
@@ -81,11 +86,6 @@
       "date": "2026-09-21",
       "sent": "2026-09-22",
       "title": "ZSE closed marginally higher"
-    },
-    {
-      "date": "2026-09-18",
-      "sent": "2026-09-21",
-      "title": "VFEX up 0.39% as Old Mutual grew by 4.3%"
     }
   ]
 }
