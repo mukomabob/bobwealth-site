@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-15T13:45:33Z",
+  "generated": "2026-10-16T08:33:44Z",
   "priceDate": "15.10.26",
   "usdZig": {
     "rate": 26.6094,
@@ -12,6 +12,11 @@
     "chgPct": -6.53
   },
   "notes": [
+    {
+      "date": "2026-10-15",
+      "sent": "2026-10-16",
+      "title": "Padenga maintains >+140% YTD gain as gold prices\r\n outlook remains positive"
+    },
     {
       "date": "2026-10-14",
       "sent": "2026-10-15",
@@ -81,11 +86,6 @@
       "date": "2026-09-28",
       "sent": "2026-09-29",
       "title": "ZSE ALSI closed 2.2% lower"
-    },
-    {
-      "date": "2026-09-24",
-      "sent": "2026-09-25",
-      "title": "VFEX closed 2% firmer; Innscor target price is under review (U/R)"
     }
   ]
 }
