@@ -84,7 +84,7 @@
       <svg class="balloon" viewBox="0 0 26 26" aria-hidden="true"><path d="M3 12L13 3l10 9v11H16v-7h-6v7H3z" fill="var(--accent)"/></svg>
       <h1>Ask the listings</h1>
     </div>
-    <span class="demo">Demo data</span>
+    <span class="demo">Live RE/MAX listings</span>
   </div>
 </header>
 
@@ -102,7 +102,7 @@
 <footer>
   <div class="wrap">
     <form id="ask">
-      <input id="q" placeholder="e.g. 4-bed house in Borrowdale under $600k" autocomplete="off" aria-label="Your question">
+      <input id="q" placeholder="e.g. 4-bed house for sale under $300k" autocomplete="off" aria-label="Your question">
       <button class="send" id="sendBtn" type="submit">Ask</button>
     </form>
   </div>
@@ -112,11 +112,11 @@
 const WORKER_URL = "https://remax-listings.robertzata23.workers.dev"; // ← change after deploying worker.js
 
 const SUGGESTIONS = [
-  "3-bed houses in Borrowdale under $600k",
+  "3-bed homes for sale under $300k",
   "Median house price by suburb",
   "What’s new this week?",
-  "Rentals under $1,000 a month",
-  "Stands in Greendale or Glen Lorne",
+  "Rentals under $2,500 a month",
+  "Houses for sale in Glen Lorne",
   "Houses with a borehole and solar",
 ];
 
