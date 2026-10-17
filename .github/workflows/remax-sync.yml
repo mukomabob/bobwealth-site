@@ -1,0 +1,36 @@
+name: Sync RE/MAX listings
+
+on:
+  schedule:
+    - cron: "17 4 * * *" # daily, 06:17 Harare time
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: remax-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Pull listings from remax.co.za
+        run: node scripts/remax-sync.mjs
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- remaxtest/listings.json; then
+            echo "Listings unchanged."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add remaxtest/listings.json
+          git commit -m "Sync RE/MAX listings ($(date -u +%Y-%m-%d))"
+          git push
