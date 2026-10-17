@@ -59,7 +59,7 @@
   .card{flex:0 0 232px;scroll-snap-align:start;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 14px 12px;display:flex;flex-direction:column;gap:6px}
   .price{font:800 1.35rem/1.1 "Bricolage Grotesque",system-ui,sans-serif;letter-spacing:-.01em}
   .price small{font:500 .78rem "Public Sans",sans-serif;color:var(--muted)}
-  a.card{text-decoration:none;color:inherit;cursor:pointer} a.card:hover{border-color:var(--accent)} .card .t{font-weight:600;font-size:.93rem;line-height:1.3}
+  .card-link{display:flex;flex-direction:column;gap:6px;flex:1;text-decoration:none;color:inherit} .card:hover{border-color:var(--accent)} .hdr-r{display:flex;align-items:center;gap:10px} .wa,.wa-card{display:inline-flex;align-items:center;justify-content:center;background:#25D366;color:#fff;font-weight:600;font-size:.85rem;border-radius:10px;padding:7px 12px;text-decoration:none;white-space:nowrap} .wa-card{margin-top:8px} @media (max-width:480px){.demo{display:none}} .card .t{font-weight:600;font-size:.93rem;line-height:1.3}
   .facts{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.85rem;color:var(--muted)}
   .foot{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:6px;font-size:.78rem;color:var(--muted)}
   .status{background:var(--accent);color:var(--accent-ink);border-radius:6px;padding:1px 7px;font-size:.75rem;font-weight:600;align-self:flex-start}
@@ -84,7 +84,7 @@
       <svg class="balloon" viewBox="0 0 26 26" aria-hidden="true"><path d="M3 12L13 3l10 9v11H16v-7h-6v7H3z" fill="var(--accent)"/></svg>
       <h1>Ask the listings</h1>
     </div>
-    <span class="demo">Live RE/MAX listings</span>
+    <div class="hdr-r"><span class="demo">Live RE/MAX listings</span><a class="wa" href="https://wa.me/263778867538?text=Hi%20Farai%2C%20I%20found%20you%20on%20the%20RE%2FMAX%20listings%20assistant." target="_blank" rel="noopener">WhatsApp Farai</a></div>
   </div>
 </header>
 
@@ -110,7 +110,7 @@
 <script>
 const WORKER_URL = "https://remax-listings.robertzata23.workers.dev"; // ← change after deploying worker.js
 
-const SUGGESTIONS = [
+const WA_NUMBER = "263778867538"; const waLink = (t) => `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(t)}`; const SUGGESTIONS = [
   "3-bed homes for sale under $300k",
   "Median house price by suburb",
   "What’s new this week?",
@@ -163,13 +163,13 @@ function cards(listings) {
     if (l.stand_size_m2) facts.push(`${l.stand_size_m2.toLocaleString("en-US")} m² stand`);
     if (l.title_type) facts.push(l.title_type);
     row.insertAdjacentHTML("beforeend", `
-      <a class="card" href="${esc(l.url || '#')}" target="_blank" rel="noopener" title="View on remax.co.za">
+      <div class="card"><a class="card-link" href="${esc(l.url || '#')}" target="_blank" rel="noopener" title="View on remax.co.za">
         ${l.status && l.status !== "Active" ? `<span class="status">${esc(l.status)}</span>` : ""}
         <div class="price">${usd(l.price_usd)}${l.price_period ? ` <small>${esc(l.price_period)}</small>` : ""}</div>
         <div class="t">${esc(l.title)}</div>
         <div class="facts">${facts.map((f) => `<span>${esc(f)}</span>`).join("")}</div>
         <div class="foot"><span>${esc(l.agent?.name || "")}</span><span>${esc(l.listing_ref)}</span></div>
-      </a>`);
+      </a><a class="wa-card" href="${esc(waLink(`Hi Farai, I'm interested in ${l.title} (${l.listing_ref}): ${l.url || ''}`))}" target="_blank" rel="noopener">WhatsApp Farai about this</a></div>`);
   }
   thread.appendChild(row); main.scrollTop = main.scrollHeight;
 }
