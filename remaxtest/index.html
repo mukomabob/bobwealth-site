@@ -59,7 +59,7 @@
   .card{flex:0 0 232px;scroll-snap-align:start;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 14px 12px;display:flex;flex-direction:column;gap:6px}
   .price{font:800 1.35rem/1.1 "Bricolage Grotesque",system-ui,sans-serif;letter-spacing:-.01em}
   .price small{font:500 .78rem "Public Sans",sans-serif;color:var(--muted)}
-  .card-link{display:flex;flex-direction:column;gap:6px;flex:1;text-decoration:none;color:inherit} .card:hover{border-color:var(--accent)} .hdr-r{display:flex;align-items:center;gap:10px} .wa,.wa-card{display:inline-flex;align-items:center;justify-content:center;background:#25D366;color:#fff;font-weight:600;font-size:.85rem;border-radius:10px;padding:7px 12px;text-decoration:none;white-space:nowrap} .wa-card{margin-top:8px} @media (max-width:480px){.demo{display:none}} .card .t{font-weight:600;font-size:.93rem;line-height:1.3}
+  .card-link{display:flex;flex-direction:column;gap:6px;flex:1;text-decoration:none;color:inherit} .card:hover{border-color:var(--accent)} .hdr-r{display:flex;align-items:center;gap:10px} .wa,.wa-card{display:inline-flex;align-items:center;justify-content:center;background:#25D366;color:#fff;font-weight:600;font-size:.85rem;border-radius:10px;padding:7px 12px;text-decoration:none;white-space:nowrap} .wa-card{margin-top:8px} .wa,.wa-card{border:0;cursor:pointer;font-family:inherit} .enquiry{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;margin:8px 0 28px;scroll-margin-top:12px} .eq-head{display:flex;justify-content:space-between;align-items:center} .enquiry h3{font:800 1.3rem/1.1 "Bricolage Grotesque",system-ui,sans-serif;margin:0} .eq-x{background:none;border:0;color:var(--muted);font-size:1.6rem;line-height:1;cursor:pointer;padding:0 4px} .eq-sub{color:var(--muted);font-size:.9rem;margin:6px 0 14px} .eq-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px} .eq-grid label{display:flex;flex-direction:column;gap:5px;font-size:.85rem;font-weight:600;color:var(--muted)} .eq-grid .full{grid-column:1/-1} .eq-grid input,.eq-grid select,.eq-grid textarea{flex:none;font:inherit;font-weight:400;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%} .eq-grid textarea{resize:vertical} .eq-err{color:var(--accent);font-size:.9rem;margin:10px 0 0} .eq-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px} .eq-actions .wa{padding:11px 16px;font-size:.95rem} .eq-mail{font:600 .95rem "Public Sans",sans-serif;background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:11px 16px;cursor:pointer} @media (max-width:560px){.eq-grid{grid-template-columns:1fr}} @media (max-width:480px){.demo{display:none}} .card .t{font-weight:600;font-size:.93rem;line-height:1.3}
   .facts{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.85rem;color:var(--muted)}
   .foot{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:6px;font-size:.78rem;color:var(--muted)}
   .status{background:var(--accent);color:var(--accent-ink);border-radius:6px;padding:1px 7px;font-size:.75rem;font-weight:600;align-self:flex-start}
@@ -84,7 +84,7 @@
       <svg class="balloon" viewBox="0 0 26 26" aria-hidden="true"><path d="M3 12L13 3l10 9v11H16v-7h-6v7H3z" fill="var(--accent)"/></svg>
       <h1>Ask the listings</h1>
     </div>
-    <div class="hdr-r"><span class="demo">Live RE/MAX listings</span><a class="wa" href="https://wa.me/263778867538?text=Hi%20Farai%2C%20I%20found%20you%20on%20the%20RE%2FMAX%20listings%20assistant." target="_blank" rel="noopener">WhatsApp Farai</a></div>
+    <div class="hdr-r"><span class="demo">Live RE/MAX listings</span><a class="wa" href="#enquiry" id="contactBtn">Contact Farai</a></div>
   </div>
 </header>
 
@@ -94,7 +94,7 @@
       <h2>What are you looking for in Harare?</h2>
       <div class="chips" id="chips"></div>
     </section>
-    <div id="thread" aria-live="polite"></div>
+    <div id="thread" aria-live="polite"></div><section class="enquiry" id="enquiry" hidden><div class="eq-head"><h3>Contact Farai</h3><button type="button" class="eq-x" id="eqClose" aria-label="Close">&times;</button></div><p class="eq-sub">Farai Madondo, RE/MAX Advisory (Zimbabwe). Your details go straight to Farai on WhatsApp or email.</p><div class="eq-grid"><label>Name &amp; surname<input id="eqName" autocomplete="name"></label><label>Mobile number<input id="eqPhone" type="tel" autocomplete="tel" placeholder="+263 7..."></label><label>Email<input id="eqEmail" type="email" autocomplete="email"></label><label>Subject<select id="eqSubject"><option>General enquiry</option><option>Buying</option><option>Renting</option><option>Selling my property</option><option>Property valuation</option></select></label><label>Budget (USD)<input id="eqBudget" placeholder="e.g. $300k or $2,000/month"></label><label>Preferred area<input id="eqArea" placeholder="e.g. Borrowdale, Avenues"></label><label class="full">Message<textarea id="eqMsg" rows="4"></textarea></label></div><p class="eq-err" id="eqErr" hidden></p><div class="eq-actions"><button type="button" class="wa" id="eqWa">Send on WhatsApp</button><button type="button" class="eq-mail" id="eqMail">Send Email</button></div></section>
   </div>
 </main>
 
@@ -169,7 +169,7 @@ function cards(listings) {
         <div class="t">${esc(l.title)}</div>
         <div class="facts">${facts.map((f) => `<span>${esc(f)}</span>`).join("")}</div>
         <div class="foot"><span>${esc(l.agent?.name || "")}</span><span>${esc(l.listing_ref)}</span></div>
-      </a><a class="wa-card" href="${esc(waLink(`Hi Farai, I'm interested in ${l.title} (${l.listing_ref}): ${l.url || ''}`))}" target="_blank" rel="noopener">WhatsApp Farai about this</a></div>`);
+      </a><button class="wa-card" type="button" data-ref="${esc(l.listing_ref)}">Enquire about this</button></div>`);
   }
   thread.appendChild(row); main.scrollTop = main.scrollHeight;
 }
@@ -204,6 +204,62 @@ async function ask(text) {
     $("sendBtn").disabled = false; $("q").focus();
   }
 }
+
+// ---------- enquiry form: sends to Farai via WhatsApp or email ----------
+const FARAI_EMAIL = "faraim@remaxzim.co.zw";
+const enq = $("enquiry");
+function openEnquiry(prefill = {}) {
+  enq.hidden = false;
+  if (prefill.subject) $("eqSubject").value = prefill.subject;
+  if (prefill.area && !$("eqArea").value) $("eqArea").value = prefill.area;
+  const asked = chatLog.filter((m) => m.role === "user").map((m) => m.content);
+  if (!$("eqBudget").value) {
+    const m = asked.join(" ").match(/\$\s?[\d,.]+\s?(k|m)?(\s?(a|per) month)?/i);
+    if (m) $("eqBudget").value = m[0];
+  }
+  if (prefill.listing) $("eqMsg").value = `I'm interested in ${prefill.listing}.` + ($("eqMsg").value ? "\n" + $("eqMsg").value : "");
+  else if (!$("eqMsg").value && asked.length) $("eqMsg").value = "I was looking for: " + asked.slice(-3).join("; ");
+  enq.scrollIntoView({ behavior: "smooth", block: "start" });
+  setTimeout(() => $("eqName").focus({ preventScroll: true }), 400);
+}
+function enquiryText() {
+  const v = (id) => $(id).value.trim();
+  return [
+    "Hi Farai, I found you on the RE/MAX listings assistant.",
+    `Name: ${v("eqName")}`,
+    v("eqPhone") && `Mobile: ${v("eqPhone")}`,
+    v("eqEmail") && `Email: ${v("eqEmail")}`,
+    `Enquiry: ${v("eqSubject")}`,
+    v("eqBudget") && `Budget: ${v("eqBudget")}`,
+    v("eqArea") && `Preferred area: ${v("eqArea")}`,
+    v("eqMsg") && `\n${v("eqMsg")}`,
+  ].filter(Boolean).join("\n");
+}
+function checkEnquiry() {
+  const name = $("eqName").value.trim(), phone = $("eqPhone").value.trim(), email = $("eqEmail").value.trim();
+  const err = !name ? "Please add your name and surname."
+    : !phone && !email ? "Please add a mobile number or email so Farai can reply." : "";
+  $("eqErr").textContent = err; $("eqErr").hidden = !err;
+  return !err;
+}
+$("contactBtn").addEventListener("click", (e) => { e.preventDefault(); openEnquiry(); });
+$("eqClose").addEventListener("click", () => { enq.hidden = true; });
+$("eqWa").addEventListener("click", () => {
+  if (checkEnquiry()) window.open(waLink(enquiryText()), "_blank", "noopener");
+});
+$("eqMail").addEventListener("click", () => {
+  if (!checkEnquiry()) return;
+  const subj = `RE/MAX enquiry: ${$("eqSubject").value} - ${$("eqName").value.trim()}`;
+  location.href = `mailto:${FARAI_EMAIL}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(enquiryText())}`;
+});
+thread.addEventListener("click", (e) => {
+  const b = e.target.closest(".wa-card"); if (!b) return;
+  const card = b.closest(".card"), link = card.querySelector(".card-link");
+  const title = card.querySelector(".t")?.textContent.trim() || "this property";
+  const area = (title.match(/ in (.+)$/i) || [])[1];
+  openEnquiry({ listing: `${title} (${b.dataset.ref}) ${link ? link.href : ""}`.trim(), area, subject: /rent/i.test(title) ? "Renting" : "Buying" });
+});
 </script>
+
 </body>
 </html>
