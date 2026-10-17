@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Ask the listings · RE/MAX demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F3F5F8; --surface:#FFFFFF; --ink:#0E2747; --muted:#5B6B7F; --line:#DCE2EA;
+    --accent:#C8102E; --accent-ink:#FFFFFF; --you:#0E2747; --you-ink:#FFFFFF; --chip:#E7ECF3;
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0D1520; --surface:#16212F; --ink:#E8EEF6; --muted:#93A3B8; --line:#26354A;
+      --accent:#E8384F; --accent-ink:#FFFFFF; --you:#2B4B78; --you-ink:#FFFFFF; --chip:#1E2C3E;
+      color-scheme:dark;
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font:16px/1.5 "Public Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    display:flex; flex-direction:column;
+    padding-top:env(safe-area-inset-top,0px);
+  }
+  .wrap{width:100%;max-width:760px;margin:0 auto;padding:0 18px}
+  header{border-bottom:1px solid var(--line);background:var(--surface)}
+  header .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px}
+  .brand{display:flex;align-items:center;gap:10px}
+  .balloon{width:24px;height:24px;flex:none}
+  h1{font:800 1.25rem/1.1 "Bricolage Grotesque",system-ui,sans-serif;margin:0;letter-spacing:-.01em}
+  .demo{font-size:.78rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+
+  main{flex:1;overflow-y:auto}
+  .intro{padding:44px 0 18px}
+  .intro h2{font:800 clamp(2rem,7vw,3.1rem)/1.02 "Bricolage Grotesque",system-ui,sans-serif;letter-spacing:-.02em;margin:0 0 12px;max-width:14ch}
+  .intro p{color:var(--muted);margin:0 0 22px;max-width:52ch}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{font:inherit;font-size:.92rem;background:var(--chip);color:var(--ink);border:0;border-radius:10px;padding:9px 13px;cursor:pointer;text-align:left}
+  .chip:hover{outline:1px solid var(--line)}
+
+  #thread{display:flex;flex-direction:column;gap:14px;padding:18px 0 24px}
+  .msg{max-width:88%;padding:11px 15px;border-radius:16px;white-space:normal;overflow-wrap:anywhere}
+  .msg.you{align-self:flex-end;background:var(--you);color:var(--you-ink);border-bottom-right-radius:4px}
+  .msg.bot{align-self:flex-start;background:var(--surface);border:1px solid var(--line);border-bottom-left-radius:4px}
+  .msg.bot p{margin:0 0 8px}.msg.bot p:last-child{margin:0}
+  .msg.bot ul{margin:4px 0 8px;padding-left:20px}
+  .ref{font-size:.8em;color:var(--muted);white-space:nowrap}
+  .msg.err{border-color:var(--accent);color:var(--accent)}
+  .thinking{color:var(--muted);font-size:.92rem}
+
+  .cards{display:flex;gap:12px;overflow-x:auto;padding:2px 2px 8px;scroll-snap-type:x mandatory;margin-top:-4px}
+  .card{flex:0 0 232px;scroll-snap-align:start;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 14px 12px;display:flex;flex-direction:column;gap:6px}
+  .price{font:800 1.35rem/1.1 "Bricolage Grotesque",system-ui,sans-serif;letter-spacing:-.01em}
+  .price small{font:500 .78rem "Public Sans",sans-serif;color:var(--muted)}
+  .card .t{font-weight:600;font-size:.93rem;line-height:1.3}
+  .facts{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.85rem;color:var(--muted)}
+  .foot{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:6px;font-size:.78rem;color:var(--muted)}
+  .status{background:var(--accent);color:var(--accent-ink);border-radius:6px;padding:1px 7px;font-size:.75rem;font-weight:600;align-self:flex-start}
+
+  footer{border-top:1px solid var(--line);background:var(--surface);padding-bottom:env(safe-area-inset-bottom,0px)}
+  form{display:flex;gap:10px;padding-block:12px}
+  input{flex:1;min-width:0;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  input:focus-visible,.chip:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  button.send{font:600 .95rem "Public Sans",sans-serif;background:var(--accent);color:var(--accent-ink);border:0;border-radius:12px;padding:0 18px;cursor:pointer}
+  button.send:disabled{opacity:.5;cursor:default}
+
+  #gate{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px;z-index:10}
+  #gate .box{width:100%;max-width:360px}
+  #gate h2{font:800 1.8rem/1.1 "Bricolage Grotesque",system-ui,sans-serif;margin:0 0 8px}
+  #gate p{color:var(--muted);margin:0 0 18px}
+  #gate form{padding:0}
+  [hidden]{display:none!important}
+  @media (prefers-reduced-motion:no-preference){ .card{animation:rise .25s ease-out both} @keyframes rise{from{opacity:0;transform:translateY(6px)}} }
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="box">
+    <h2>Ask the listings</h2>
+    <p>This is a private test. Enter the access code to continue.</p>
+    <form id="gateForm">
+      <input id="code" type="password" placeholder="Access code" autocomplete="off" aria-label="Access code" required>
+      <button class="send" type="submit">Enter</button>
+    </form>
+  </div>
+</div>
+
+<header>
+  <div class="wrap">
+    <div class="brand">
+      <svg class="balloon" viewBox="0 0 26 26" aria-hidden="true"><path d="M3 12L13 3l10 9v11H16v-7h-6v7H3z" fill="var(--accent)"/></svg>
+      <h1>Ask the listings</h1>
+    </div>
+    <span class="demo">Demo data</span>
+  </div>
+</header>
+
+<main id="main">
+  <div class="wrap">
+    <section class="intro" id="intro">
+      <h2>What are you looking for in Harare?</h2>
+      <p>Ask in plain English or Shona. Answers come only from the office’s current listings.</p>
+      <div class="chips" id="chips"></div>
+    </section>
+    <div id="thread" aria-live="polite"></div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <form id="ask">
+      <input id="q" placeholder="e.g. 4-bed house in Borrowdale under $600k" autocomplete="off" aria-label="Your question">
+      <button class="send" id="sendBtn" type="submit">Ask</button>
+    </form>
+  </div>
+</footer>
+
+<script>
+const WORKER_URL = "https://remax-listings.YOUR-SUBDOMAIN.workers.dev"; // ← change after deploying worker.js
+
+const SUGGESTIONS = [
+  "3-bed houses in Borrowdale under $600k",
+  "Median house price by suburb",
+  "What’s new this week?",
+  "Rentals under $1,000 a month",
+  "Stands in Greendale or Glen Lorne",
+  "Houses with a borehole and solar",
+];
+
+const $ = (id) => document.getElementById(id);
+const thread = $("thread"), main = $("main");
+const chatLog = [];
+let code = null;
+try { code = sessionStorage.getItem("rmx_code"); } catch {}
+if (code) $("gate").hidden = true;
+
+$("gateForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  code = $("code").value.trim();
+  try { sessionStorage.setItem("rmx_code", code); } catch {}
+  $("gate").hidden = true; $("q").focus();
+});
+
+SUGGESTIONS.forEach((s) => {
+  const b = document.createElement("button");
+  b.className = "chip"; b.type = "button"; b.textContent = s;
+  b.onclick = () => ask(s);
+  $("chips").appendChild(b);
+});
+
+$("ask").addEventListener("submit", (e) => { e.preventDefault(); const v = $("q").value.trim(); if (v) ask(v); });
+
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+function md(text) {
+  const lines = esc(text).split(/\n/);
+  let html = "", list = false;
+  for (let line of lines) {
+    line = line.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/\[(RMX-[A-Z]\d+)\]/g, '<span class="ref">$1</span>');
+    if (/^\s*[-*•]\s+/.test(line)) { if (!list) { html += "<ul>"; list = true; } html += "<li>" + line.replace(/^\s*[-*•]\s+/, "") + "</li>"; continue; }
+    if (list) { html += "</ul>"; list = false; }
+    if (line.trim()) html += "<p>" + line + "</p>";
+  }
+  return html + (list ? "</ul>" : "");
+}
+const usd = (n) => "$" + Number(n).toLocaleString("en-US");
+
+function add(cls, html) {
+  const d = document.createElement("div");
+  d.className = "msg " + cls; d.innerHTML = html;
+  thread.appendChild(d); main.scrollTop = main.scrollHeight;
+  return d;
+}
+
+function cards(listings) {
+  if (!listings?.length) return;
+  const row = document.createElement("div"); row.className = "cards";
+  for (const l of listings) {
+    const facts = [];
+    if (l.bedrooms) facts.push(`${l.bedrooms} bed`);
+    if (l.bathrooms) facts.push(`${l.bathrooms} bath`);
+    if (l.stand_size_m2) facts.push(`${l.stand_size_m2.toLocaleString("en-US")} m² stand`);
+    if (l.title_type) facts.push(l.title_type);
+    row.insertAdjacentHTML("beforeend", `
+      <article class="card">
+        ${l.status && l.status !== "Active" ? `<span class="status">${esc(l.status)}</span>` : ""}
+        <div class="price">${usd(l.price_usd)}${l.price_period ? ` <small>${esc(l.price_period)}</small>` : ""}</div>
+        <div class="t">${esc(l.title)}</div>
+        <div class="facts">${facts.map((f) => `<span>${esc(f)}</span>`).join("")}</div>
+        <div class="foot"><span>${esc(l.agent?.name || "")}</span><span>${esc(l.listing_ref)}</span></div>
+      </article>`);
+  }
+  thread.appendChild(row); main.scrollTop = main.scrollHeight;
+}
+
+async function ask(text) {
+  $("intro").hidden = true;
+  $("q").value = ""; $("sendBtn").disabled = true;
+  add("you", esc(text));
+  chatLog.push({ role: "user", content: text });
+  const wait = add("bot thinking", "Checking the listings…");
+
+  if (WORKER_URL.includes("YOUR-SUBDOMAIN")) {
+    wait.remove(); add("bot err", "The assistant isn’t connected yet. Set WORKER_URL in the script at the bottom of index.html to your Worker’s address.");
+    chatLog.pop(); $("sendBtn").disabled = false; return;
+  }
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-access-code": code || "" },
+      body: JSON.stringify({ messages: chatLog }),
+    });
+    const data = await res.json().catch(() => ({}));
+    wait.remove();
+    if (res.status === 401) {
+      try { sessionStorage.removeItem("rmx_code"); } catch {}
+      chatLog.pop(); add("bot err", "That access code didn’t work. Reload the page and enter it again."); return;
+    }
+    if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
+    chatLog.push({ role: "assistant", content: data.reply });
+    add("bot", md(data.reply));
+    cards(data.listings);
+  } catch (e) {
+    wait.remove(); chatLog.pop();
+    add("bot err", "Couldn’t get an answer: " + esc(e.message) + ". Try again in a moment.");
+  } finally {
+    $("sendBtn").disabled = false; $("q").focus();
+  }
+}
+</script>
+</body>
+</html>
