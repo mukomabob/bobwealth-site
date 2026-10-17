@@ -71,27 +71,12 @@
   button.send{font:600 .95rem "Public Sans",sans-serif;background:var(--accent);color:var(--accent-ink);border:0;border-radius:12px;padding:0 18px;cursor:pointer}
   button.send:disabled{opacity:.5;cursor:default}
 
-  #gate{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px;z-index:10}
-  #gate .box{width:100%;max-width:360px}
-  #gate h2{font:800 1.8rem/1.1 "Bricolage Grotesque",system-ui,sans-serif;margin:0 0 8px}
-  #gate p{color:var(--muted);margin:0 0 18px}
-  #gate form{padding:0}
   [hidden]{display:none!important}
   @media (prefers-reduced-motion:no-preference){ .card{animation:rise .25s ease-out both} @keyframes rise{from{opacity:0;transform:translateY(6px)}} }
 </style>
 </head>
 <body>
 
-<div id="gate">
-  <div class="box">
-    <h2>Ask the listings</h2>
-    <p>This is a private test. Enter the access code to continue.</p>
-    <form id="gateForm">
-      <input id="code" type="password" placeholder="Access code" autocomplete="off" aria-label="Access code" required>
-      <button class="send" type="submit">Enter</button>
-    </form>
-  </div>
-</div>
 
 <header>
   <div class="wrap">
@@ -138,16 +123,6 @@ const SUGGESTIONS = [
 const $ = (id) => document.getElementById(id);
 const thread = $("thread"), main = $("main");
 const chatLog = [];
-let code = null;
-try { code = sessionStorage.getItem("rmx_code"); } catch {}
-if (code) $("gate").hidden = true;
-
-$("gateForm").addEventListener("submit", (e) => {
-  e.preventDefault();
-  code = $("code").value.trim();
-  try { sessionStorage.setItem("rmx_code", code); } catch {}
-  $("gate").hidden = true; $("q").focus();
-});
 
 SUGGESTIONS.forEach((s) => {
   const b = document.createElement("button");
@@ -214,15 +189,11 @@ async function ask(text) {
   try {
     const res = await fetch(WORKER_URL, {
       method: "POST",
-      headers: { "content-type": "application/json", "x-access-code": code || "" },
+      headers: { "content-type": "application/json" },
       body: JSON.stringify({ messages: chatLog }),
     });
     const data = await res.json().catch(() => ({}));
     wait.remove();
-    if (res.status === 401) {
-      try { sessionStorage.removeItem("rmx_code"); } catch {}
-      chatLog.pop(); add("bot err", "That access code didn’t work. Reload the page and enter it again."); return;
-    }
     if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
     chatLog.push({ role: "assistant", content: data.reply });
     add("bot", md(data.reply));
