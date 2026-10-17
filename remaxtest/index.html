@@ -94,7 +94,7 @@
       <h2>What are you looking for in Harare?</h2>
       <div class="chips" id="chips"></div>
     </section>
-    <div id="thread" aria-live="polite"></div><section class="enquiry" id="enquiry" hidden><div class="eq-head"><h3>Next steps</h3><button type="button" class="eq-x" id="eqClose" aria-label="Close">&times;</button></div><p class="eq-sub">Leave your name and number and Farai Madondo at RE/MAX will get back to you about viewings.</p><div class="eq-grid"><label>Name &amp; surname<input id="eqName" autocomplete="name"></label><label>Mobile number<input id="eqPhone" type="tel" autocomplete="tel" placeholder="+263 7..."></label></div><p class="eq-summary" id="eqSummary" hidden></p><details class="eq-more"><summary>Add email, budget or a message (optional)</summary><div class="eq-grid"><label>Email<input id="eqEmail" type="email" autocomplete="email"></label><label>Subject<select id="eqSubject"><option>General enquiry</option><option>Buying</option><option>Renting</option><option>Selling my property</option><option>Property valuation</option></select></label><label>Budget (USD)<input id="eqBudget" placeholder="e.g. $300k or $2,000/month"></label><label>Preferred area<input id="eqArea" placeholder="e.g. Borrowdale, Avenues"></label><label class="full">Message<textarea id="eqMsg" rows="3"></textarea></label></div></details><p class="eq-err" id="eqErr" hidden></p><div class="eq-actions"><button type="button" class="wa" id="eqWa">Send to Farai on WhatsApp</button><button type="button" class="eq-mail" id="eqMail">Email instead</button></div></section>
+    <div id="thread" aria-live="polite"></div><section class="enquiry" id="enquiry" hidden><div class="eq-head"><h3>Next steps</h3><button type="button" class="eq-x" id="eqClose" aria-label="Close">&times;</button></div><p class="eq-sub">Leave your name and number and Farai Madondo at RE/MAX will get back to you about viewings. Your details are saved so RE/MAX can follow up.</p><div class="eq-grid"><label>Name &amp; surname<input id="eqName" autocomplete="name"></label><label>Mobile number<input id="eqPhone" type="tel" autocomplete="tel" placeholder="+263 7..."></label></div><p class="eq-summary" id="eqSummary" hidden></p><details class="eq-more"><summary>Add email, budget or a message (optional)</summary><div class="eq-grid"><label>Email<input id="eqEmail" type="email" autocomplete="email"></label><label>Subject<select id="eqSubject"><option>General enquiry</option><option>Buying</option><option>Renting</option><option>Selling my property</option><option>Property valuation</option></select></label><label>Budget (USD)<input id="eqBudget" placeholder="e.g. $300k or $2,000/month"></label><label>Preferred area<input id="eqArea" placeholder="e.g. Borrowdale, Avenues"></label><label class="full">Message<textarea id="eqMsg" rows="3"></textarea></label></div></details><p class="eq-err" id="eqErr" hidden></p><div class="eq-actions"><button type="button" class="wa" id="eqWa">Send to Farai on WhatsApp</button><button type="button" class="eq-mail" id="eqMail">Email instead</button></div></section>
   </div>
 </main>
 
@@ -206,7 +206,7 @@ async function ask(text) {
 }
 
 // ---------- enquiry form: sends to Farai via WhatsApp or email ----------
-const FARAI_EMAIL = "faraim@remaxzim.co.zw";
+const FARAI_EMAIL = "faraim@remaxzim.co.zw"; function saveLead(channel) { const v = (id) => $(id).value.trim(); const lead = { name: v("eqName"), phone: v("eqPhone"), email: v("eqEmail"), subject: v("eqSubject"), budget: v("eqBudget"), area: v("eqArea"), message: v("eqMsg"), listings: [...new Set(v("eqMsg").match(/RMX-[A-Z]\d+/g) || [])].join(", "), questions: chatLog.filter((m) => m.role === "user").map((m) => m.content).join(" | "), channel }; try { fetch(WORKER_URL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ lead }), keepalive: true }).catch(() => {}); } catch (e) {} }
 const enq = $("enquiry"); function renderSummary() { const parts = []; const s = $("eqSubject").value; if (s !== "General enquiry") parts.push(s); if ($("eqBudget").value.trim()) parts.push("Budget " + $("eqBudget").value.trim()); if ($("eqArea").value.trim()) parts.push($("eqArea").value.trim()); [...new Set($("eqMsg").value.match(/RMX-[A-Z]\d+/g) || [])].forEach((r) => parts.push(r)); $("eqSummary").innerHTML = parts.length ? "Farai will also see: " + parts.map((p) => `<span class="eq-chip">${esc(p)}</span>`).join("") : ""; $("eqSummary").hidden = !parts.length; } enq.addEventListener("input", renderSummary); enq.addEventListener("change", renderSummary);
 function openEnquiry(prefill = {}) {
   enq.hidden = false;
@@ -245,10 +245,10 @@ function checkEnquiry() {
 $("contactBtn").addEventListener("click", (e) => { e.preventDefault(); openEnquiry(); });
 $("eqClose").addEventListener("click", () => { enq.hidden = true; });
 $("eqWa").addEventListener("click", () => {
-  if (checkEnquiry()) window.open(waLink(enquiryText()), "_blank", "noopener");
+  if (checkEnquiry()) { saveLead("WhatsApp"); window.open(waLink(enquiryText()), "_blank", "noopener"); }
 });
 $("eqMail").addEventListener("click", () => {
-  if (!checkEnquiry()) return;
+  if (!checkEnquiry()) return; saveLead("Email");
   const subj = `RE/MAX enquiry: ${$("eqSubject").value} - ${$("eqName").value.trim()}`;
   location.href = `mailto:${FARAI_EMAIL}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(enquiryText())}`;
 });
