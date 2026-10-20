@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-19T16:40:27Z",
+  "generated": "2026-10-20T08:56:42Z",
   "priceDate": "19.10.26",
   "usdZig": {
     "rate": 26.6259,
@@ -12,6 +12,11 @@
     "chgPct": 5.22
   },
   "notes": [
+    {
+      "date": "2026-10-19",
+      "sent": "2026-10-20",
+      "title": "VFEX up 0.5% in a near flat session"
+    },
     {
       "date": "2026-10-15",
       "sent": "2026-10-16",
@@ -81,11 +86,6 @@
       "date": "2026-09-29",
       "sent": "2026-09-30",
       "title": "CAFCA (+8%) & Delta (+7%) supported the ZSE ALSI\r\n to close 2% firmer"
-    },
-    {
-      "date": "2026-09-28",
-      "sent": "2026-09-29",
-      "title": "ZSE ALSI closed 2.2% lower"
     }
   ]
 }
