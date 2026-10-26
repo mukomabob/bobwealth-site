@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-23T13:53:02Z",
+  "generated": "2026-10-26T09:26:18Z",
   "priceDate": "23.10.26",
   "usdZig": {
     "rate": 26.5775,
@@ -12,6 +12,11 @@
     "chgPct": -3.7
   },
   "notes": [
+    {
+      "date": "2026-10-23",
+      "sent": "2026-10-26",
+      "title": "Stocks closed the week in green"
+    },
     {
       "date": "2026-10-21",
       "sent": "2026-10-22",
@@ -81,11 +86,6 @@
       "date": "2026-10-01",
       "sent": "2026-10-02",
       "title": "ZSE closed 4.5% higher"
-    },
-    {
-      "date": "2026-09-30",
-      "sent": "2026-10-01",
-      "title": "VFEX falters in midweek trades"
     }
   ]
 }
