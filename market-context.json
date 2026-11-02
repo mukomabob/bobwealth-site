@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-30T16:50:51Z",
+  "generated": "2026-11-02T11:44:48Z",
   "priceDate": "30.10.26",
   "usdZig": {
     "rate": 26.5714,
@@ -12,6 +12,11 @@
     "chgPct": -4.14
   },
   "notes": [
+    {
+      "date": "2026-10-30",
+      "sent": "2026-11-02",
+      "title": "Stocks closed the week firmer"
+    },
     {
       "date": "2026-10-29",
       "sent": "2026-10-30",
@@ -81,11 +86,6 @@
       "date": "2026-10-08",
       "sent": "2026-10-09",
       "title": "VFEX slips further"
-    },
-    {
-      "date": "2026-10-07",
-      "sent": "2026-10-08",
-      "title": "ZSE closed firmer in a near flat session; VFEX\r\n closed in red"
     }
   ]
 }
