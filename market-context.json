@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-03T18:43:42Z",
+  "generated": "2026-11-04T11:40:42Z",
   "priceDate": "03.11.26",
   "usdZig": {
     "rate": 26.5638,
@@ -12,6 +12,11 @@
     "chgPct": 1.16
   },
   "notes": [
+    {
+      "date": "2026-11-03",
+      "sent": "2026-11-04",
+      "title": "Tigere REIT closed 4% higher"
+    },
     {
       "date": "2026-11-02",
       "sent": "2026-11-03",
@@ -81,11 +86,6 @@
       "date": "2026-10-12",
       "sent": "2026-10-13",
       "title": "VFEX slips; ZSE marginally gains"
-    },
-    {
-      "date": "2026-10-09",
-      "sent": "2026-10-12",
-      "title": "Buying Opportunities Created on Innscor, Padenga\r\n & SeedCo Int."
     }
   ]
 }
