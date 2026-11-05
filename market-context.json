@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-04T18:56:43Z",
+  "generated": "2026-11-05T11:41:09Z",
   "priceDate": "04.11.26",
   "usdZig": {
     "rate": 26.5412,
@@ -12,6 +12,11 @@
     "chgPct": -9.88
   },
   "notes": [
+    {
+      "date": "2026-11-04",
+      "sent": "2026-11-05",
+      "title": "ZSE falters as only ZWG390K worth of shares were\r\n traded"
+    },
     {
       "date": "2026-11-03",
       "sent": "2026-11-04",
@@ -81,11 +86,6 @@
       "date": "2026-10-13",
       "sent": "2026-10-14",
       "title": "ZSE falters; VFEX closed in green"
-    },
-    {
-      "date": "2026-10-12",
-      "sent": "2026-10-13",
-      "title": "VFEX slips; ZSE marginally gains"
     }
   ]
 }
