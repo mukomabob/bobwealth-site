@@ -1,15 +1,15 @@
 {
-  "generated": "2026-11-09T12:15:21Z",
-  "priceDate": "06.11.26",
+  "generated": "2026-11-09T22:46:09Z",
+  "priceDate": "09.11.26",
   "usdZig": {
-    "rate": 26.5466,
-    "prevRate": 26.5365,
-    "chgPct": 0.04
+    "rate": 26.5247,
+    "prevRate": 26.5466,
+    "chgPct": -0.08
   },
   "gold": {
     "name": "FMW Gold ETF",
-    "price": 0.1118,
-    "chgPct": 6.17
+    "price": 0.1099,
+    "chgPct": -1.7
   },
   "notes": [
     {
