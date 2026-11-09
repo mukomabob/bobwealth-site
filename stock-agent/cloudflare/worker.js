@@ -17,6 +17,9 @@
  * The client may send the last few turns as `history` so follow-ups like
  * "and Delta?" can be resolved; they are context only, never trusted as SQL.
  *
+ * Every question is also written to the ask_log table (see logAsk) for the
+ * daily monitor in stock-agent/monitor/.
+ *
  * Bindings expected (see wrangler.toml):
  *   env.DB  - D1 database bound as "DB", containing the `prices`,
  *             `predictions` and `model_track_record` tables (schema.sql /
@@ -365,7 +368,40 @@ async function searchNews(env, counters, rows, actions) {
   }
 }
 
-async function handleAsk(request, env, origin) {
+// ---------- question log (anonymous, 30 days) ----------
+// One row per question in D1. No IP address and no user agent are kept: only
+// the country Cloudflare reports and "mobile"/"desktop". The session id is a
+// random value the page makes on load and drops on Clear. This table is not in
+// schema.sql, so the daily data rebuild never deletes it.
+const LOG_RETENTION_DAYS = 30;
+const LOG_DDL = `CREATE TABLE IF NOT EXISTS ask_log (
+  ts TEXT, session TEXT, question TEXT, counters TEXT, outcome TEXT, row_count INTEGER,
+  sql_by TEXT, answer_by TEXT, searched INTEGER, sources INTEGER, said_no_data INTEGER,
+  latency_ms INTEGER, country TEXT, device TEXT)`;
+const NO_DATA_RE = /\b(no data|don't have (?:any )?data|do not have (?:any )?data|not available|outside what I can)\b/i;
+
+async function logAsk(env, m) {
+  if (!env.DB || !m.question) return;
+  const v = (x) => (x === undefined ? null : x);
+  const cutoff = new Date(Date.now() - LOG_RETENTION_DAYS * 86400000).toISOString();
+  try {
+    await env.DB.batch([
+      env.DB.prepare(LOG_DDL),
+      env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_ask_log_ts ON ask_log(ts)"),
+      env.DB.prepare("INSERT INTO ask_log VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)").bind(
+        new Date(m.t0).toISOString(), v(m.session), m.question.slice(0, MAX_QUESTION_CHARS),
+        JSON.stringify(m.counters || []), v(m.outcome), v(m.rowCount), v(m.sqlBy), v(m.answerBy),
+        m.searched ? 1 : 0, v(m.sources), m.saidNoData ? 1 : 0, Date.now() - m.t0,
+        v(m.country), v(m.device)
+      ),
+      env.DB.prepare("DELETE FROM ask_log WHERE ts < ?").bind(cutoff),
+    ]);
+  } catch (e) {
+    console.error("ask_log write failed:", e?.message || e);
+  }
+}
+
+async function handleAsk(request, env, origin, meta = {}) {
   let body;
   try {
     body = await request.json();
@@ -377,12 +413,15 @@ async function handleAsk(request, env, origin) {
   }
 
   const question = String(body.question || "").trim();
+  meta.session = /^[a-z0-9-]{8,40}$/i.test(String(body.session || "")) ? String(body.session) : null;
+  meta.outcome = "bad_request";
   if (!question) {
     return new Response(JSON.stringify({ error: "Missing 'question'." }), {
       status: 400,
       headers: { "Content-Type": "application/json", ...corsHeaders(origin) },
     });
   }
+  meta.question = question;
   if (question.length > MAX_QUESTION_CHARS) {
     return new Response(
       JSON.stringify({ error: `Please keep questions under ${MAX_QUESTION_CHARS} characters.` }),
@@ -400,8 +439,10 @@ async function handleAsk(request, env, origin) {
   ];
   let { sql, by: sqlBy } = await writeSql(env, sqlMessages);
   const check = validateSql(sql);
+  meta.sqlBy = sqlBy;
 
   if (!check.ok) {
+    meta.outcome = check.reason === "not_answerable" ? "not_answerable" : "bad_sql";
     const answer =
       check.reason === "not_answerable"
         ? "I can only answer questions about ZSE/VFEX prices, volumes, sectors and the site's watchlist -- that one's outside what I can query."
@@ -437,7 +478,9 @@ async function handleAsk(request, env, origin) {
       }
     }
   }
+  meta.sqlBy = sqlBy;
   if (!rows) {
+    meta.outcome = "query_failed";
     return new Response(
       JSON.stringify({
         answer: "That query didn't run cleanly against the database -- try asking a simpler or more specific version of the question.",
@@ -474,18 +517,35 @@ async function handleAsk(request, env, origin) {
   }
   if (!answer) answer = aiText(await env.AI.run(MODEL, { messages: answerMessages }));
 
+  Object.assign(meta, {
+    outcome: rows.length ? "ok" : "empty",
+    rowCount: rows.length,
+    counters: [...new Set(rows.map((r) => r.counter).filter((c) => typeof c === "string"))].slice(0, 10),
+    answerBy,
+    searched: !!news,
+    sources: news ? news.sources.length : 0,
+    saidNoData: NO_DATA_RE.test(answer || ""),
+  });
+
   return new Response(
     JSON.stringify({
       answer: (answer || "").trim(), sql, sqlBy, answerBy, rows: rows.slice(0, 20),
-      actions, sources: news ? news.sources : [],
+      actions, sources: news ? news.sources : [], searched: !!news,
     }),
     { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders(origin) } }
   );
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const origin = request.headers.get("Origin") || "";
+    const meta = {
+      t0: Date.now(),
+      outcome: "error",
+      country: request.cf?.country || null,
+      device: /Mobi|Android|iPhone|iPad/i.test(request.headers.get("User-Agent") || "") ? "mobile" : "desktop",
+    };
+    const log = () => ctx?.waitUntil?.(logAsk(env, meta));
 
     // Browsers always send Origin on a cross-site POST, so a missing or
     // unknown one is either another website or a script -- refuse both.
@@ -508,6 +568,9 @@ export default {
       const ip = request.headers.get("CF-Connecting-IP") || "unknown";
       const { success } = await env.RATE_LIMITER.limit({ key: ip });
       if (!success) {
+        meta.outcome = "rate_limited";
+        meta.question = "(rate limited)";
+        log();
         return new Response(
           JSON.stringify({ error: "Too many questions in a short time -- please wait a minute and try again." }),
           { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders(origin) } }
@@ -516,9 +579,13 @@ export default {
     }
 
     try {
-      return await handleAsk(request, env, origin);
+      const res = await handleAsk(request, env, origin, meta);
+      log();
+      return res;
     } catch (e) {
       console.error("handleAsk failed:", e);
+      meta.outcome = "error";
+      log();
       return new Response(JSON.stringify({ error: "Something went wrong answering that -- please try again." }), {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders(origin) },

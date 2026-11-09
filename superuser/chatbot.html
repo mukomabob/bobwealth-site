@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Chatbot monitor — Bob Wealth Holdings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F8FAFC;--panel:#FFFFFF;--ink:#172A3D;--text:#1A1A1A;--muted:#5E7389;--faint:#8FA1B3;--line:#D5DEE7;
+  --ok:#1D6B3A;--warn:#B4530A;--bad:#C0392B;--bar:#52708C;--bar-2:#B9C7D4;
+  --font:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,monospace;--display:'IBM Plex Sans Condensed','IBM Plex Sans',sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#0F1720;--panel:#16212D;--ink:#E6EDF4;--text:#DCE4EC;--muted:#93A6B9;--faint:#64788C;--line:#26384A;
+    --ok:#4CB878;--warn:#E8A04A;--bad:#E8665A;--bar:#7E9BB6;--bar-2:#2E4458;color-scheme:dark}
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+.wrap{max-width:1040px;margin:0 auto;padding:28px 20px 60px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;border-bottom:3px solid var(--ink);padding-bottom:14px;margin-bottom:22px}
+h1{font-family:var(--display);font-size:28px;color:var(--ink);letter-spacing:-.01em}
+.sub{font-family:var(--mono);font-size:11px;color:var(--muted)}
+a{color:var(--ink)}
+.status{display:flex;align-items:center;gap:12px;padding:14px 18px;border:1px solid var(--line);background:var(--panel);margin-bottom:22px;border-left:4px solid var(--ok)}
+.status.attention{border-left-color:var(--warn)}
+.status.error{border-left-color:var(--bad)}
+.status b{font-family:var(--display);font-size:18px;color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:22px}
+.kpi{background:var(--panel);border:1px solid var(--line);padding:12px 14px}
+.kpi .l{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.kpi .v{font-family:var(--display);font-size:26px;color:var(--ink);line-height:1.2;margin-top:2px}
+.kpi .s{font-size:11px;color:var(--faint)}
+section{background:var(--panel);border:1px solid var(--line);padding:16px 18px;margin-bottom:14px}
+h2{font-family:var(--display);font-size:16px;color:var(--ink);margin-bottom:10px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.cols section{margin-bottom:0}
+ul.list{list-style:none;display:flex;flex-direction:column;gap:8px}
+ul.list li{padding-left:16px;position:relative}
+ul.list li::before{content:'';position:absolute;left:0;top:.6em;width:7px;height:7px;background:var(--warn)}
+ul.fixes li::before{background:var(--ok)}
+.empty{color:var(--faint);font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{padding:6px 0;border-bottom:1px solid var(--line);text-align:left}
+th{font-family:var(--mono);font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+td.n,th.n{text-align:right;font-family:var(--mono)}
+.bars{display:flex;align-items:flex-end;gap:3px;height:110px;padding-top:6px}
+.bars div{flex:1;background:var(--bar);min-height:1px;position:relative}
+.bars div.zero{background:var(--bar-2)}
+.axis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:4px}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.warn{color:var(--warn)}
+.scroll{overflow-x:auto}
+footer{margin-top:24px;font-size:12px;color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Chatbot monitor</h1>
+      <div class="sub">“Ask the data” on bobwealth.org/markets · daily check at 07:00 Harare time</div>
+    </div>
+    <div class="sub" id="generated">Loading…</div>
+  </header>
+
+  <div class="status" id="status"><b>Loading the report…</b></div>
+
+  <div class="grid" id="kpis"></div>
+
+  <div class="cols">
+    <section><h2>Problems</h2><div id="problems"></div></section>
+    <section><h2>Recommended fixes</h2><div id="fixes"></div></section>
+  </div>
+  <div style="height:14px"></div>
+
+  <section>
+    <h2>Questions per day</h2>
+    <div class="bars" id="daily"></div>
+    <div class="axis" id="dailyAxis"></div>
+  </section>
+
+  <div class="cols">
+    <section><h2>Weak answers by topic (24 h)</h2><div id="topics"></div></section>
+    <section><h2>Most asked counters (7 days)</h2><div id="counters"></div></section>
+  </div>
+  <div style="height:14px"></div>
+  <div class="cols">
+    <section><h2>Models (24 h)</h2><div id="models"></div></section>
+    <section><h2>Questions by hour, Harare time (7 days)</h2><div class="bars" id="hours"></div><div class="axis"><span>00</span><span>06</span><span>12</span><span>18</span><span>23</span></div></section>
+  </div>
+  <div style="height:14px"></div>
+  <div class="cols">
+    <section><h2>Where and how (7 days)</h2><div id="audience"></div></section>
+    <section><h2>Pipelines</h2><div id="pipelines"></div></section>
+  </div>
+
+  <footer id="note"></footer>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmtTime = (iso) => iso ? new Date(iso).toLocaleString('en-GB', { timeZone: 'Africa/Harare', dateStyle: 'medium', timeStyle: 'short' }) : '—';
+const MODEL_NAMES = { caimex: 'Caimex DeepSeek', workers_ai: 'Workers AI (fallback)', claude: 'Claude Haiku', none: 'None' };
+
+function kpi(label, value, sub) {
+  return `<div class="kpi"><div class="l">${esc(label)}</div><div class="v">${esc(value ?? '—')}</div><div class="s">${esc(sub || '')}</div></div>`;
+}
+function list(items, cls) {
+  return items && items.length ? `<ul class="list ${cls || ''}">${items.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : '';
+}
+function table(rows, head) {
+  if (!rows.length) return '<p class="empty">No data yet.</p>';
+  return `<div class="scroll"><table><tr><th>${esc(head[0])}</th><th class="n">${esc(head[1])}</th></tr>` +
+    rows.map((r) => `<tr><td>${esc(r[0])}</td><td class="n">${esc(r[1])}</td></tr>`).join('') + '</table></div>';
+}
+function bars(el, values, titles) {
+  const max = Math.max(1, ...values);
+  el.innerHTML = values.map((v, i) =>
+    `<div class="${v ? '' : 'zero'}" style="height:${Math.max(1, (v / max) * 100)}%" title="${esc(titles[i])}: ${v}"></div>`).join('');
+}
+
+async function load() {
+  let r, history = [];
+  try {
+    r = await fetch('chatbot-report.json', { cache: 'no-store' }).then((x) => { if (!x.ok) throw new Error(x.status); return x.json(); });
+  } catch (e) {
+    $('status').className = 'status error';
+    $('status').innerHTML = '<b>No report yet.</b><span>The monitor writes its first report on its first run.</span>';
+    $('generated').textContent = '';
+    return;
+  }
+  try { history = await fetch('chatbot-history.json', { cache: 'no-store' }).then((x) => x.ok ? x.json() : []); } catch (e) {}
+
+  const d = r.last_24h || {}, w = r.last_7d || {};
+  $('generated').textContent = 'Updated ' + fmtTime(r.generated_at);
+  const attention = r.status !== 'ok';
+  $('status').className = 'status ' + (attention ? 'attention' : '');
+  $('status').innerHTML = attention
+    ? `<b>Needs attention.</b><span>${r.problems.length} problem${r.problems.length === 1 ? '' : 's'} found in the last 24 hours.</span>`
+    : '<b>All checks passed.</b><span>No problems found in the last 24 hours.</span>';
+
+  const caimexShare = d.answered ? Math.round(100 * (d.answer_models.caimex || 0) / d.answered) + '%' : '—';
+  $('kpis').innerHTML = [
+    kpi('Questions · 24 h', d.questions, `${w.questions ?? 0} in 7 days`),
+    kpi('Sessions · 24 h', d.sessions, d.sessions ? `${(d.questions / d.sessions).toFixed(1)} questions each` : ''),
+    kpi('Good answers', d.answered_ok_pct != null ? d.answered_ok_pct + '%' : '—', `${d.weak_answers ?? 0} weak or failed`),
+    kpi('Caimex answers', caimexShare, `est. $${(d.est_caimex_spend_usd ?? 0).toFixed(4)} today`),
+    kpi('Web searches · 24 h', d.web_searches, `${w.web_searches ?? 0} in 7 days`),
+    kpi('Answer time p95', d.latency_p95_ms ? (d.latency_p95_ms / 1000).toFixed(1) + ' s' : '—', d.latency_p50_ms ? `median ${(d.latency_p50_ms / 1000).toFixed(1)} s` : ''),
+  ].join('');
+
+  $('problems').innerHTML = list(r.problems) || '<p class="empty ok">No problems.</p>';
+  $('fixes').innerHTML = list(r.fixes, 'fixes') ||
+    `<p class="empty">${esc(r.review_error || (r.problems.length ? 'No fixes from the review this time.' : 'Nothing to fix.'))}</p>`;
+
+  const last30 = history.slice(-30);
+  bars($('daily'), last30.map((h) => h.questions), last30.map((h) => h.date));
+  $('dailyAxis').innerHTML = last30.length ? `<span>${esc(last30[0].date)}</span><span>${esc(last30[last30.length - 1].date)}</span>` : '<span>The trend starts after the first daily run.</span>';
+
+  $('topics').innerHTML = r.weak_topics && r.weak_topics.length
+    ? table(r.weak_topics.map((t) => [t.topic, t.count]), ['Topic', 'Questions'])
+    : '<p class="empty">No weak answers.</p>';
+  $('counters').innerHTML = table((w.top_counters || []).map((c) => [c.name, c.count]), ['Counter', 'Questions']);
+
+  const am = d.answer_models || {}, sm = d.sql_models || {};
+  const names = [...new Set([...Object.keys(am), ...Object.keys(sm)])];
+  $('models').innerHTML = names.length
+    ? `<div class="scroll"><table><tr><th>Model</th><th class="n">SQL</th><th class="n">Answers</th></tr>${names.map((k) =>
+        `<tr><td class="${k === 'workers_ai' && am[k] ? 'warn' : ''}">${esc(MODEL_NAMES[k] || k)}</td><td class="n">${sm[k] || 0}</td><td class="n">${am[k] || 0}</td></tr>`).join('')}</table></div>`
+    : '<p class="empty">No data yet.</p>';
+
+  bars($('hours'), w.hours_harare || Array(24).fill(0), [...Array(24).keys()].map((h) => String(h).padStart(2, '0') + ':00'));
+
+  const dev = w.devices || {};
+  $('audience').innerHTML = table((w.countries || []).map((c) => [c.name, c.count]), ['Country', 'Questions']) +
+    `<p class="sub" style="margin-top:8px">Mobile ${dev.mobile || 0} · Desktop ${dev.desktop || 0}</p>`;
+
+  const wf = r.workflows || [];
+  $('pipelines').innerHTML = (wf.length ? `<div class="scroll"><table><tr><th>Workflow</th><th class="n">Last run</th></tr>${wf.map((x) =>
+      `<tr><td>${x.url ? `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.name)}</a>` : esc(x.name)}</td>` +
+      `<td class="n ${x.conclusion === 'success' ? 'ok' : 'bad'}">${esc(x.conclusion || '—')} · ${esc(fmtTime(x.at))}</td></tr>`).join('')}</table></div>` : '') +
+    `<p class="sub" style="margin-top:8px">Newest price data: ${esc(r.latest_price_date || '—')}</p>`;
+
+  $('note').textContent = r.notes || '';
+}
+load();
+</script>
+</body>
+</html>

@@ -233,6 +233,14 @@ select option{background:var(--panel-2);color:var(--text)}
 .sim-ask-text.error{color:var(--down)}
 .sim-ask-filter{margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--text-2);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .sim-ask-filter button{background:transparent;border:1px solid var(--border);color:var(--text-2);font-family:var(--mono);font-size:10px;padding:2px 8px;cursor:pointer}
+.sim-ask-log{margin-top:16px;display:flex;flex-direction:column;gap:10px}
+.sim-ask-log[hidden]{display:none}
+.sim-ask-turn{border:1px solid var(--border);background:var(--bg);padding:10px 14px;opacity:.8}
+.sim-ask-q{font-family:var(--mono);font-size:11px;color:var(--text-2);margin-bottom:6px;overflow-wrap:anywhere}
+.sim-ask-q::before{content:'Q  ';color:var(--text-3)}
+.sim-ask-turn .sim-ask-text{font-size:12px}
+.sim-ask-meta{margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--text-3);display:flex;flex-wrap:wrap;gap:4px 14px}
+.sim-ask-meta[hidden]{display:none}
 .sim-ask-sources{margin-top:8px;font-family:var(--mono);font-size:10px;color:var(--text-3);display:flex;flex-wrap:wrap;gap:4px 12px}
 .sim-ask-sources[hidden]{display:none}
 .sim-ask-sources a{color:var(--text-2);text-decoration:underline;overflow-wrap:anywhere}
@@ -450,9 +458,12 @@ try { const t = localStorage.getItem('bw_theme'); if (t === 'light') document.do
         <button type="button" class="sim-ask-chip">Most traded counters this month</button>
         <button type="button" class="sim-ask-chip">What's on today's watchlist?</button>
       </div>
+      <div class="sim-ask-log" id="simAskLog" hidden aria-label="Earlier questions in this session"></div>
       <div class="sim-ask-answer" id="simAskAnswer" hidden>
-        <div class="sim-ask-text" id="simAskText"></div>
+        <div class="sim-ask-q" id="simAskQ"></div>
+        <div class="sim-ask-text" id="simAskText" aria-live="polite"></div>
         <div class="sim-ask-sources" id="simAskSources" hidden></div>
+        <div class="sim-ask-meta" id="simAskMeta" hidden></div>
         <div class="sim-ask-filter" id="simAskFilter" hidden></div>
         <button type="button" class="sim-ask-sql-toggle" id="simAskSqlToggle" hidden>Show the query</button>
         <pre class="sim-ask-sql" id="simAskSql" hidden></pre>
@@ -1360,9 +1371,54 @@ let _askSeq = 0;
 // The last few answered turns, sent with each question so follow-ups like
 // "and Delta?" make sense. Clear starts a fresh conversation.
 let _askHistory = [];
+// Anonymous session id: random, made on page load, replaced on Clear. The
+// Worker logs it so the monitor can count sessions; it is never stored here.
+const newAskSession = () => (window.crypto && crypto.randomUUID
+  ? crypto.randomUUID().replace(/-/g, '') : Math.random().toString(36).slice(2) + Date.now().toString(36)).slice(0, 24);
+let _askSession = newAskSession();
+// The finished turn on screen. It moves into the session log when a new
+// question starts, so the whole session stays visible.
+let _askCurrent = null;
+
+// Short names for the model labels under each answer.
+function askModelName(id) {
+  if (!id) return '—';
+  if (/^claude-haiku/i.test(id)) return 'Claude Haiku';
+  if (/^claude-/i.test(id)) return 'Claude';
+  if (/deepseek/i.test(id)) return 'Caimex DeepSeek';
+  if (id.startsWith('@cf/')) return 'Workers AI (fallback)';
+  return id;
+}
+
+function askMetaParts(data) {
+  if (!data || (!data.sqlBy && !data.answerBy)) return [];
+  return ['SQL: ' + askModelName(data.sqlBy), 'Answer: ' + askModelName(data.answerBy),
+          'Web search: ' + (data.searched ? 'yes' : 'no')];
+}
+
+function askAppendToLog(turn) {
+  const log = document.getElementById('simAskLog');
+  const box = document.createElement('div');
+  box.className = 'sim-ask-turn';
+  const q = document.createElement('div'); q.className = 'sim-ask-q'; q.textContent = turn.question;
+  const a = document.createElement('div'); a.className = 'sim-ask-text'; a.textContent = turn.answer;
+  box.append(q, a);
+  const parts = askMetaParts(turn.data);
+  if (parts.length) {
+    const m = document.createElement('div'); m.className = 'sim-ask-meta';
+    parts.forEach(t => { const s = document.createElement('span'); s.textContent = t; m.append(s); });
+    box.append(m);
+  }
+  log.append(box);
+  log.hidden = false;
+}
 
 async function askSimulator(question) {
   const seq = ++_askSeq;
+  if (_askCurrent) { askAppendToLog(_askCurrent); _askCurrent = null; }
+  document.getElementById('simAskQ').textContent = question;
+  const meta = document.getElementById('simAskMeta');
+  meta.hidden = true; meta.replaceChildren();
   const answer = document.getElementById('simAskAnswer');
   const text = document.getElementById('simAskText');
   const btn = document.getElementById('simAskBtn');
@@ -1381,7 +1437,7 @@ async function askSimulator(question) {
     const res = await fetch(ASK_WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question, history: _askHistory }),
+      body: JSON.stringify({ question, history: _askHistory, session: _askSession }),
     });
     const data = await res.json().catch(() => ({}));
     if (seq !== _askSeq) return;
@@ -1390,11 +1446,16 @@ async function askSimulator(question) {
       text.textContent = res.status === 429
         ? 'Too many questions in a short time — please wait a minute and try again.'
         : 'Something went wrong answering that — try rephrasing the question.';
+      _askCurrent = { question, answer: text.textContent, data: null };
       return;
     }
     text.className = 'sim-ask-text';
     text.textContent = data.answer || 'No answer returned.';
     if (data.answer) _askHistory = [..._askHistory, { question, answer: data.answer, sql: data.sql || '' }].slice(-3);
+    _askCurrent = { question, answer: text.textContent, data };
+    const parts = askMetaParts(data);
+    parts.forEach(t => { const s = document.createElement('span'); s.textContent = t; meta.append(s); });
+    meta.hidden = !parts.length;
     setAskFilter(askFilterFromRows(data.rows));
     // Where a reason came from: web pages found for a big move, or a
     // corporate action on record (link only when its source is a URL).
@@ -1424,6 +1485,7 @@ async function askSimulator(question) {
     if (seq !== _askSeq) return;
     text.className = 'sim-ask-text error';
     text.textContent = 'Couldn\'t reach the assistant — please try again in a moment.';
+    _askCurrent = { question, answer: text.textContent, data: null };
   } finally {
     if (seq === _askSeq) btn.disabled = false;
   }
@@ -1445,6 +1507,10 @@ document.getElementById('simAskClear').addEventListener('click', () => {
   document.getElementById('simAskSql').hidden = true;
   document.getElementById('simAskSources').hidden = true;
   document.getElementById('simAskClear').hidden = true;
+  const log = document.getElementById('simAskLog');
+  log.replaceChildren(); log.hidden = true;
+  _askCurrent = null;
+  _askSession = newAskSession();
   _askHistory = [];
   setAskFilter(null);
   document.getElementById('simAskInput').focus();
