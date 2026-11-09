@@ -34,6 +34,20 @@ Table: prices (one row per counter per trading day, ZSE/VFEX stock exchange data
                             Already a percentage. NULL before a counter's start date.
   return_since      TEXT    'YYYY-MM-DD' start of usd_return_pct: 2026-01-06, or the listing /
                             first-price date for counters listed later
+  adj_usd_price     REAL    usd_price_ibr adjusted for splits/consolidations/bonus issues, in
+                            today's share units -- use for price trends across dates
+  adj_change_pct    REAL    change_pct with splits taken out -- use for daily gainers/fallers
+  adj_usd_return_pct REAL   usd_return_pct with splits taken out -- what a holder actually
+                            made. Equals usd_return_pct for counters with no split.
+
+Table: corporate_actions (splits, consolidations, bonus issues, dividends)
+  ex_date           TEXT    'YYYY-MM-DD'
+  counter           TEXT    same names as prices.counter
+  action            TEXT    'split', 'consolidation', 'bonus', 'dividend', 'rights', 'listing', 'other'
+  ratio             REAL    new shares per old share (split/consolidation/bonus)
+  amount_usd        REAL    cash per share (dividend)
+  note              TEXT    plain-language detail
+  source            TEXT    a URL, 'corporate_actions.csv' or 'auto-detected'
 
 Table: predictions (the site's ML watchlist: one row per counter from the latest model run only)
   price_date        TEXT    'YYYY-MM-DD' price sheet the model scored
@@ -74,15 +88,19 @@ export const SQL_SYSTEM_PROMPT = `You are a SQLite query writer for a stock-mark
 question, write exactly ONE read-only SQL query (SELECT, or WITH ... SELECT)
 that answers it, using only the tables below. Output ONLY the SQL query --
 no explanation, no markdown code fences, no trailing semicolon commentary.
-If the question has nothing to do with the stocks, prices, volumes, sectors or the site's
-watchlist/model in these tables, output exactly: NONE
+If the question has nothing to do with the stocks, prices, volumes, sectors, corporate actions or
+the site's watchlist/model in these tables, output exactly: NONE
+A "why did X rise/fall" question IS answerable: return X's rows around the move (date, usd_price_ibr,
+change_pct, adj_change_pct, volume, sector, market). Reasons are found separately.
 
 ${SCHEMA_DOC}
 
 Rules:
 - Only SELECT or WITH ... SELECT. Never INSERT/UPDATE/DELETE/DROP/etc.
 - For performance questions -- best/worst performer, gainers/losers, returns, "this year",
-  "since January" -- use usd_return_pct on the most recent date. Use ytd_gain_loss ONLY when
+  "since January" -- use adj_usd_return_pct on the most recent date (also SELECT return_since).
+  For a single day's gainers/fallers use adj_change_pct. For a price trend or a change between
+  two dates use adj_usd_price. Use usd_price_ibr only for "what was the price on <date>". Use ytd_gain_loss ONLY when
   the user explicitly asks for ZiG / local-currency terms.
 - Use usd_price_ibr for price questions unless the user asks about ZiG specifically.
 - A question naming a counter -- "what's ART?", "tell me about Delta", "how is Econet doing?" --
@@ -121,6 +139,8 @@ Rules:
   use the predictions table: the watchlist is WHERE watchlist_rank IS NOT NULL ORDER BY
   watchlist_rank. Select price_date, signal, risk_score, volatility_band and watchlist_rank; you may ORDER BY
   predicted_chg_pct but do not SELECT it.
+- Questions about splits, dividends, bonus issues or other corporate actions use corporate_actions,
+  e.g. WHERE UPPER(counter) LIKE UPPER('%West Prop%') ORDER BY ex_date DESC.
 - Questions about how accurate the model is, its track record, or whether the picks work
   use model_track_record: SELECT * FROM model_track_record.
 - Questions about how calm, volatile, jumpy or risky counters are use predictions.volatility_band

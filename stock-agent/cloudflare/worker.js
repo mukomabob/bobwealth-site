@@ -25,6 +25,10 @@
  *   env.ANTHROPIC_API_KEY - optional Worker secret. When set, Claude writes
  *             the SQL (step 1); Workers AI still words the answer (step 2)
  *             and takes over step 1 if Claude is unavailable.
+ *   Big moves and "why" questions also get context the price table can't give:
+ *   the counter's corporate_actions rows (splits, dividends) from D1, and -- when
+ *   ANTHROPIC_API_KEY is set -- a short Claude web search for announcements or
+ *   news. Both go to the answer step, clearly marked, with sources returned.
  *   env.CAIMEX_API_KEY - optional Worker secret for Econet's Caimex gateway
  *             (OpenAI-compatible). Writes the SQL when Claude isn't set
  *             (CAIMEX_SQL_MODEL) and words the answer (CAIMEX_ANSWER_MODEL);
@@ -38,6 +42,13 @@ const MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
 // Writing the query is where the answers went wrong (wrong day, wrong counter),
 // so that step goes to Claude. Haiku 4.5 is the cheapest Claude model.
 const CLAUDE_SQL_MODEL = "claude-haiku-4-5";
+// Claude model for the web-search step (override with SEARCH_MODEL in wrangler.toml).
+const CLAUDE_SEARCH_MODEL = "claude-haiku-4-5";
+// A row moving this much (%) in a day, or this much over a period, counts as a
+// big move worth explaining.
+const BIG_DAY_MOVE_PCT = 20;
+const BIG_PERIOD_MOVE_PCT = 40;
+const WHY_RE = /\b(why|reason|cause|caused|what happened|news|announce\w*|split|dividend)\b/i;
 
 // Plain-language sector definitions, keyed by the sector values in the data.
 // The answer step may only use these, so it never improvises one.
@@ -74,7 +85,8 @@ const answerSystemPrompt = (rowCount) =>
 const ANSWER_SYSTEM_PROMPT = `You are a stock-market assistant for the Zimbabwe Stock Exchange (ZSE) and
 VFEX. You are given a user's question and the exact rows a SQL query
 returned for it. Answer the question in 2-4 sentences using ONLY the numbers
-in those rows -- never state a figure that isn't present in the data. If the
+in those rows and in the context blocks below them -- never state a figure that isn't
+present in what you were given. If the
 rows are empty, say plainly that there's no data for that question rather
 than guessing. Earlier turns, if shown, only explain what the new question refers to --
 take every figure from the new rows, never from an earlier answer. For a question about one counter, describe it from its row: sector and
@@ -120,7 +132,18 @@ Watchlist and model rows (predictions / model_track_record):
   result (picks_rose_next_day_pct% of individual picks rose the next day).
 - For accuracy, compare model_mae with no_change_mae honestly: if model_mae is larger, say
   the model's predicted percentages have missed by more than simply assuming no change.
-- End any answer about the watchlist or model with: "Algorithmic signals only, not financial advice."`;
+- End any answer about the watchlist or model with: "Algorithmic signals only, not financial advice."
+
+Corporate actions and web findings (only when given, after the rows):
+- adj_change_pct / adj_usd_return_pct / adj_usd_price have splits taken out. When they differ from
+  the raw figures, lead with the adjusted figure and say the raw price fell (or rose) because of the
+  split, e.g. "the price drop from $14.00 to $0.34 was mainly a 33-for-1 share split; adjusted for
+  it, the share fell 20% that day".
+- A corporate action with source "auto-detected" was inferred from the price sheets: say it
+  "appears to be" a split and that the sheets show the share count change.
+- Web findings come from news and announcements, not the price data: say "reported" or name the
+  source (e.g. "according to Africanfinancials"). Never present them as certain.
+- If neither explains a move, say the data shows the move but not its cause. Never guess a cause.`;
 
 // Only these sites may call the Worker from a browser. Override with the
 // ALLOWED_ORIGINS var in wrangler.toml (comma-separated) without a code change.
@@ -244,6 +267,93 @@ function aiText(resp) {
   return "";
 }
 
+
+// ---------- context for big moves: corporate actions + web search ----------
+
+// Counters in the rows that moved a lot, or every counter when the question
+// asks why. At most 2, so a long list never triggers a burst of searches.
+function countersToExplain(question, rows) {
+  const why = WHY_RE.test(question);
+  const big = (r) =>
+    ["change_pct", "adj_change_pct", "chg_pct_filled"].some((k) => Math.abs(Number(r[k])) >= BIG_DAY_MOVE_PCT) ||
+    ["pct_change_usd", "usd_return_pct", "adj_usd_return_pct"].some((k) => Math.abs(Number(r[k])) >= BIG_PERIOD_MOVE_PCT);
+  const bigNames = [], otherNames = [];
+  for (const r of rows) {
+    const c = typeof r.counter === "string" ? r.counter.trim() : "";
+    if (!c) continue;
+    if (big(r)) { if (!bigNames.includes(c)) bigNames.push(c); }
+    else if (why && !otherNames.includes(c)) otherNames.push(c);
+  }
+  const names = [...bigNames, ...otherNames.filter((c) => !bigNames.includes(c))];
+  // A "why" question about one counter's rows: explain that counter.
+  return { counters: names.slice(0, 2), why };
+}
+
+async function corporateActionsFor(env, counters) {
+  if (!counters.length) return [];
+  try {
+    const marks = counters.map(() => "?").join(",");
+    const res = await env.DB.prepare(
+      `SELECT ex_date, counter, action, ratio, amount_usd, note, source FROM corporate_actions
+       WHERE counter IN (${marks}) ORDER BY ex_date DESC LIMIT 10`
+    ).bind(...counters).all();
+    return res.results || [];
+  } catch (e) {
+    // Table missing before the first rebuild -- carry on without it.
+    console.error("corporate_actions lookup failed:", e?.message || e);
+    return [];
+  }
+}
+
+// The date range a move happened in, from the rows, for the search query.
+function moveDates(rows, counter) {
+  const dates = rows
+    .filter((r) => r.counter === counter)
+    .flatMap((r) => [r.date, r.start_date, r.end_date])
+    .filter((d) => typeof d === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d))
+    .sort();
+  return dates.length ? `${dates[0]} to ${dates[dates.length - 1]}` : "recent months";
+}
+
+// One Claude call with the web search tool. Returns { text, sources } or null.
+async function searchNews(env, counters, rows, actions) {
+  if (!env.ANTHROPIC_API_KEY || !counters.length) return null;
+  const targets = counters
+    .map((c) => {
+      const row = rows.find((r) => r.counter === c) || {};
+      return `- ${c} (${row.market || "ZSE/VFEX"}, Zimbabwe), move between ${moveDates(rows, c)}`;
+    })
+    .join("\n");
+  const known = actions.length ? `\nAlready on record: ${JSON.stringify(actions).slice(0, 1500)}` : "";
+  try {
+    const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY, maxRetries: 1, timeout: 45_000 });
+    const resp = await client.messages.create({
+      model: env.SEARCH_MODEL || CLAUDE_SEARCH_MODEL,
+      max_tokens: 700,
+      tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 3 }],
+      system:
+        "You research listed Zimbabwean companies. Search for company announcements, results, " +
+        "corporate actions (splits, consolidations, rights issues, dividends), suspensions or news " +
+        "that explain a share price move. Prefer the ZSE/VFEX, the company's site, africanfinancials.com " +
+        "and Zimbabwean business press. Reply in at most 4 short factual sentences: what happened, when, " +
+        "and the source. If nothing explains the move, say so in one sentence. Do not speculate.",
+      messages: [{ role: "user", content: `Why did these share prices move?\n${targets}${known}` }],
+    });
+    const text = resp.content.filter((b) => b.type === "text").map((b) => b.text).join("").trim();
+    const sources = [];
+    const add = (url, title) => {
+      if (url && /^https?:\/\//.test(url) && !sources.some((s) => s.url === url)) sources.push({ url, title: title || url });
+    };
+    for (const b of resp.content) {
+      for (const c of b.citations || []) add(c.url, c.title);
+    }
+    return text ? { text, sources: sources.slice(0, 4) } : null;
+  } catch (e) {
+    console.error("web search failed:", e?.message || e);
+    return null;
+  }
+}
+
 async function handleAsk(request, env, origin) {
   let body;
   try {
@@ -330,11 +440,20 @@ async function handleAsk(request, env, origin) {
   // Step 3: SQL results -> natural-language answer. Caimex first when
   // configured (the free model ignored instructions, e.g. said "no data" for a
   // price from the nearest trading day); Workers AI otherwise.
+  const { counters } = countersToExplain(question, rows);
+  const actions = await corporateActionsFor(env, counters);
+  const news = await searchNews(env, counters, rows, actions);
+  let context = "";
+  if (actions.length) context += `\n\nCorporate actions on record (JSON):\n${JSON.stringify(actions).slice(0, 2000)}`;
+  if (news) {
+    context += `\n\nWeb findings (news/announcements, NOT from the price data):\n${news.text}` +
+      (news.sources.length ? `\nSources: ${news.sources.map((s) => s.title).join("; ")}` : "");
+  }
   const answerMessages = [
     { role: "system", content: answerSystemPrompt(rows.length) },
     {
       role: "user",
-      content: `${prompt}\n\nQuery results (JSON):\n${JSON.stringify(rows).slice(0, 4000)}`,
+      content: `${prompt}\n\nQuery results (JSON):\n${JSON.stringify(rows).slice(0, 4000)}${context}`,
     },
   ];
   let answer = null, answerBy = MODEL;
@@ -345,7 +464,10 @@ async function handleAsk(request, env, origin) {
   if (!answer) answer = aiText(await env.AI.run(MODEL, { messages: answerMessages }));
 
   return new Response(
-    JSON.stringify({ answer: (answer || "").trim(), sql, sqlBy, answerBy, rows: rows.slice(0, 20) }),
+    JSON.stringify({
+      answer: (answer || "").trim(), sql, sqlBy, answerBy, rows: rows.slice(0, 20),
+      actions, sources: news ? news.sources : [],
+    }),
     { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders(origin) } }
   );
 }

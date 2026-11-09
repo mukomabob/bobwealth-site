@@ -32,7 +32,10 @@ COLUMNS = [
     "div_yield_fy25", "div_yield_fy26", "ytd_gain_loss",
     "chg_pct_filled", "roll5_chg", "roll20_std_chg", "traded",
     "usd_return_pct", "return_since",
+    "adj_usd_price", "adj_change_pct", "adj_usd_return_pct",
 ]
+
+ACTION_COLUMNS = ["ex_date", "counter", "action", "ratio", "amount_usd", "note", "source"]
 
 PREDICTION_COLUMNS = [
     "price_date", "counter", "market", "sector", "close", "usd_price",
@@ -110,6 +113,10 @@ def export(db_path, out_path, predictions_path=DEFAULT_PREDICTIONS_PATH):
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     rows = conn.execute(f"SELECT {', '.join(COLUMNS)} FROM prices ORDER BY date, counter").fetchall()
+    has_actions = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='corporate_actions'").fetchone()
+    actions = (conn.execute(f"SELECT {', '.join(ACTION_COLUMNS)} FROM corporate_actions").fetchall()
+               if has_actions else [])
     conn.close()
 
     if not rows:
@@ -127,6 +134,7 @@ def export(db_path, out_path, predictions_path=DEFAULT_PREDICTIONS_PATH):
     ]
 
     lines += insert_statements("prices", COLUMNS, rows)
+    lines += insert_statements("corporate_actions", ACTION_COLUMNS, actions)
     preds, record = prediction_rows(predictions_path)
     lines += insert_statements("predictions", PREDICTION_COLUMNS, preds)
     lines += insert_statements("model_track_record", TRACK_RECORD_COLUMNS, record)
@@ -134,7 +142,7 @@ def export(db_path, out_path, predictions_path=DEFAULT_PREDICTIONS_PATH):
     with open(out_path, "w") as f:
         f.write("\n".join(lines) + "\n")
 
-    print(f"Wrote {out_path} -- {len(rows):,} price rows, {len(preds)} prediction rows.")
+    print(f"Wrote {out_path} -- {len(rows):,} price rows, {len(preds)} prediction rows, {len(actions)} corporate action(s).")
 
 
 if __name__ == "__main__":

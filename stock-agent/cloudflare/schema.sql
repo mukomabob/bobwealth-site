@@ -26,7 +26,10 @@ CREATE TABLE prices (
   "roll20_std_chg"    REAL,
   "traded"            INTEGER,
   "usd_return_pct"    REAL,
-  "return_since"      TEXT
+  "return_since"      TEXT,
+  "adj_usd_price"     REAL,
+  "adj_change_pct"    REAL,
+  "adj_usd_return_pct" REAL
 );
 
 CREATE INDEX idx_counter_date ON prices(counter, date);
@@ -74,3 +77,19 @@ CREATE TABLE model_track_record (
   "model_mae"                         REAL,
   "no_change_mae"                     REAL
 );
+
+-- Splits, consolidations, bonus issues and dividends: hand-entered in
+-- stock-agent/corporate_actions.csv plus splits auto-detected by build_dataset.py.
+DROP TABLE IF EXISTS corporate_actions;
+
+CREATE TABLE corporate_actions (
+  "ex_date"     TEXT,
+  "counter"     TEXT,
+  "action"      TEXT,
+  "ratio"       REAL,
+  "amount_usd"  REAL,
+  "note"        TEXT,
+  "source"      TEXT
+);
+
+CREATE INDEX idx_actions_counter ON corporate_actions(counter, ex_date);

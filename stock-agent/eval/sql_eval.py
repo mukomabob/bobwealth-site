@@ -55,11 +55,11 @@ QUESTIONS = [
      f"""SELECT counter FROM prices WHERE market = 'VFEX' AND date = {LATEST}
          ORDER BY change_pct ASC LIMIT 3"""),
     ("Top 5 gainers this year",
-     f"""SELECT counter FROM prices WHERE date = {LATEST} AND usd_return_pct IS NOT NULL
-         ORDER BY usd_return_pct DESC LIMIT 5"""),
+     f"""SELECT counter FROM prices WHERE date = {LATEST} AND adj_usd_return_pct IS NOT NULL
+         ORDER BY adj_usd_return_pct DESC LIMIT 5"""),
     ("Which REIT is up the most this year?",
      f"""SELECT counter FROM prices WHERE date = {LATEST} AND sector = 'Reit'
-         ORDER BY usd_return_pct DESC LIMIT 1"""),
+         ORDER BY adj_usd_return_pct DESC LIMIT 1"""),
     ("What's on today's watchlist?",
      """SELECT counter FROM predictions WHERE watchlist_rank IS NOT NULL"""),
     ("How accurate is the prediction model?",
@@ -67,10 +67,10 @@ QUESTIONS = [
     ("What is Delta's latest closing price in ZiG?",
      f"""SELECT close FROM prices WHERE counter = 'Delta' AND date = {LATEST}"""),
     ("How has Econet InfraCo done in US dollars since it listed?",
-     f"""SELECT usd_return_pct FROM prices WHERE counter = 'Econet InfraCo' AND date = {LATEST}"""),
+     f"""SELECT adj_usd_return_pct FROM prices WHERE counter = 'Econet InfraCo' AND date = {LATEST}"""),
     ("Which sector has the best average US-dollar return this year?",
-     f"""SELECT sector FROM prices WHERE date = {LATEST} AND usd_return_pct IS NOT NULL
-         GROUP BY sector ORDER BY AVG(usd_return_pct) DESC LIMIT 1"""),
+     f"""SELECT sector FROM prices WHERE date = {LATEST} AND adj_usd_return_pct IS NOT NULL
+         GROUP BY sector ORDER BY AVG(adj_usd_return_pct) DESC LIMIT 1"""),
     ("What was Innscor's US dollar price a month ago, and what is it now?",
      f"""SELECT usd_price_ibr FROM prices WHERE counter LIKE 'Innscor%' AND date IN (
            {LATEST},

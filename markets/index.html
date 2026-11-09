@@ -233,6 +233,9 @@ select option{background:var(--panel-2);color:var(--text)}
 .sim-ask-text.error{color:var(--down)}
 .sim-ask-filter{margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--text-2);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .sim-ask-filter button{background:transparent;border:1px solid var(--border);color:var(--text-2);font-family:var(--mono);font-size:10px;padding:2px 8px;cursor:pointer}
+.sim-ask-sources{margin-top:8px;font-family:var(--mono);font-size:10px;color:var(--text-3);display:flex;flex-wrap:wrap;gap:4px 12px}
+.sim-ask-sources[hidden]{display:none}
+.sim-ask-sources a{color:var(--text-2);text-decoration:underline;overflow-wrap:anywhere}
 .sim-ask-sql-toggle{margin-top:6px;background:none;border:none;color:var(--text-3);font-family:var(--mono);font-size:10px;cursor:pointer;padding:0;text-decoration:underline}
 .sim-ask-sql{margin-top:6px;white-space:pre-wrap;font-family:var(--mono);font-size:10px;color:var(--text-2);background:var(--panel-2);padding:8px}
 
@@ -449,6 +452,7 @@ try { const t = localStorage.getItem('bw_theme'); if (t === 'light') document.do
       </div>
       <div class="sim-ask-answer" id="simAskAnswer" hidden>
         <div class="sim-ask-text" id="simAskText"></div>
+        <div class="sim-ask-sources" id="simAskSources" hidden></div>
         <div class="sim-ask-filter" id="simAskFilter" hidden></div>
         <button type="button" class="sim-ask-sql-toggle" id="simAskSqlToggle" hidden>Show the query</button>
         <pre class="sim-ask-sql" id="simAskSql" hidden></pre>
@@ -1369,6 +1373,8 @@ async function askSimulator(question) {
   text.className = 'sim-ask-text loading';
   text.textContent = 'Thinking…';
   sqlToggle.hidden = true; sql.hidden = true;
+  const sources = document.getElementById('simAskSources');
+  sources.hidden = true; sources.replaceChildren();
   btn.disabled = true;
   setAskFilter(null);  // a new question starts from the full chart
   try {
@@ -1390,6 +1396,25 @@ async function askSimulator(question) {
     text.textContent = data.answer || 'No answer returned.';
     if (data.answer) _askHistory = [..._askHistory, { question, answer: data.answer, sql: data.sql || '' }].slice(-3);
     setAskFilter(askFilterFromRows(data.rows));
+    // Where a reason came from: web pages found for a big move, or a
+    // corporate action on record (link only when its source is a URL).
+    const links = (data.sources || []).slice(0, 4);
+    (data.actions || []).forEach(a => {
+      if (/^https?:\/\//.test(a.source || '') && !links.some(l => l.url === a.source))
+        links.push({ url: a.source, title: a.counter + ' ' + a.action + ' (' + a.ex_date + ')' });
+    });
+    if (links.length) {
+      const label = document.createElement('span');
+      label.textContent = 'Sources:';
+      sources.append(label);
+      links.slice(0, 5).forEach(l => {
+        const a = document.createElement('a');
+        a.href = l.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+        a.textContent = l.title || l.url;
+        sources.append(a);
+      });
+      sources.hidden = false;
+    }
     if (data.sql) {
       sqlToggle.hidden = false;
       sqlToggle.textContent = 'Show the query';
@@ -1418,6 +1443,7 @@ document.getElementById('simAskClear').addEventListener('click', () => {
   document.getElementById('simAskInput').value = '';
   document.getElementById('simAskAnswer').hidden = true;
   document.getElementById('simAskSql').hidden = true;
+  document.getElementById('simAskSources').hidden = true;
   document.getElementById('simAskClear').hidden = true;
   _askHistory = [];
   setAskFilter(null);

@@ -1,0 +1,13 @@
+# Corporate actions for the Ask the data chatbot. build_dataset.py loads this
+# file into the corporate_actions table on every build.
+#
+# action: split | consolidation | bonus | dividend | rights | listing | other
+# ratio:  new shares per old share. Required for split, consolidation and bonus
+#         (they adjust the adj_* price columns). Examples: 10-for-1 split = 10,
+#         1-for-10 consolidation = 0.1, 1 bonus share per 10 held = 1.1.
+# amount_usd: cash per share, for dividends.
+# counter: must match the counter name in the FBC sheets exactly.
+# Splits the sheets show clearly are auto-detected; an entry here within 7 days
+# of a detected one replaces it, so add one to correct a wrong ratio or date.
+ex_date,counter,action,ratio,amount_usd,note,source
+2026-10-22,West Prop Holdings Limited,dividend,,0.0602,Interim dividend of USD 0.0602 per share; record date 23 Oct 2026; paid 28 Oct 2026 (revised dates).,https://africanfinancials.com/westprop-holdings-limited-westp-vx-ammendment-to-dividend-announcement/

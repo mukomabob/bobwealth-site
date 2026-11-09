@@ -18,7 +18,9 @@ validated (in generate_predictions.py) against all 111 archived sheets:
 Usage:
     python3 build_dataset.py /path/to/fbc-sheets-dir /path/to/output.db
 """
+import csv
 import glob
+import math
 import os
 import re
 import sqlite3
@@ -296,6 +298,127 @@ def add_usd_returns(df):
     return df
 
 
+# ---------------------------------------------------------------------------
+# Corporate actions: splits, consolidations, bonus issues, dividends.
+#
+# A split makes the raw price fall (or a consolidation makes it jump) with no
+# change in what a holder owns. Without an adjustment the chatbot reads that as
+# a crash -- West Prop on 28 Oct 2026 showed as -97.6% when its shares in issue
+# went from 30 million to 1 billion. Two sources feed the corporate_actions table:
+#   1. stock-agent/corporate_actions.csv -- entered by hand from announcements.
+#   2. Auto-detection -- a price move of 2x or more that the sheets' own
+#      shares-in-issue column matches (within 1.5x) in the opposite direction.
+# Price-affecting actions (split / consolidation / bonus) drive the adj_* columns.
+# ---------------------------------------------------------------------------
+ACTIONS_CSV = os.path.join(os.path.dirname(os.path.abspath(__file__)), "corporate_actions.csv")
+PRICE_ACTIONS = {"split", "consolidation", "bonus"}
+ACTION_COLUMNS = ["ex_date", "counter", "action", "ratio", "amount_usd", "note", "source"]
+
+
+def load_corporate_actions(path=ACTIONS_CSV):
+    """Hand-entered actions. Lines starting with # are comments."""
+    if not os.path.exists(path):
+        return []
+    with open(path, newline="", encoding="utf-8") as f:
+        lines = [ln for ln in f if ln.strip() and not ln.lstrip().startswith("#")]
+    out = []
+    for r in csv.DictReader(lines):
+        action = (r.get("action") or "").strip().lower()
+        if not r.get("ex_date") or not r.get("counter") or not action:
+            continue
+        ratio = float(r["ratio"]) if (r.get("ratio") or "").strip() else None
+        if action in PRICE_ACTIONS and not ratio:
+            log(f"WARNING: corporate_actions.csv {action} for {r['counter']} has no ratio -- ignored.")
+            continue
+        out.append({
+            "ex_date": r["ex_date"].strip(), "counter": r["counter"].strip(), "action": action,
+            "ratio": ratio,
+            "amount_usd": float(r["amount_usd"]) if (r.get("amount_usd") or "").strip() else None,
+            "note": (r.get("note") or "").strip() or None,
+            "source": (r.get("source") or "").strip() or "corporate_actions.csv",
+        })
+    return out
+
+
+def detect_splits(df, manual):
+    """Price jumps of 2x+ that the shares-in-issue column explains."""
+    manual_dates = {(a["counter"].upper(), a["ex_date"]) for a in manual if a["action"] in PRICE_ACTIONS}
+    found = []
+    for counter, g in df.sort_values("date").groupby("counter"):
+        g = g.reset_index(drop=True)
+        dates = g["date"].dt.strftime("%Y-%m-%d").tolist()
+        price = pd.to_numeric(g["usd_price_ibr"], errors="coerce").tolist()
+        shares = pd.to_numeric(g["shares_in_issue"], errors="coerce").tolist()
+        last = None  # (index, price) of the last row with a price
+        for i, p in enumerate(price):
+            if not (p == p and p > 0):
+                continue
+            if last is not None:
+                move = p / last[1]
+                if move <= 0.5 or move >= 2:
+                    best = None
+                    # FBC updates shares in issue a day or so after the price.
+                    for j in range(max(1, i - 3), min(len(g), i + 4)):
+                        s0, s1 = shares[j - 1], shares[j]
+                        if s0 == s0 and s1 == s1 and s0 > 0 and s1 > 0 and abs(math.log(s1 / s0)) > math.log(1.5):
+                            err = abs(math.log(move * s1 / s0))
+                            if best is None or err < best[0]:
+                                best = (err, s1 / s0, s0, s1)
+                    if best and best[0] < math.log(1.5):
+                        ex = dates[i]
+                        near = any(k[0] == counter.upper() and abs((pd.Timestamp(k[1]) - pd.Timestamp(ex)).days) <= 7
+                                   for k in manual_dates)
+                        if not near:
+                            ratio = round(best[1], 6)
+                            found.append({
+                                "ex_date": ex, "counter": counter,
+                                "action": "split" if ratio > 1 else "consolidation", "ratio": ratio,
+                                "amount_usd": None,
+                                "note": (f"Auto-detected from the price sheets: shares in issue went from "
+                                         f"{best[2]:,.0f} to {best[3]:,.0f} while the USD price went from "
+                                         f"{last[1]:g} to {p:g}. Treated as a {ratio:g}-for-1 "
+                                         f"{'split' if ratio > 1 else 'consolidation'}; confirm against the "
+                                         f"company announcement."),
+                                "source": "auto-detected",
+                            })
+            last = (i, p)
+    for a in found:
+        log(f"Corporate action detected: {a['counter']} {a['action']} x{a['ratio']:g} on {a['ex_date']}")
+    return found
+
+
+def add_adjusted_prices(df, actions):
+    """adj_* columns: prices and returns with splits/consolidations/bonus issues
+    taken out. Prices are restated in today's share units; returns and daily
+    changes become what a holder actually saw."""
+    df["adj_usd_price"] = pd.to_numeric(df["usd_price_ibr"], errors="coerce")
+    df["adj_change_pct"] = df["change_pct"]
+    df["adj_usd_return_pct"] = df["usd_return_pct"]
+    by_counter = {}
+    for a in actions:
+        if a["action"] in PRICE_ACTIONS and a["ratio"]:
+            by_counter.setdefault(a["counter"].strip().upper(), []).append((a["ex_date"], a["ratio"]))
+    for key, acts in by_counter.items():
+        mask = df["counter"].str.strip().str.upper() == key
+        if not mask.any():
+            log(f"WARNING: corporate action for unknown counter {key!r} -- no adjustment made.")
+            continue
+        d = df.loc[mask, "date"].dt.strftime("%Y-%m-%d")
+
+        def cum(day):  # product of ratios with ex_date on or before day
+            return math.prod(r for ex, r in acts if ex <= day)
+
+        total = math.prod(r for _, r in acts)
+        cum_d = d.map(cum)
+        df.loc[mask, "adj_usd_price"] = df.loc[mask, "adj_usd_price"] * cum_d / total
+        on_ex = d.map(lambda day: math.prod(r for ex, r in acts if ex == day))
+        df.loc[mask, "adj_change_pct"] = ((1 + df.loc[mask, "change_pct"] / 100) * on_ex - 1) * 100
+        since = df.loc[mask, "return_since"]
+        cum_since = since.map(lambda day: cum(day) if isinstance(day, str) else float("nan"))
+        df.loc[mask, "adj_usd_return_pct"] = ((1 + df.loc[mask, "usd_return_pct"] / 100) * cum_d / cum_since - 1) * 100
+    return df
+
+
 def build(sheets_dir, db_path):
     combined = load_sheets(sheets_dir)
     combined = clean_rows(combined)
@@ -303,6 +426,9 @@ def build(sheets_dir, db_path):
     df = sanity_check(df)
     df = engineer_derived_fields(df)
     df = add_usd_returns(df)
+    manual = load_corporate_actions()
+    actions = manual + detect_splits(df, manual)
+    df = add_adjusted_prices(df, actions)
 
     keep_cols = [
         "date", "counter", "isin", "market", "sector",
@@ -311,6 +437,7 @@ def build(sheets_dir, db_path):
         "div_yield_fy25", "div_yield_fy26", "ytd_gain_loss",
         "chg_pct_filled", "roll5_chg", "roll20_std_chg", "traded",
         "usd_return_pct", "return_since",
+        "adj_usd_price", "adj_change_pct", "adj_usd_return_pct",
     ]
     df = df[[c for c in keep_cols if c in df.columns]].copy()
     df["date"] = df["date"].dt.strftime("%Y-%m-%d")
@@ -332,6 +459,8 @@ def build(sheets_dir, db_path):
     df.to_sql("prices", conn, index=False)
     conn.execute("CREATE INDEX idx_counter_date ON prices(counter, date)")
     conn.execute("CREATE INDEX idx_date ON prices(date)")
+    pd.DataFrame(actions, columns=ACTION_COLUMNS).sort_values(["counter", "ex_date"]).to_sql(
+        "corporate_actions", conn, index=False)
     conn.commit()
 
     n_counters = df["counter"].nunique()
