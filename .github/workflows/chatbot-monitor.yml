@@ -1,1 +1,48 @@
+name: Chatbot monitor
 
+# Daily check on the "Ask the data" chatbot. Reads the anonymous question log
+# in D1, checks the pipelines, asks Caimex for at most 3 fixes, and publishes
+# the report at bobwealth.org/superuser/chatbot.html. It changes no code or data.
+on:
+  schedule:
+    - cron: '0 5 * * *'   # 07:00 Harare time (UTC+2), every day
+  workflow_dispatch: {}   # run it now from the Actions tab
+
+permissions:
+  contents: write   # commit the report files
+  actions: read     # read the last run of the other workflows
+
+concurrency:
+  group: chatbot-monitor
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Check the chatbot and write the report
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CAIMEX_API_KEY: ${{ secrets.CAIMEX_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python stock-agent/monitor/monitor.py
+
+      - name: Publish the report
+        run: |
+          git add superuser/chatbot-report.json superuser/chatbot-history.json
+          if git diff --cached --quiet; then
+            echo "Nothing changed -- skipping commit."
+            exit 0
+          fi
+          git config user.name "chatbot-monitor"
+          git config user.email "actions@users.noreply.github.com"
+          git commit -m "chatbot monitor: $(TZ=Africa/Harare date +%Y-%m-%d)"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push
