@@ -1,0 +1,164 @@
+{
+ "generated_at": "2026-11-10T13:08:00+00:00",
+ "status": "attention",
+ "log_available": true,
+ "last_24h": {
+  "questions": 2,
+  "sessions": 0,
+  "rate_limited": 0,
+  "answered": 1,
+  "answered_ok_pct": 50.0,
+  "weak_answers": 1,
+  "outcomes": {
+   "ok": 1,
+   "not_answerable": 1
+  },
+  "answer_models": {
+   "caimex": 1
+  },
+  "sql_models": {
+   "caimex": 2
+  },
+  "web_searches": 0,
+  "latency_p50_ms": 4497,
+  "latency_p95_ms": 4497,
+  "top_counters": [
+   {
+    "name": "West Prop Holdings Limited",
+    "count": 1
+   }
+  ],
+  "countries": [
+   {
+    "name": "ZW",
+    "count": 2
+   }
+  ],
+  "devices": {
+   "desktop": 2
+  },
+  "hours_harare": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   2,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "est_caimex_spend_usd": 0.0013
+ },
+ "last_7d": {
+  "questions": 2,
+  "sessions": 0,
+  "rate_limited": 0,
+  "answered": 1,
+  "answered_ok_pct": 50.0,
+  "weak_answers": 1,
+  "outcomes": {
+   "ok": 1,
+   "not_answerable": 1
+  },
+  "answer_models": {
+   "caimex": 1
+  },
+  "sql_models": {
+   "caimex": 2
+  },
+  "web_searches": 0,
+  "latency_p50_ms": 4497,
+  "latency_p95_ms": 4497,
+  "top_counters": [
+   {
+    "name": "West Prop Holdings Limited",
+    "count": 1
+   }
+  ],
+  "countries": [
+   {
+    "name": "ZW",
+    "count": 2
+   }
+  ],
+  "devices": {
+   "desktop": 2
+  },
+  "hours_harare": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   2,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "est_caimex_spend_usd": 0.0013
+ },
+ "problems": [
+  "Claude wrote no SQL in the last 7 days. ANTHROPIC_API_KEY is probably not set on the Worker. Web search does not work without it.",
+  "The chatbot refused 1 question as outside its data."
+ ],
+ "weak_topics": [
+  {
+   "topic": "Greetings and small talk",
+   "count": 1
+  }
+ ],
+ "fixes": [
+  "Set ANTHROPIC_API_KEY on the Worker. Without the key, the model cannot write SQL and the chatbot cannot answer.",
+  "Add an answer rule for greetings. Reply with a short welcome and list example questions. Do not run SQL for a greeting.",
+  "Add a fallback rule for out-of-scope questions. State the covered data: ZSE and VFEX prices, corporate actions, predictions and model track record. Then give two example questions."
+ ],
+ "review_model": "Caimex2/deepseek-ai/DeepSeek-V4-Flash",
+ "review_error": null,
+ "workflows": [
+  {
+   "name": "Deploy chatbot",
+   "conclusion": "success",
+   "at": "2026-11-09T15:46:54Z",
+   "url": "https://github.com/mukomabob/bobwealth-site/actions/runs/42647896179"
+  },
+  {
+   "name": "Daily FBC prices",
+   "conclusion": "success",
+   "at": "2026-11-10T11:54:43Z",
+   "url": "https://github.com/mukomabob/bobwealth-site/actions/runs/42811164800"
+  }
+ ],
+ "latest_price_date": "2026-11-09",
+ "notes": "Anonymous data only. Questions are kept 30 days in D1 and are never published here."
+}
