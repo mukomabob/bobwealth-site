@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-09T22:46:09Z",
+  "generated": "2026-11-10T11:54:01Z",
   "priceDate": "09.11.26",
   "usdZig": {
     "rate": 26.5247,
@@ -12,6 +12,11 @@
     "chgPct": -1.7
   },
   "notes": [
+    {
+      "date": "2026-11-09",
+      "sent": "2026-11-10",
+      "title": "Notable gains on both markets"
+    },
     {
       "date": "2026-11-06",
       "sent": "2026-11-09",
@@ -81,11 +86,6 @@
       "date": "2026-10-19",
       "sent": "2026-10-20",
       "title": "VFEX up 0.5% in a near flat session"
-    },
-    {
-      "date": "2026-10-15",
-      "sent": "2026-10-16",
-      "title": "Padenga maintains >+140% YTD gain as gold prices\r\n outlook remains positive"
     }
   ]
 }
