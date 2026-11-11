@@ -1,42 +1,23 @@
 {
- "generated_at": "2026-11-10T13:08:00+00:00",
+ "generated_at": "2026-11-11T12:17:24+00:00",
  "status": "attention",
  "log_available": true,
  "last_24h": {
-  "questions": 2,
+  "questions": 0,
   "sessions": 0,
   "rate_limited": 0,
-  "answered": 1,
-  "answered_ok_pct": 50.0,
-  "weak_answers": 1,
-  "outcomes": {
-   "ok": 1,
-   "not_answerable": 1
-  },
-  "answer_models": {
-   "caimex": 1
-  },
-  "sql_models": {
-   "caimex": 2
-  },
+  "answered": 0,
+  "answered_ok_pct": null,
+  "weak_answers": 0,
+  "outcomes": {},
+  "answer_models": {},
+  "sql_models": {},
   "web_searches": 0,
-  "latency_p50_ms": 4497,
-  "latency_p95_ms": 4497,
-  "top_counters": [
-   {
-    "name": "West Prop Holdings Limited",
-    "count": 1
-   }
-  ],
-  "countries": [
-   {
-    "name": "ZW",
-    "count": 2
-   }
-  ],
-  "devices": {
-   "desktop": 2
-  },
+  "latency_p50_ms": null,
+  "latency_p95_ms": null,
+  "top_counters": [],
+  "countries": [],
+  "devices": {},
   "hours_harare": [
    0,
    0,
@@ -46,7 +27,7 @@
    0,
    0,
    0,
-   2,
+   0,
    0,
    0,
    0,
@@ -63,7 +44,7 @@
    0,
    0
   ],
-  "est_caimex_spend_usd": 0.0013
+  "est_caimex_spend_usd": 0.0
  },
  "last_7d": {
   "questions": 2,
@@ -129,19 +110,13 @@
   "est_caimex_spend_usd": 0.0013
  },
  "problems": [
-  "Claude wrote no SQL in the last 7 days. ANTHROPIC_API_KEY is probably not set on the Worker. Web search does not work without it.",
-  "The chatbot refused 1 question as outside its data."
+  "Claude wrote no SQL in the last 7 days. ANTHROPIC_API_KEY is probably not set on the Worker. Web search does not work without it."
  ],
- "weak_topics": [
-  {
-   "topic": "Greetings and small talk",
-   "count": 1
-  }
- ],
+ "weak_topics": [],
  "fixes": [
-  "Set ANTHROPIC_API_KEY on the Worker. Without the key, the model cannot write SQL and the chatbot cannot answer.",
-  "Add an answer rule for greetings. Reply with a short welcome and list example questions. Do not run SQL for a greeting.",
-  "Add a fallback rule for out-of-scope questions. State the covered data: ZSE and VFEX prices, corporate actions, predictions and model track record. Then give two example questions."
+  "Set ANTHROPIC_API_KEY as an encrypted secret on the Worker. Restart the Worker. Then send one test question and confirm that the model writes SQL.",
+  "Add an hourly health check that sends one small model request. Alert the operator when the request fails or when no SQL is written in 24 hours.",
+  "Add a fallback answer for a missing key or a failed model call. Tell the user that the service is not available and to try later."
  ],
  "review_model": "Caimex2/deepseek-ai/DeepSeek-V4-Flash",
  "review_error": null,
@@ -155,10 +130,10 @@
   {
    "name": "Daily FBC prices",
    "conclusion": "success",
-   "at": "2026-11-10T11:54:43Z",
-   "url": "https://github.com/mukomabob/bobwealth-site/actions/runs/42811164800"
+   "at": "2026-11-11T11:31:23Z",
+   "url": "https://github.com/mukomabob/bobwealth-site/actions/runs/43012413671"
   }
  ],
- "latest_price_date": "2026-11-09",
+ "latest_price_date": "2026-11-10",
  "notes": "Anonymous data only. Questions are kept 30 days in D1 and are never published here."
 }
