@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-10T18:58:11Z",
+  "generated": "2026-11-11T11:30:41Z",
   "priceDate": "10.11.26",
   "usdZig": {
     "rate": 26.5489,
@@ -12,6 +12,11 @@
     "chgPct": 1.46
   },
   "notes": [
+    {
+      "date": "2026-11-10",
+      "sent": "2026-11-11",
+      "title": "VFEX slips due to selling pressure on blue chips"
+    },
     {
       "date": "2026-11-09",
       "sent": "2026-11-10",
@@ -81,11 +86,6 @@
       "date": "2026-10-20",
       "sent": "2026-10-21",
       "title": "VFEX slips, as ZSE marginally gains"
-    },
-    {
-      "date": "2026-10-19",
-      "sent": "2026-10-20",
-      "title": "VFEX up 0.5% in a near flat session"
     }
   ]
 }
