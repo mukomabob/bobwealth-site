@@ -224,9 +224,12 @@ def find_problems(day, week, workflows, latest_date, moves, now):
     if errs:
         total = sum(e["count"] for e in errs)
         p.append(f"Caimex failed {n_of(total, 'time')}. The most common reason: {errs[0]['name']}.")
-    if week["questions"] and not week["sql_models"].get("claude"):
-        p.append("Claude wrote no SQL in the last 7 days. ANTHROPIC_API_KEY is probably not set on the Worker. "
-                 "Web search does not work without it.")
+    # Caimex (DeepSeek) is the chosen SQL writer; the free model is only a fallback.
+    sql_total = sum(day["sql_models"].values())
+    sql_fallback = day["sql_models"].get("workers_ai", 0)
+    if sql_total and sql_fallback / sql_total > FALLBACK_ALERT_SHARE:
+        p.append(f"The free fallback model wrote {sql_fallback} of {sql_total} SQL queries. "
+                 "Caimex failed for these. Check the Caimex balance and status.")
     failed = sum(day["outcomes"].get(k, 0) for k in ("error", "query_failed", "bad_sql"))
     if failed:
         p.append(f"{n_of(failed, 'question')} failed with an error or a bad query.")
