@@ -116,6 +116,11 @@ def summarise(rows):
     for r in answered:
         g = model_group(r["answer_by"])
         answer_models[g] = answer_models.get(g, 0) + 1
+    caimex_errors = {}
+    for r in questions:
+        for part in (r.get("caimex_error") or "").split("; "):
+            if part:
+                caimex_errors[part] = caimex_errors.get(part, 0) + 1
     latency = [r["latency_ms"] for r in answered if r["latency_ms"] is not None]
     weak = [r for r in questions if r["outcome"] != "ok" or r["said_no_data"]]
     top = lambda d, n: [{"name": k, "count": v} for k, v in sorted(d.items(), key=lambda x: -x[1])[:n]]
@@ -137,6 +142,7 @@ def summarise(rows):
         "devices": devices,
         "hours_harare": hours,
         "est_caimex_spend_usd": round(answer_models.get("caimex", 0) * CAIMEX_COST_PER_ANSWER, 4),
+        "caimex_errors": top(caimex_errors, 5),
     }
 
 
@@ -214,6 +220,10 @@ def find_problems(day, week, workflows, latest_date, moves, now):
     if answered and fallback / answered > FALLBACK_ALERT_SHARE:
         p.append(f"The free fallback model wrote {fallback} of {answered} answers. Caimex failed for these. "
                  "Check the Caimex balance and status.")
+    errs = day.get("caimex_errors") or []
+    if errs:
+        total = sum(e["count"] for e in errs)
+        p.append(f"Caimex failed {n_of(total, 'time')}. The most common reason: {errs[0]['name']}.")
     if week["questions"] and not week["sql_models"].get("claude"):
         p.append("Claude wrote no SQL in the last 7 days. ANTHROPIC_API_KEY is probably not set on the Worker. "
                  "Web search does not work without it.")

@@ -137,6 +137,14 @@ Watchlist and model rows (predictions / model_track_record):
   the model's predicted percentages have missed by more than simply assuming no change.
 - End any answer about the watchlist or model with: "Algorithmic signals only, not financial advice."
 
+Advice and periods:
+- If the user asks whether to buy, sell or hold, or what to invest in, start with this sentence:
+  "I cannot tell you to buy or sell a share." Then give the facts from the rows, and end with:
+  "Algorithmic signals only, not financial advice."
+- Every percentage change must state its period or start date, for example "on 10 November
+  2026", "in the last 5 trading days" or "since 6 January 2026". Use the date column and
+  return_since. If the rows do not show the period, do not state the percentage.
+
 Corporate actions and web findings (only when given, after the rows):
 - adj_change_pct / adj_usd_return_pct / adj_usd_price have splits taken out. When they differ from
   the raw figures, lead with the adjusted figure and say the raw price fell (or rose) because of the
@@ -208,7 +216,7 @@ function withHistory(question, history) {
   return `Earlier in this conversation:\n${turns}\n\nNew question: ${question}`;
 }
 
-async function writeSql(env, messages) {
+async function writeSql(env, messages, meta = {}) {
   if (env.ANTHROPIC_API_KEY) {
     const [system, ...turns] = messages;
     try {
@@ -236,7 +244,7 @@ async function writeSql(env, messages) {
     }
   }
   if (env.CAIMEX_API_KEY && env.CAIMEX_SQL_MODEL) {
-    const text = await caimexChat(env, env.CAIMEX_SQL_MODEL, messages, 2048);
+    const text = await caimexChat(env, env.CAIMEX_SQL_MODEL, messages, 3000, meta, "sql");
     if (text) return { sql: extractSql(text), by: env.CAIMEX_SQL_MODEL };
   }
   // The free Workers AI model for this step is set by SQL_MODEL in wrangler.toml.
@@ -249,8 +257,11 @@ async function writeSql(env, messages) {
 
 // One chat request to Econet's Caimex gateway. Returns the reply text, or null
 // when it is out of balance, over a limit, down or unreachable -- the caller
-// then falls back to the free Workers AI model.
-async function caimexChat(env, model, messages, maxTokens) {
+// then falls back to the free Workers AI model. The reason for a failure goes
+// into meta.caimexErrors, so the question log and the monitor can show it.
+// DeepSeek V4 "thinks" before it replies and the thinking counts against
+// max_tokens: too low a limit gives an empty reply (finish_reason "length").
+async function caimexChat(env, model, messages, maxTokens, meta = {}, step = "") {
   try {
     const res = await fetch(`${env.CAIMEX_BASE_URL}/chat/completions`, {
       method: "POST",
@@ -259,11 +270,14 @@ async function caimexChat(env, model, messages, maxTokens) {
       signal: AbortSignal.timeout(25_000),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text()).slice(0, 200)}`);
-    const text = aiText(await res.json());
-    if (!text) throw new Error("empty reply");
+    const json = await res.json();
+    const text = aiText(json);
+    if (!text) throw new Error(`empty reply (finish_reason: ${json?.choices?.[0]?.finish_reason || "unknown"})`);
     return text;
   } catch (e) {
-    console.error(`Caimex (${model}) failed; falling back to Workers AI:`, e?.message || e);
+    const reason = e?.name === "TimeoutError" ? "timeout after 25 s" : String(e?.message || e).slice(0, 160);
+    (meta.caimexErrors ||= []).push(`${step || "call"}: ${reason}`);
+    console.error(`Caimex (${model}) failed; falling back to Workers AI:`, reason);
     return null;
   }
 }
@@ -377,22 +391,35 @@ const LOG_RETENTION_DAYS = 30;
 const LOG_DDL = `CREATE TABLE IF NOT EXISTS ask_log (
   ts TEXT, session TEXT, question TEXT, counters TEXT, outcome TEXT, row_count INTEGER,
   sql_by TEXT, answer_by TEXT, searched INTEGER, sources INTEGER, said_no_data INTEGER,
-  latency_ms INTEGER, country TEXT, device TEXT)`;
+  latency_ms INTEGER, country TEXT, device TEXT, caimex_error TEXT)`;
+const LOG_COLUMNS = "ts, session, question, counters, outcome, row_count, sql_by, answer_by, searched, " +
+  "sources, said_no_data, latency_ms, country, device, caimex_error";
+// Tables made before caimex_error existed get the column once per Worker instance.
+let logSchemaChecked = false;
 const NO_DATA_RE = /\b(no data|don't have (?:any )?data|do not have (?:any )?data|not available|outside what I can)\b/i;
 
 async function logAsk(env, m) {
   if (!env.DB || !m.question) return;
   const v = (x) => (x === undefined ? null : x);
   const cutoff = new Date(Date.now() - LOG_RETENTION_DAYS * 86400000).toISOString();
+  if (!logSchemaChecked) {
+    logSchemaChecked = true;
+    try {
+      await env.DB.prepare(LOG_DDL).run();
+      await env.DB.prepare("ALTER TABLE ask_log ADD COLUMN caimex_error TEXT").run();
+    } catch (e) {
+      // "duplicate column name" -- the column is already there.
+    }
+  }
   try {
     await env.DB.batch([
       env.DB.prepare(LOG_DDL),
       env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_ask_log_ts ON ask_log(ts)"),
-      env.DB.prepare("INSERT INTO ask_log VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)").bind(
+      env.DB.prepare(`INSERT INTO ask_log (${LOG_COLUMNS}) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(
         new Date(m.t0).toISOString(), v(m.session), m.question.slice(0, MAX_QUESTION_CHARS),
         JSON.stringify(m.counters || []), v(m.outcome), v(m.rowCount), v(m.sqlBy), v(m.answerBy),
         m.searched ? 1 : 0, v(m.sources), m.saidNoData ? 1 : 0, Date.now() - m.t0,
-        v(m.country), v(m.device)
+        v(m.country), v(m.device), m.caimexErrors ? m.caimexErrors.join("; ").slice(0, 400) : null
       ),
       env.DB.prepare("DELETE FROM ask_log WHERE ts < ?").bind(cutoff),
     ]);
@@ -437,7 +464,7 @@ async function handleAsk(request, env, origin, meta = {}) {
     { role: "system", content: SQL_SYSTEM_PROMPT },
     { role: "user", content: prompt },
   ];
-  let { sql, by: sqlBy } = await writeSql(env, sqlMessages);
+  let { sql, by: sqlBy } = await writeSql(env, sqlMessages, meta);
   const check = validateSql(sql);
   meta.sqlBy = sqlBy;
 
@@ -467,7 +494,7 @@ async function handleAsk(request, env, origin, meta = {}) {
         content: `That query failed with: ${String(e && e.message ? e.message : e).slice(0, 300)}\n` +
           "Write a corrected query. Output ONLY the SQL.",
       },
-    ]);
+    ], meta);
     if (validateSql(retry.sql).ok) {
       try {
         rows = (await env.DB.prepare(retry.sql).all()).results || [];
@@ -512,7 +539,7 @@ async function handleAsk(request, env, origin, meta = {}) {
   ];
   let answer = null, answerBy = MODEL;
   if (env.CAIMEX_API_KEY && env.CAIMEX_ANSWER_MODEL) {
-    answer = await caimexChat(env, env.CAIMEX_ANSWER_MODEL, answerMessages, 1024);
+    answer = await caimexChat(env, env.CAIMEX_ANSWER_MODEL, answerMessages, 3000, meta, "answer");
     if (answer) answerBy = env.CAIMEX_ANSWER_MODEL;
   }
   if (!answer) answer = aiText(await env.AI.run(MODEL, { messages: answerMessages }));
