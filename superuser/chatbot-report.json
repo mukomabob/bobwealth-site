@@ -1,46 +1,23 @@
 {
- "generated_at": "2026-11-12T13:27:07+00:00",
- "status": "attention",
+ "generated_at": "2026-11-13T12:42:26+00:00",
+ "status": "ok",
  "log_available": true,
  "last_24h": {
-  "questions": 4,
-  "sessions": 2,
+  "questions": 0,
+  "sessions": 0,
   "rate_limited": 0,
-  "answered": 4,
-  "answered_ok_pct": 100.0,
+  "answered": 0,
+  "answered_ok_pct": null,
   "weak_answers": 0,
-  "outcomes": {
-   "ok": 4
-  },
-  "answer_models": {
-   "workers_ai": 1,
-   "caimex": 3
-  },
-  "sql_models": {
-   "caimex": 4
-  },
+  "outcomes": {},
+  "answer_models": {},
+  "sql_models": {},
   "web_searches": 0,
-  "latency_p50_ms": 10955,
-  "latency_p95_ms": 39845,
-  "top_counters": [
-   {
-    "name": "Econet InfraCo",
-    "count": 2
-   },
-   {
-    "name": "Dairibord",
-    "count": 2
-   }
-  ],
-  "countries": [
-   {
-    "name": "ZW",
-    "count": 4
-   }
-  ],
-  "devices": {
-   "desktop": 4
-  },
+  "latency_p50_ms": null,
+  "latency_p95_ms": null,
+  "top_counters": [],
+  "countries": [],
+  "devices": {},
   "hours_harare": [
    0,
    0,
@@ -54,8 +31,8 @@
    0,
    0,
    0,
-   1,
-   3,
+   0,
+   0,
    0,
    0,
    0,
@@ -67,7 +44,7 @@
    0,
    0
   ],
-  "est_caimex_spend_usd": 0.0039,
+  "est_caimex_spend_usd": 0.0,
   "caimex_errors": []
  },
  "last_7d": {
@@ -143,17 +120,10 @@
   "est_caimex_spend_usd": 0.0052,
   "caimex_errors": []
  },
- "problems": [
-  "The free fallback model wrote 1 of 4 answers. Caimex failed for these. Check the Caimex balance and status.",
-  "Answers are slow. 95% of answers took up to 39.8 seconds."
- ],
+ "problems": [],
  "weak_topics": [],
- "fixes": [
-  "Add a health check before each model call. If the fallback model fails, switch to a second fallback model. Top up the failing model account.",
-  "Set a 15 second limit on each model call. Return the best answer that is ready when the limit expires.",
-  "Cache the usual answers and cut the answer length limit. Add indexes on the date columns of the prices table."
- ],
- "review_model": "Caimex2/deepseek-ai/DeepSeek-V4-Flash",
+ "fixes": [],
+ "review_model": null,
  "review_error": null,
  "workflows": [
   {
@@ -165,10 +135,10 @@
   {
    "name": "Daily FBC prices",
    "conclusion": "success",
-   "at": "2026-11-12T11:58:03Z",
-   "url": "https://github.com/mukomabob/bobwealth-site/actions/runs/43213437634"
+   "at": "2026-11-13T11:40:12Z",
+   "url": "https://github.com/mukomabob/bobwealth-site/actions/runs/43418780181"
   }
  ],
- "latest_price_date": "2026-11-11",
+ "latest_price_date": "2026-11-12",
  "notes": "Anonymous data only. Questions are kept 30 days in D1 and are never published here."
 }
