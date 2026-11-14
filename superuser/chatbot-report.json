@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-13T12:42:26+00:00",
+ "generated_at": "2026-11-14T11:51:21+00:00",
  "status": "ok",
  "log_available": true,
  "last_24h": {
@@ -135,10 +135,10 @@
   {
    "name": "Daily FBC prices",
    "conclusion": "success",
-   "at": "2026-11-13T11:40:12Z",
-   "url": "https://github.com/mukomabob/bobwealth-site/actions/runs/43418780181"
+   "at": "2026-11-13T23:59:11Z",
+   "url": "https://github.com/mukomabob/bobwealth-site/actions/runs/43530941825"
   }
  ],
- "latest_price_date": "2026-11-12",
+ "latest_price_date": "2026-11-13",
  "notes": "Anonymous data only. Questions are kept 30 days in D1 and are never published here."
 }
