@@ -1,23 +1,61 @@
 {
- "generated_at": "2026-11-14T11:51:21+00:00",
+ "generated_at": "2026-11-15T12:22:08+00:00",
  "status": "ok",
  "log_available": true,
  "last_24h": {
-  "questions": 0,
-  "sessions": 0,
+  "questions": 5,
+  "sessions": 2,
   "rate_limited": 0,
-  "answered": 0,
-  "answered_ok_pct": null,
+  "answered": 5,
+  "answered_ok_pct": 100.0,
   "weak_answers": 0,
-  "outcomes": {},
-  "answer_models": {},
-  "sql_models": {},
+  "outcomes": {
+   "ok": 5
+  },
+  "answer_models": {
+   "caimex": 5
+  },
+  "sql_models": {
+   "caimex": 5
+  },
   "web_searches": 0,
-  "latency_p50_ms": null,
-  "latency_p95_ms": null,
-  "top_counters": [],
-  "countries": [],
-  "devices": {},
+  "latency_p50_ms": 4586,
+  "latency_p95_ms": 6493,
+  "top_counters": [
+   {
+    "name": "Pfuma REIT",
+    "count": 3
+   },
+   {
+    "name": "Revitus",
+    "count": 3
+   },
+   {
+    "name": "Eagle REIT",
+    "count": 3
+   },
+   {
+    "name": "Tigere Reit",
+    "count": 3
+   },
+   {
+    "name": "Simbisa",
+    "count": 1
+   },
+   {
+    "name": "Delta",
+    "count": 1
+   }
+  ],
+  "countries": [
+   {
+    "name": "ZW",
+    "count": 5
+   }
+  ],
+  "devices": {
+   "mobile": 5
+  },
   "hours_harare": [
    0,
    0,
@@ -31,12 +69,12 @@
    0,
    0,
    0,
+   1,
    0,
    0,
    0,
    0,
-   0,
-   0,
+   4,
    0,
    0,
    0,
@@ -44,31 +82,47 @@
    0,
    0
   ],
-  "est_caimex_spend_usd": 0.0,
+  "est_caimex_spend_usd": 0.0065,
   "caimex_errors": []
  },
  "last_7d": {
-  "questions": 6,
-  "sessions": 2,
+  "questions": 11,
+  "sessions": 4,
   "rate_limited": 0,
-  "answered": 5,
-  "answered_ok_pct": 83.3,
+  "answered": 10,
+  "answered_ok_pct": 90.9,
   "weak_answers": 1,
   "outcomes": {
-   "ok": 5,
+   "ok": 10,
    "not_answerable": 1
   },
   "answer_models": {
-   "caimex": 4,
+   "caimex": 9,
    "workers_ai": 1
   },
   "sql_models": {
-   "caimex": 6
+   "caimex": 11
   },
   "web_searches": 0,
-  "latency_p50_ms": 7666,
+  "latency_p50_ms": 5710,
   "latency_p95_ms": 39845,
   "top_counters": [
+   {
+    "name": "Pfuma REIT",
+    "count": 3
+   },
+   {
+    "name": "Revitus",
+    "count": 3
+   },
+   {
+    "name": "Eagle REIT",
+    "count": 3
+   },
+   {
+    "name": "Tigere Reit",
+    "count": 3
+   },
    {
     "name": "Econet InfraCo",
     "count": 2
@@ -80,16 +134,21 @@
    {
     "name": "West Prop Holdings Limited",
     "count": 1
+   },
+   {
+    "name": "Simbisa",
+    "count": 1
    }
   ],
   "countries": [
    {
     "name": "ZW",
-    "count": 6
+    "count": 11
    }
   ],
   "devices": {
-   "desktop": 6
+   "desktop": 6,
+   "mobile": 5
   },
   "hours_harare": [
    0,
@@ -104,12 +163,12 @@
    0,
    0,
    0,
-   1,
+   2,
    3,
    0,
    0,
    0,
-   0,
+   4,
    0,
    0,
    0,
@@ -117,7 +176,7 @@
    0,
    0
   ],
-  "est_caimex_spend_usd": 0.0052,
+  "est_caimex_spend_usd": 0.0117,
   "caimex_errors": []
  },
  "problems": [],
