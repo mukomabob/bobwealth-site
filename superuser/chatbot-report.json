@@ -1,61 +1,23 @@
 {
- "generated_at": "2026-11-15T12:22:08+00:00",
+ "generated_at": "2026-11-16T13:14:13+00:00",
  "status": "ok",
  "log_available": true,
  "last_24h": {
-  "questions": 5,
-  "sessions": 2,
+  "questions": 0,
+  "sessions": 0,
   "rate_limited": 0,
-  "answered": 5,
-  "answered_ok_pct": 100.0,
+  "answered": 0,
+  "answered_ok_pct": null,
   "weak_answers": 0,
-  "outcomes": {
-   "ok": 5
-  },
-  "answer_models": {
-   "caimex": 5
-  },
-  "sql_models": {
-   "caimex": 5
-  },
+  "outcomes": {},
+  "answer_models": {},
+  "sql_models": {},
   "web_searches": 0,
-  "latency_p50_ms": 4586,
-  "latency_p95_ms": 6493,
-  "top_counters": [
-   {
-    "name": "Pfuma REIT",
-    "count": 3
-   },
-   {
-    "name": "Revitus",
-    "count": 3
-   },
-   {
-    "name": "Eagle REIT",
-    "count": 3
-   },
-   {
-    "name": "Tigere Reit",
-    "count": 3
-   },
-   {
-    "name": "Simbisa",
-    "count": 1
-   },
-   {
-    "name": "Delta",
-    "count": 1
-   }
-  ],
-  "countries": [
-   {
-    "name": "ZW",
-    "count": 5
-   }
-  ],
-  "devices": {
-   "mobile": 5
-  },
+  "latency_p50_ms": null,
+  "latency_p95_ms": null,
+  "top_counters": [],
+  "countries": [],
+  "devices": {},
   "hours_harare": [
    0,
    0,
@@ -69,12 +31,12 @@
    0,
    0,
    0,
-   1,
    0,
    0,
    0,
    0,
-   4,
+   0,
+   0,
    0,
    0,
    0,
@@ -82,7 +44,7 @@
    0,
    0
   ],
-  "est_caimex_spend_usd": 0.0065,
+  "est_caimex_spend_usd": 0.0,
   "caimex_errors": []
  },
  "last_7d": {
@@ -194,10 +156,10 @@
   {
    "name": "Daily FBC prices",
    "conclusion": "success",
-   "at": "2026-11-13T23:59:11Z",
-   "url": "https://github.com/mukomabob/bobwealth-site/actions/runs/43530941825"
+   "at": "2026-11-16T12:11:12Z",
+   "url": "https://github.com/mukomabob/bobwealth-site/actions/runs/43863945188"
   }
  ],
- "latest_price_date": "2026-11-13",
+ "latest_price_date": "2026-11-16",
  "notes": "Anonymous data only. Questions are kept 30 days in D1 and are never published here."
 }
