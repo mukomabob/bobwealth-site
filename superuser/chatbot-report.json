@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-16T13:14:13+00:00",
+ "generated_at": "2026-11-17T13:57:26+00:00",
  "status": "ok",
  "log_available": true,
  "last_24h": {
@@ -48,25 +48,24 @@
   "caimex_errors": []
  },
  "last_7d": {
-  "questions": 11,
+  "questions": 9,
   "sessions": 4,
   "rate_limited": 0,
-  "answered": 10,
-  "answered_ok_pct": 90.9,
-  "weak_answers": 1,
+  "answered": 9,
+  "answered_ok_pct": 100.0,
+  "weak_answers": 0,
   "outcomes": {
-   "ok": 10,
-   "not_answerable": 1
+   "ok": 9
   },
   "answer_models": {
-   "caimex": 9,
-   "workers_ai": 1
+   "workers_ai": 1,
+   "caimex": 8
   },
   "sql_models": {
-   "caimex": 11
+   "caimex": 9
   },
   "web_searches": 0,
-  "latency_p50_ms": 5710,
+  "latency_p50_ms": 6160,
   "latency_p95_ms": 39845,
   "top_counters": [
    {
@@ -94,22 +93,22 @@
     "count": 2
    },
    {
-    "name": "West Prop Holdings Limited",
+    "name": "Simbisa",
     "count": 1
    },
    {
-    "name": "Simbisa",
+    "name": "Delta",
     "count": 1
    }
   ],
   "countries": [
    {
     "name": "ZW",
-    "count": 11
+    "count": 9
    }
   ],
   "devices": {
-   "desktop": 6,
+   "desktop": 4,
    "mobile": 5
   },
   "hours_harare": [
@@ -121,7 +120,7 @@
    0,
    0,
    0,
-   2,
+   0,
    0,
    0,
    0,
@@ -138,7 +137,7 @@
    0,
    0
   ],
-  "est_caimex_spend_usd": 0.0117,
+  "est_caimex_spend_usd": 0.0104,
   "caimex_errors": []
  },
  "problems": [],
@@ -156,8 +155,8 @@
   {
    "name": "Daily FBC prices",
    "conclusion": "success",
-   "at": "2026-11-16T12:11:12Z",
-   "url": "https://github.com/mukomabob/bobwealth-site/actions/runs/43863945188"
+   "at": "2026-11-17T12:35:11Z",
+   "url": "https://github.com/mukomabob/bobwealth-site/actions/runs/44084357055"
   }
  ],
  "latest_price_date": "2026-11-16",
