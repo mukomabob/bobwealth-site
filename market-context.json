@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-17T21:25:19Z",
+  "generated": "2026-11-18T12:22:56Z",
   "priceDate": "17.11.26",
   "usdZig": {
     "rate": 26.6142,
@@ -12,6 +12,11 @@
     "chgPct": -0.18
   },
   "notes": [
+    {
+      "date": "2026-11-17",
+      "sent": "2026-11-18",
+      "title": "Notable losses on VFEX as blue-chips falter"
+    },
     {
       "date": "2026-11-16",
       "sent": "2026-11-17",
@@ -81,11 +86,6 @@
       "date": "2026-10-26",
       "sent": "2026-10-27",
       "title": "ZSE falters in Monday trades; VFEX closed higher"
-    },
-    {
-      "date": "2026-10-23",
-      "sent": "2026-10-26",
-      "title": "Stocks closed the week in green"
     }
   ]
 }
