@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-18T13:33:53+00:00",
+ "generated_at": "2026-11-19T14:00:06+00:00",
  "status": "ok",
  "log_available": true,
  "last_24h": {
@@ -48,25 +48,24 @@
   "caimex_errors": []
  },
  "last_7d": {
-  "questions": 9,
-  "sessions": 4,
+  "questions": 5,
+  "sessions": 2,
   "rate_limited": 0,
-  "answered": 9,
+  "answered": 5,
   "answered_ok_pct": 100.0,
   "weak_answers": 0,
   "outcomes": {
-   "ok": 9
+   "ok": 5
   },
   "answer_models": {
-   "workers_ai": 1,
-   "caimex": 8
+   "caimex": 5
   },
   "sql_models": {
-   "caimex": 9
+   "caimex": 5
   },
   "web_searches": 0,
-  "latency_p50_ms": 6160,
-  "latency_p95_ms": 39845,
+  "latency_p50_ms": 4586,
+  "latency_p95_ms": 6493,
   "top_counters": [
    {
     "name": "Pfuma REIT",
@@ -85,14 +84,6 @@
     "count": 3
    },
    {
-    "name": "Econet InfraCo",
-    "count": 2
-   },
-   {
-    "name": "Dairibord",
-    "count": 2
-   },
-   {
     "name": "Simbisa",
     "count": 1
    },
@@ -104,11 +95,10 @@
   "countries": [
    {
     "name": "ZW",
-    "count": 9
+    "count": 5
    }
   ],
   "devices": {
-   "desktop": 4,
    "mobile": 5
   },
   "hours_harare": [
@@ -124,8 +114,8 @@
    0,
    0,
    0,
-   2,
-   3,
+   1,
+   0,
    0,
    0,
    0,
@@ -137,7 +127,7 @@
    0,
    0
   ],
-  "est_caimex_spend_usd": 0.0104,
+  "est_caimex_spend_usd": 0.0065,
   "caimex_errors": []
  },
  "problems": [],
@@ -155,10 +145,10 @@
   {
    "name": "Daily FBC prices",
    "conclusion": "success",
-   "at": "2026-11-18T12:23:46Z",
-   "url": "https://github.com/mukomabob/bobwealth-site/actions/runs/44303258445"
+   "at": "2026-11-19T12:17:57Z",
+   "url": "https://github.com/mukomabob/bobwealth-site/actions/runs/44522352467"
   }
  ],
- "latest_price_date": "2026-11-17",
+ "latest_price_date": "2026-11-18",
  "notes": "Anonymous data only. Questions are kept 30 days in D1 and are never published here."
 }
