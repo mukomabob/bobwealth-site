@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-18T20:57:11Z",
+  "generated": "2026-11-19T12:17:10Z",
   "priceDate": "18.11.26",
   "usdZig": {
     "rate": 26.5639,
@@ -12,6 +12,11 @@
     "chgPct": 0.18
   },
   "notes": [
+    {
+      "date": "2026-11-18",
+      "sent": "2026-11-19",
+      "title": "Year-end selling pressure creates attractive\r\n entry points on Innscor & Padenga"
+    },
     {
       "date": "2026-11-17",
       "sent": "2026-11-18",
@@ -81,11 +86,6 @@
       "date": "2026-10-27",
       "sent": "2026-10-28",
       "title": "ZSE ALSI up 5%; YTD gain approaches 80%"
-    },
-    {
-      "date": "2026-10-26",
-      "sent": "2026-10-27",
-      "title": "ZSE falters in Monday trades; VFEX closed higher"
     }
   ]
 }
