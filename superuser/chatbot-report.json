@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-11-20T13:42:40+00:00",
- "status": "ok",
+ "generated_at": "2026-11-21T13:08:19+00:00",
+ "status": "attention",
  "log_available": true,
  "last_24h": {
   "questions": 0,
@@ -130,10 +130,16 @@
   "est_caimex_spend_usd": 0.0065,
   "caimex_errors": []
  },
- "problems": [],
+ "problems": [
+  "Starafrica changed 33.9% on 2026-11-20, and no corporate action explains it. Check for a split or an announcement."
+ ],
  "weak_topics": [],
- "fixes": [],
- "review_model": null,
+ "fixes": [
+  "Add a SQL rule: flag any daily price change over 10% when no corporate action matches the date.",
+  "Add an answer rule: for a flagged move, say the cause is not verified and list checks (split, announcement). Never invent a reason.",
+  "Add a check on corporate_actions.csv: compare the close ratio with common split factors and report missing split rows."
+ ],
+ "review_model": "Caimex2/deepseek-ai/DeepSeek-V4-Flash",
  "review_error": null,
  "workflows": [
   {
@@ -145,10 +151,10 @@
   {
    "name": "Daily FBC prices",
    "conclusion": "success",
-   "at": "2026-11-20T12:18:11Z",
-   "url": "https://github.com/mukomabob/bobwealth-site/actions/runs/44734365568"
+   "at": "2026-11-20T20:50:25Z",
+   "url": "https://github.com/mukomabob/bobwealth-site/actions/runs/44814670951"
   }
  ],
- "latest_price_date": "2026-11-19",
+ "latest_price_date": "2026-11-20",
  "notes": "Anonymous data only. Questions are kept 30 days in D1 and are never published here."
 }
