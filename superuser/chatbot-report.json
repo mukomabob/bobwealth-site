@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-21T13:08:19+00:00",
+ "generated_at": "2026-11-22T12:55:46+00:00",
  "status": "attention",
  "log_available": true,
  "last_24h": {
@@ -48,59 +48,21 @@
   "caimex_errors": []
  },
  "last_7d": {
-  "questions": 5,
-  "sessions": 2,
+  "questions": 0,
+  "sessions": 0,
   "rate_limited": 0,
-  "answered": 5,
-  "answered_ok_pct": 100.0,
+  "answered": 0,
+  "answered_ok_pct": null,
   "weak_answers": 0,
-  "outcomes": {
-   "ok": 5
-  },
-  "answer_models": {
-   "caimex": 5
-  },
-  "sql_models": {
-   "caimex": 5
-  },
+  "outcomes": {},
+  "answer_models": {},
+  "sql_models": {},
   "web_searches": 0,
-  "latency_p50_ms": 4586,
-  "latency_p95_ms": 6493,
-  "top_counters": [
-   {
-    "name": "Pfuma REIT",
-    "count": 3
-   },
-   {
-    "name": "Revitus",
-    "count": 3
-   },
-   {
-    "name": "Eagle REIT",
-    "count": 3
-   },
-   {
-    "name": "Tigere Reit",
-    "count": 3
-   },
-   {
-    "name": "Simbisa",
-    "count": 1
-   },
-   {
-    "name": "Delta",
-    "count": 1
-   }
-  ],
-  "countries": [
-   {
-    "name": "ZW",
-    "count": 5
-   }
-  ],
-  "devices": {
-   "mobile": 5
-  },
+  "latency_p50_ms": null,
+  "latency_p95_ms": null,
+  "top_counters": [],
+  "countries": [],
+  "devices": {},
   "hours_harare": [
    0,
    0,
@@ -114,12 +76,12 @@
    0,
    0,
    0,
-   1,
    0,
    0,
    0,
    0,
-   4,
+   0,
+   0,
    0,
    0,
    0,
@@ -127,18 +89,14 @@
    0,
    0
   ],
-  "est_caimex_spend_usd": 0.0065,
+  "est_caimex_spend_usd": 0.0,
   "caimex_errors": []
  },
  "problems": [
   "Starafrica changed 33.9% on 2026-11-20, and no corporate action explains it. Check for a split or an announcement."
  ],
  "weak_topics": [],
- "fixes": [
-  "Add a SQL rule: flag any daily price change over 10% when no corporate action matches the date.",
-  "Add an answer rule: for a flagged move, say the cause is not verified and list checks (split, announcement). Never invent a reason.",
-  "Add a check on corporate_actions.csv: compare the close ratio with common split factors and report missing split rows."
- ],
+ "fixes": [],
  "review_model": "Caimex2/deepseek-ai/DeepSeek-V4-Flash",
  "review_error": null,
  "workflows": [
