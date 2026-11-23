@@ -1,23 +1,69 @@
 {
- "generated_at": "2026-11-22T12:55:46+00:00",
+ "generated_at": "2026-11-23T15:30:18+00:00",
  "status": "attention",
  "log_available": true,
  "last_24h": {
-  "questions": 0,
-  "sessions": 0,
+  "questions": 2,
+  "sessions": 1,
   "rate_limited": 0,
-  "answered": 0,
-  "answered_ok_pct": null,
+  "answered": 2,
+  "answered_ok_pct": 100.0,
   "weak_answers": 0,
-  "outcomes": {},
-  "answer_models": {},
-  "sql_models": {},
+  "outcomes": {
+   "ok": 2
+  },
+  "answer_models": {
+   "caimex": 2
+  },
+  "sql_models": {
+   "caimex": 2
+  },
   "web_searches": 0,
-  "latency_p50_ms": null,
-  "latency_p95_ms": null,
-  "top_counters": [],
-  "countries": [],
-  "devices": {},
+  "latency_p50_ms": 9029,
+  "latency_p95_ms": 17469,
+  "top_counters": [
+   {
+    "name": "Tn Cybertech Investments Holdings Limited",
+    "count": 2
+   },
+   {
+    "name": "Tanganda",
+    "count": 2
+   },
+   {
+    "name": "ART",
+    "count": 2
+   },
+   {
+    "name": "Dairibord",
+    "count": 2
+   },
+   {
+    "name": "ZSE Holdings",
+    "count": 2
+   },
+   {
+    "name": "Fidelity",
+    "count": 1
+   },
+   {
+    "name": "Padenga",
+    "count": 1
+   },
+   {
+    "name": "CBZ",
+    "count": 1
+   }
+  ],
+  "countries": [
+   {
+    "name": "ZW",
+    "count": 2
+   }
+  ],
+  "devices": {
+   "desktop": 2
+  },
   "hours_harare": [
    0,
    0,
@@ -34,7 +80,7 @@
    0,
    0,
    0,
-   0,
+   2,
    0,
    0,
    0,
@@ -44,25 +90,71 @@
    0,
    0
   ],
-  "est_caimex_spend_usd": 0.0,
+  "est_caimex_spend_usd": 0.0026,
   "caimex_errors": []
  },
  "last_7d": {
-  "questions": 0,
-  "sessions": 0,
+  "questions": 2,
+  "sessions": 1,
   "rate_limited": 0,
-  "answered": 0,
-  "answered_ok_pct": null,
+  "answered": 2,
+  "answered_ok_pct": 100.0,
   "weak_answers": 0,
-  "outcomes": {},
-  "answer_models": {},
-  "sql_models": {},
+  "outcomes": {
+   "ok": 2
+  },
+  "answer_models": {
+   "caimex": 2
+  },
+  "sql_models": {
+   "caimex": 2
+  },
   "web_searches": 0,
-  "latency_p50_ms": null,
-  "latency_p95_ms": null,
-  "top_counters": [],
-  "countries": [],
-  "devices": {},
+  "latency_p50_ms": 9029,
+  "latency_p95_ms": 17469,
+  "top_counters": [
+   {
+    "name": "Tn Cybertech Investments Holdings Limited",
+    "count": 2
+   },
+   {
+    "name": "Tanganda",
+    "count": 2
+   },
+   {
+    "name": "ART",
+    "count": 2
+   },
+   {
+    "name": "Dairibord",
+    "count": 2
+   },
+   {
+    "name": "ZSE Holdings",
+    "count": 2
+   },
+   {
+    "name": "Fidelity",
+    "count": 1
+   },
+   {
+    "name": "Padenga",
+    "count": 1
+   },
+   {
+    "name": "CBZ",
+    "count": 1
+   }
+  ],
+  "countries": [
+   {
+    "name": "ZW",
+    "count": 2
+   }
+  ],
+  "devices": {
+   "desktop": 2
+  },
   "hours_harare": [
    0,
    0,
@@ -79,7 +171,7 @@
    0,
    0,
    0,
-   0,
+   2,
    0,
    0,
    0,
@@ -89,7 +181,7 @@
    0,
    0
   ],
-  "est_caimex_spend_usd": 0.0,
+  "est_caimex_spend_usd": 0.0026,
   "caimex_errors": []
  },
  "problems": [
@@ -109,8 +201,8 @@
   {
    "name": "Daily FBC prices",
    "conclusion": "success",
-   "at": "2026-11-20T20:50:25Z",
-   "url": "https://github.com/mukomabob/bobwealth-site/actions/runs/44814670951"
+   "at": "2026-11-23T13:46:45Z",
+   "url": "https://github.com/mukomabob/bobwealth-site/actions/runs/45187035938"
   }
  ],
  "latest_price_date": "2026-11-20",
