@@ -1,17 +1,22 @@
 {
-  "generated": "2026-11-24T01:17:51Z",
-  "priceDate": "23.11.26",
+  "generated": "2026-11-24T14:21:58Z",
+  "priceDate": "24.11.26",
   "usdZig": {
-    "rate": 26.5534,
-    "prevRate": 26.5872,
-    "chgPct": -0.13
+    "rate": 26.5213,
+    "prevRate": 26.5534,
+    "chgPct": -0.12
   },
   "gold": {
     "name": "FMW Gold ETF",
-    "price": 0.1094,
-    "chgPct": -1.08
+    "price": 0.11,
+    "chgPct": 0.55
   },
   "notes": [
+    {
+      "date": "2026-11-23",
+      "sent": "2026-11-24",
+      "title": "Notable gains recorded on both ZSE & VFEX"
+    },
     {
       "date": "2026-11-20",
       "sent": "2026-11-23",
@@ -81,11 +86,6 @@
       "date": "2026-10-30",
       "sent": "2026-11-02",
       "title": "Stocks closed the week firmer"
-    },
-    {
-      "date": "2026-10-29",
-      "sent": "2026-10-30",
-      "title": "VFEX slips again as Padenga loses 6%"
     }
   ]
 }
