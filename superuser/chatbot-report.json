@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-24T15:24:39+00:00",
+ "generated_at": "2026-11-25T15:07:58+00:00",
  "status": "attention",
  "log_available": true,
  "last_24h": {
@@ -142,7 +142,11 @@
   "Starafrica changed 33.9% on 2026-11-20, and no corporate action explains it. Check for a split or an announcement."
  ],
  "weak_topics": [],
- "fixes": [],
+ "fixes": [
+  "Add a rule: when a one-day price change exceeds 20%, the query must also read corporate_actions for the prior five trading days. Mark the event as unexplained if no record exists.",
+  "Add an answer rule. State that the recorded corporate actions do not explain the move. Ask the user to check the official ZSE or VFEX announcement.",
+  "Review corporate_actions.csv for the days around 2026-11-20. Add each missing split, consolidation or rights issue record, then reload the table."
+ ],
  "review_model": "Caimex2/deepseek-ai/DeepSeek-V4-Flash",
  "review_error": null,
  "workflows": [
@@ -155,8 +159,8 @@
   {
    "name": "Daily FBC prices",
    "conclusion": "success",
-   "at": "2026-11-24T14:23:38Z",
-   "url": "https://github.com/mukomabob/bobwealth-site/actions/runs/45413136339"
+   "at": "2026-11-25T13:41:09Z",
+   "url": "https://github.com/mukomabob/bobwealth-site/actions/runs/45625902458"
   }
  ],
  "latest_price_date": "2026-11-24",
