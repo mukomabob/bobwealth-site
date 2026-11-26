@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-25T22:51:18Z",
+  "generated": "2026-11-26T13:17:46Z",
   "priceDate": "25.11.26",
   "usdZig": {
     "rate": 26.5269,
@@ -12,6 +12,11 @@
     "chgPct": 0.0
   },
   "notes": [
+    {
+      "date": "2026-11-25",
+      "sent": "2026-11-26",
+      "title": "ZSE ALSI up 85% YTD"
+    },
     {
       "date": "2026-11-24",
       "sent": "2026-11-25",
@@ -81,11 +86,6 @@
       "date": "2026-11-03",
       "sent": "2026-11-04",
       "title": "Tigere REIT closed 4% higher"
-    },
-    {
-      "date": "2026-11-02",
-      "sent": "2026-11-03",
-      "title": "Both markets closed in red on thin volumes"
     }
   ]
 }
