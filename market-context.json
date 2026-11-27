@@ -1,10 +1,10 @@
 {
-  "generated": "2026-11-26T13:17:46Z",
-  "priceDate": "25.11.26",
+  "generated": "2026-11-27T13:15:13Z",
+  "priceDate": "26.11.26",
   "usdZig": {
-    "rate": 26.5269,
-    "prevRate": 26.5213,
-    "chgPct": 0.02
+    "rate": 26.5013,
+    "prevRate": 26.5269,
+    "chgPct": -0.1
   },
   "gold": {
     "name": "FMW Gold ETF",
@@ -12,6 +12,11 @@
     "chgPct": 0.0
   },
   "notes": [
+    {
+      "date": "2026-11-26",
+      "sent": "2026-11-27",
+      "title": "HOLD on Padenga as we monitor the direction of\r\n gold prices"
+    },
     {
       "date": "2026-11-25",
       "sent": "2026-11-26",
@@ -81,11 +86,6 @@
       "date": "2026-11-04",
       "sent": "2026-11-05",
       "title": "ZSE falters as only ZWG390K worth of shares were\r\n traded"
-    },
-    {
-      "date": "2026-11-03",
-      "sent": "2026-11-04",
-      "title": "Tigere REIT closed 4% higher"
     }
   ]
 }
