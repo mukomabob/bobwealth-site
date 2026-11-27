@@ -1,23 +1,34 @@
 {
- "generated_at": "2026-11-26T14:35:40+00:00",
+ "generated_at": "2026-11-27T14:30:00+00:00",
  "status": "attention",
  "log_available": true,
  "last_24h": {
-  "questions": 0,
-  "sessions": 0,
+  "questions": 1,
+  "sessions": 1,
   "rate_limited": 0,
   "answered": 0,
-  "answered_ok_pct": null,
-  "weak_answers": 0,
-  "outcomes": {},
+  "answered_ok_pct": 0.0,
+  "weak_answers": 1,
+  "outcomes": {
+   "not_answerable": 1
+  },
   "answer_models": {},
-  "sql_models": {},
+  "sql_models": {
+   "caimex": 1
+  },
   "web_searches": 0,
   "latency_p50_ms": null,
   "latency_p95_ms": null,
   "top_counters": [],
-  "countries": [],
-  "devices": {},
+  "countries": [
+   {
+    "name": "ZW",
+    "count": 1
+   }
+  ],
+  "devices": {
+   "desktop": 1
+  },
   "hours_harare": [
    0,
    0,
@@ -34,7 +45,7 @@
    0,
    0,
    0,
-   0,
+   1,
    0,
    0,
    0,
@@ -48,20 +59,21 @@
   "caimex_errors": []
  },
  "last_7d": {
-  "questions": 2,
-  "sessions": 1,
+  "questions": 3,
+  "sessions": 2,
   "rate_limited": 0,
   "answered": 2,
-  "answered_ok_pct": 100.0,
-  "weak_answers": 0,
+  "answered_ok_pct": 66.7,
+  "weak_answers": 1,
   "outcomes": {
-   "ok": 2
+   "ok": 2,
+   "not_answerable": 1
   },
   "answer_models": {
    "caimex": 2
   },
   "sql_models": {
-   "caimex": 2
+   "caimex": 3
   },
   "web_searches": 0,
   "latency_p50_ms": 9029,
@@ -103,11 +115,11 @@
   "countries": [
    {
     "name": "ZW",
-    "count": 2
+    "count": 3
    }
   ],
   "devices": {
-   "desktop": 2
+   "desktop": 3
   },
   "hours_harare": [
    0,
@@ -125,7 +137,7 @@
    0,
    0,
    0,
-   2,
+   3,
    0,
    0,
    0,
@@ -139,6 +151,7 @@
   "caimex_errors": []
  },
  "problems": [
+  "The chatbot refused 1 question as outside its data.",
   "Starafrica changed 33.9% on 2026-11-20, and no corporate action explains it. Check for a split or an announcement."
  ],
  "weak_topics": [],
@@ -155,10 +168,10 @@
   {
    "name": "Daily FBC prices",
    "conclusion": "success",
-   "at": "2026-11-26T13:18:21Z",
-   "url": "https://github.com/mukomabob/bobwealth-site/actions/runs/45827681118"
+   "at": "2026-11-27T13:16:39Z",
+   "url": "https://github.com/mukomabob/bobwealth-site/actions/runs/46005414164"
   }
  ],
- "latest_price_date": "2026-11-25",
+ "latest_price_date": "2026-11-26",
  "notes": "Anonymous data only. Questions are kept 30 days in D1 and are never published here."
 }

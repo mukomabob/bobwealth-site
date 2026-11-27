@@ -168,5 +168,15 @@
   "searches": 0,
   "p95_ms": null,
   "problems": 1
+ },
+ {
+  "date": "2026-11-27",
+  "questions": 1,
+  "sessions": 1,
+  "weak": 1,
+  "fallback": 0,
+  "searches": 0,
+  "p95_ms": null,
+  "problems": 2
  }
 ]
