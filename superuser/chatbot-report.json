@@ -1,34 +1,23 @@
 {
- "generated_at": "2026-11-27T14:30:00+00:00",
+ "generated_at": "2026-11-28T13:46:15+00:00",
  "status": "attention",
  "log_available": true,
  "last_24h": {
-  "questions": 1,
-  "sessions": 1,
+  "questions": 0,
+  "sessions": 0,
   "rate_limited": 0,
   "answered": 0,
-  "answered_ok_pct": 0.0,
-  "weak_answers": 1,
-  "outcomes": {
-   "not_answerable": 1
-  },
+  "answered_ok_pct": null,
+  "weak_answers": 0,
+  "outcomes": {},
   "answer_models": {},
-  "sql_models": {
-   "caimex": 1
-  },
+  "sql_models": {},
   "web_searches": 0,
   "latency_p50_ms": null,
   "latency_p95_ms": null,
   "top_counters": [],
-  "countries": [
-   {
-    "name": "ZW",
-    "count": 1
-   }
-  ],
-  "devices": {
-   "desktop": 1
-  },
+  "countries": [],
+  "devices": {},
   "hours_harare": [
    0,
    0,
@@ -45,7 +34,7 @@
    0,
    0,
    0,
-   1,
+   0,
    0,
    0,
    0,
@@ -151,13 +140,12 @@
   "caimex_errors": []
  },
  "problems": [
-  "The chatbot refused 1 question as outside its data.",
   "Starafrica changed 33.9% on 2026-11-20, and no corporate action explains it. Check for a split or an announcement."
  ],
  "weak_topics": [],
  "fixes": [],
  "review_model": "Caimex2/deepseek-ai/DeepSeek-V4-Flash",
- "review_error": null,
+ "review_error": "Caimex did not reply.",
  "workflows": [
   {
    "name": "Deploy chatbot",
@@ -168,10 +156,10 @@
   {
    "name": "Daily FBC prices",
    "conclusion": "success",
-   "at": "2026-11-27T13:16:39Z",
-   "url": "https://github.com/mukomabob/bobwealth-site/actions/runs/46005414164"
+   "at": "2026-11-27T22:25:39Z",
+   "url": "https://github.com/mukomabob/bobwealth-site/actions/runs/46076367540"
   }
  ],
- "latest_price_date": "2026-11-26",
+ "latest_price_date": "2026-11-27",
  "notes": "Anonymous data only. Questions are kept 30 days in D1 and are never published here."
 }
